@@ -628,6 +628,15 @@
     if (pos === -1) return;
     guess[pos] = symIndex;
     renderGuess();
+    // Kurzer Pop plus Ripple auf der gerade gefuellten Zelle.
+    if (!reduceMotion) {
+      var cell = slotRefs[currentRow] && slotRefs[currentRow][pos];
+      if (cell) {
+        cell.classList.remove('place');
+        void cell.offsetWidth; // Reflow erzwingen, damit die Animation neu startet
+        cell.classList.add('place');
+      }
+    }
   }
 
   function clearSlot(pos) {
@@ -695,7 +704,7 @@
         '<span class="badge" aria-hidden="true">' + STATE_BADGE[st] + '</span>';
       cell.setAttribute('aria-label',
         t('aria_slot_eval', { n: c + 1, name: symbolName(rowGuess[c]), state: t(STATE_KEY[st]) }));
-      if (animate && !reduceMotion) { cell.style.animationDelay = (c * 70) + 'ms'; }
+      if (animate && !reduceMotion) { cell.style.setProperty('--reveal-delay', (c * 95) + 'ms'); }
     }
   }
 
@@ -711,6 +720,11 @@
     var won = result.every(function (s) { return s === 'correct'; });
     if (won) {
       phase = 'won';
+      // Ruhiger Lichtimpuls ueber die Siegreihe, nur bei aktiver Bewegung.
+      if (!reduceMotion) {
+        var winRow = boardEl.children[currentRow];
+        if (winRow) winRow.classList.add('win-row');
+      }
       recordResult(true, currentRow + 1);
       setStatus('status_win', { n: currentRow + 1, max: MAX_TRIES }, 'win');
       endGame();
@@ -748,6 +762,13 @@
     }
     wrap.innerHTML = html;
     statusEl.insertAdjacentElement('afterend', wrap);
+    // Gestaffeltes ruhiges Einleuchten der Mini Felder (Stagger via CSSOM Custom Property).
+    if (!reduceMotion) {
+      var minis = wrap.querySelectorAll('.slot.mini');
+      for (var m = 0; m < minis.length; m++) {
+        minis[m].style.setProperty('--reveal-delay', (m * 90) + 'ms');
+      }
+    }
   }
 
   function updateRevealCode() {
@@ -1010,6 +1031,112 @@
     } catch (e) { /* nie crashen */ }
   }
 
+  /* ---------- Driftender Lichthintergrund (Canvas, CSP konform) ----------
+     2 bis 3 grosse weiche Lichtflecken, sehr langsame Drift, niedrige
+     Deckkraft, faintes Indigo und Cyan. Nur im Dark Schema und nur ohne
+     reduced-motion. Pause bei verstecktem Tab (Akku auf Mobil). Buffer
+     herunterskaliert (Mobil). Kein externes Asset, keine data-URI. */
+  function initBackground() {
+    var canvas = document.getElementById('bgCanvas');
+    if (!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
+    var rafId = 0;
+    var startTs = null;
+    var blobs = [];
+    var W = 0, H = 0;
+    var SCALE = 0.6; // herunterskalierter Buffer, Flecken sind ohnehin weich
+
+    var COLORS = [
+      [108, 140, 255], // Indigo
+      [86, 196, 255],  // Cyan
+      [124, 122, 255]  // Blauviolett
+    ];
+
+    function eligible() { return darkMQ.matches && !reduceMotion; }
+
+    function setup() {
+      W = Math.max(1, Math.floor(window.innerWidth * SCALE));
+      H = Math.max(1, Math.floor(window.innerHeight * SCALE));
+      canvas.width = W;
+      canvas.height = H;
+      blobs = [];
+      for (var i = 0; i < 3; i++) {
+        blobs.push({
+          cx: 0.28 + 0.22 * i,           // Grundposition (Bruchteil)
+          cy: 0.30 + 0.20 * (i % 2),
+          r: 0.55 + 0.12 * i,            // Radius (Bruchteil der kurzen Kante)
+          col: COLORS[i % COLORS.length],
+          ax: 0.10 + 0.03 * i,           // Driftamplitude
+          ay: 0.08 + 0.025 * i,
+          px: i * 1.7,                   // Phasenversatz
+          py: i * 2.3,
+          sx: 0.20 + 0.04 * i,           // Winkelgeschwindigkeit (Periode ca. 28 bis 31s)
+          sy: 0.16 + 0.035 * i
+        });
+      }
+    }
+
+    function draw(tSec) {
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighter';
+      var minSide = Math.min(W, H);
+      for (var i = 0; i < blobs.length; i++) {
+        var b = blobs[i];
+        var x = (b.cx + b.ax * Math.sin(tSec * b.sx + b.px)) * W;
+        var y = (b.cy + b.ay * Math.cos(tSec * b.sy + b.py)) * H;
+        var rad = b.r * minSide;
+        var g = ctx.createRadialGradient(x, y, 0, x, y, rad);
+        var c = b.col;
+        g.addColorStop(0, 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',0.12)');
+        g.addColorStop(1, 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function frame(now) {
+      if (startTs === null) startTs = now;
+      draw((now - startTs) / 1000);
+      rafId = window.requestAnimationFrame(frame);
+    }
+
+    function play() {
+      if (rafId || !eligible() || document.hidden) return;
+      rafId = window.requestAnimationFrame(frame);
+    }
+    function stop() {
+      if (rafId) { window.cancelAnimationFrame(rafId); rafId = 0; }
+    }
+    function clearCanvas() {
+      if (canvas.width && canvas.height) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    function refresh() {
+      stop();
+      if (eligible()) { setup(); play(); }
+      else { clearCanvas(); }
+    }
+
+    var resizeTimer = 0;
+    window.addEventListener('resize', function () {
+      if (resizeTimer) window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(function () { if (eligible()) setup(); }, 200);
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop();
+      else play();
+    });
+
+    if (darkMQ.addEventListener) darkMQ.addEventListener('change', refresh);
+    else if (darkMQ.addListener) darkMQ.addListener(refresh);
+
+    refresh();
+  }
+
   /* ---------- Start ---------- */
   function init() {
     buildLangBar();
@@ -1040,6 +1167,7 @@
     if (copyBtn) copyBtn.addEventListener('click', onCopy);
     setupShareButton();
     registerServiceWorker();
+    initBackground();
   }
 
   init();

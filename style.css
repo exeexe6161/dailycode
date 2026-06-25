@@ -19,12 +19,23 @@
   --accent-ink:  #ffffff;
   --focus:       #1f6feb;
 
-  /* Feedback Zustände (weiße Symboltinte, Kontrast geprüft) */
+  /* Feedback Signal Tokens (Statuszeile, Statistik, weiße Tinte) */
   --correct-bg:  #15803d;
   --present-bg:  #b45309;
   --absent-bg:   #4b5563;
   --state-ink:   #ffffff;
   --bar-hl:      #15803d;
+
+  /* Feedback Zell Tokens (Hell: Vollfüllung wie bisher, kein Glow) */
+  --cell-correct: #15803d; --edge-correct: #15803d; --ink-correct: #ffffff; --glow-correct: transparent;
+  --cell-present: #b45309; --edge-present: #b45309; --ink-present: #ffffff; --glow-present: transparent;
+  --cell-absent:  #4b5563; --edge-absent:  #4b5563; --ink-absent:  #ffffff; --glow-absent:  transparent;
+  --glow-color:   transparent;
+
+  /* Atmosphäre (Hell: ruhig, ohne Glow) */
+  --cell-shadow:  0 2px 8px rgba(20, 30, 60, .08);
+  --cell-edge:    rgba(255, 255, 255, .55);
+  --accent-sweep: rgba(59, 91, 219, .14);
 
   /* Form */
   --radius:      14px;
@@ -36,22 +47,34 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:          #14161a;
-    --surface:     #1d2025;
-    --surface-2:   #262a31;
-    --border:      #343a44;
-    --text:        #e8eaed;
-    --text-muted:  #9aa3af;
+    /* Tiefer, ruhiger Raum */
+    --bg:          #0a0c11;
+    --surface:     #14171f;
+    --surface-2:   #1b1f29;
+    --border:      #2a2f3b;
+    --text:        #e9ecf3;
+    --text-muted:  #8b93a3;
 
-    --accent:      #5c7cfa;
-    --accent-ink:  #0b0d10;
-    --focus:       #5c9cf5;
+    --accent:      #6b8cff;
+    --accent-ink:  #0a0c11;
+    --focus:       #9ab0ff;
 
-    --correct-bg:  #1f9d57;
-    --present-bg:  #c9740f;
+    /* Signal Tokens, lesbar auf tiefem Grund */
+    --correct-bg:  #34d399;
+    --present-bg:  #fbbf24;
     --absent-bg:   #515a67;
     --state-ink:   #ffffff;
     --bar-hl:      #157f45;
+
+    /* Zell Tokens: Rahmen plus dezente Tonung statt Vollfüllung, mit Glow */
+    --cell-correct: #12281c; --edge-correct: #34d399; --ink-correct: #eafdf3; --glow-correct: rgba(52, 211, 153, .45);
+    --cell-present: #2a2110; --edge-present: #fbbf24; --ink-present: #fff7e6; --glow-present: rgba(251, 191, 36, .42);
+    --cell-absent:  #16181f; --edge-absent:  #3a4150; --ink-absent:  #c2c8d4; --glow-absent:  transparent;
+
+    /* Atmosphäre: Schwebewirkung und Lichtkante */
+    --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
+    --cell-edge:    rgba(255, 255, 255, .05);
+    --accent-sweep: rgba(108, 140, 255, .20);
   }
 }
 
@@ -112,6 +135,7 @@ body {
 /* Spielfeld */
 .board { display: grid; gap: var(--gap); margin: 8px 0 14px; }
 .row {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--gap);
@@ -131,7 +155,8 @@ body {
   color: var(--text);
   font: inherit;
   cursor: default;
-  transition: border-color var(--ease), background var(--ease), transform var(--ease);
+  box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow);
+  transition: border-color var(--ease), background var(--ease), box-shadow var(--ease), transform var(--ease);
 }
 .slot svg { width: 100%; height: 100%; display: block; fill: currentColor; }
 
@@ -143,11 +168,11 @@ button.slot:not(:disabled):active { transform: scale(.96); }
 
 .row[data-active="true"] .slot.empty { border-color: var(--accent); }
 
-.slot[data-state="correct"] { background: var(--correct-bg); border-color: var(--correct-bg); color: var(--state-ink); }
-.slot[data-state="present"] { background: var(--present-bg); border-color: var(--present-bg); color: var(--state-ink); }
-.slot[data-state="absent"]  { background: var(--absent-bg);  border-color: var(--absent-bg);  color: var(--state-ink); }
+.slot[data-state="correct"] { background: var(--cell-correct); border-color: var(--edge-correct); color: var(--ink-correct); --glow-color: var(--glow-correct); }
+.slot[data-state="present"] { background: var(--cell-present); border-color: var(--edge-present); color: var(--ink-present); --glow-color: var(--glow-present); }
+.slot[data-state="absent"]  { background: var(--cell-absent);  border-color: var(--edge-absent);  color: var(--ink-absent);  --glow-color: var(--glow-absent); }
 
-/* Nicht von Farbe allein abhängiges Zeichen */
+/* Nicht von Farbe allein abhängiges Zeichen, folgt der Zelltinte */
 .badge {
   position: absolute;
   top: 4px;
@@ -156,7 +181,7 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   line-height: 1;
   font-weight: 700;
   opacity: .92;
-  color: var(--state-ink);
+  color: inherit;
 }
 
 /* Status */
@@ -270,12 +295,116 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   outline-offset: 2px;
 }
 
-/* Auswertung sanft einblenden */
-@keyframes pop {
-  from { transform: scale(.82); opacity: .25; }
-  to   { transform: scale(1);   opacity: 1; }
+/* ============================================================
+   Bewegung. Nur transform und opacity (GPU freundlich), Glow als
+   kurze ::after Blende in Zustandsfarbe (var --glow-color, hell
+   transparent). Alles per @keyframes, Stagger via --reveal-delay
+   (CSSOM). prefers-reduced-motion schaltet unten alles ab.
+   ============================================================ */
+
+/* Enthüllung beim Prüfen: Scale Pop plus aufklingendes Leuchten */
+@keyframes reveal-pop {
+  0%   { transform: scale(.8);  opacity: .25; }
+  55%  { transform: scale(1.05); }
+  100% { transform: scale(1);   opacity: 1; }
 }
-.slot.reveal { animation: pop 220ms ease both; }
+@keyframes reveal-glow {
+  0%   { opacity: 0; }
+  45%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.slot.reveal {
+  animation: reveal-pop 360ms cubic-bezier(.2, .7, .2, 1) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+.slot.reveal::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 18px var(--glow-color);
+  opacity: 0;
+  pointer-events: none;
+  animation: reveal-glow 600ms ease both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+/* Symbol setzen: Pop plus dezenter Ripple Ring */
+@keyframes place-pop {
+  0%   { transform: scale(.85); }
+  55%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes place-ripple {
+  0%   { transform: scale(.96); opacity: .5; }
+  100% { transform: scale(1.22); opacity: 0; }
+}
+.slot.place { animation: place-pop 240ms ease; }
+.slot.place::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: place-ripple 440ms ease-out;
+}
+
+/* Sieg: ruhiger Lichtimpuls über die Reihe, kein Konfetti */
+@keyframes win-sweep {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  25%  { opacity: 1; }
+  100% { transform: translateX(120%);  opacity: 0; }
+}
+.row.win-row::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, transparent, var(--accent-sweep), transparent);
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  animation: win-sweep 1100ms ease both;
+}
+
+/* Niederlage: aufgedeckter Code klingt ruhig leuchtend ein */
+@keyframes reveal-soft {
+  from { opacity: 0; transform: scale(.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.reveal-code .slot.mini {
+  animation: reveal-soft 700ms ease both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+/* ---------- Glow und Halo nur im Dark, Light bleibt flach ---------- */
+@media (prefers-color-scheme: dark) {
+  .slot[data-state="correct"],
+  .slot[data-state="present"] {
+    box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow), 0 0 14px var(--glow-color);
+  }
+  .slot.filled svg,
+  .slot[data-state] svg,
+  .sym-btn svg {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, .16));
+  }
+  .btn-primary:not(:disabled) { box-shadow: 0 0 18px rgba(108, 140, 255, .32); }
+  .btn-primary:not(:disabled):hover { box-shadow: 0 0 24px rgba(108, 140, 255, .48); }
+  :where(button, summary, a):focus-visible { box-shadow: 0 0 16px rgba(108, 140, 255, .4); }
+}
+
+/* ---------- Driftender Lichthintergrund (Canvas, hinter dem Inhalt) ---------- */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  display: block;
+}
 
 /* Ergebnis, Teilen, Statistik */
 .result {

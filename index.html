@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f5f7">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14161a">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0c11">
   <title>dailycode</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
@@ -13,6 +13,9 @@
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
+
+  <!-- Driftender Lichthintergrund, rein dekorativ, hinter dem Inhalt -->
+  <canvas id="bgCanvas" class="bg-canvas" aria-hidden="true"></canvas>
 
   <!-- Symbol Definitionen, selbst gezeichnet, einmalig -->
   <svg width="0" height="0" aria-hidden="true" focusable="false" class="svg-defs">
