@@ -1,0 +1,17 @@
+# Betriebssystem
+.DS_Store
+
+# Node
+node_modules/
+*.log
+
+# Vercel
+.vercel
+
+# Lokale Tool-Konfiguration
+.claude/
+
+# Python venv und Cache
+venv/
+.venv/
+__pycache__/
