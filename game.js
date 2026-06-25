@@ -11,6 +11,8 @@
   var MAX_TRIES = 6;
   var STORAGE_KEY = 'dailycode:v1';
   var LANG_KEY = 'dailycode:lang';
+  var THEME_KEY = 'dailycode:theme';
+  var THEMES = ['auto', 'light', 'dark'];
 
   var SYMBOLS = [
     { id: 'sym-circle',   key: 'sym_circle' },
@@ -93,7 +95,11 @@
       copy_fail: 'Kopieren nicht möglich, bitte manuell markieren',
       aria_lang_group: 'Sprache',
       nav_privacy: 'Datenschutz',
-      nav_imprint: 'Impressum'
+      nav_imprint: 'Impressum',
+      theme_group: 'Darstellung',
+      theme_auto: 'Auto',
+      theme_light: 'Hell',
+      theme_dark: 'Dunkel'
     },
     en: {
       subtitle: 'Crack the secret code of the day.',
@@ -152,7 +158,11 @@
       copy_fail: 'Copy failed, please select manually',
       aria_lang_group: 'Language',
       nav_privacy: 'Privacy',
-      nav_imprint: 'Imprint'
+      nav_imprint: 'Imprint',
+      theme_group: 'Appearance',
+      theme_auto: 'Auto',
+      theme_light: 'Light',
+      theme_dark: 'Dark'
     },
     tr: {
       subtitle: 'Günün gizli kodunu çöz.',
@@ -207,7 +217,11 @@
       copy_fail: 'Kopyalanamadı, lütfen elle seçin',
       aria_lang_group: 'Dil',
       nav_privacy: 'Gizlilik',
-      nav_imprint: 'Künye'
+      nav_imprint: 'Künye',
+      theme_group: 'Görünüm',
+      theme_auto: 'Otomatik',
+      theme_light: 'Açık',
+      theme_dark: 'Koyu'
     }
   };
 
@@ -458,6 +472,77 @@
     relocalize();
   }
 
+  /* ---------- Theme: auto, hell, dunkel ---------- */
+  // Wahl laden, defensiv wie bei Sprache. Bei Storage Ausfall gilt auto.
+  function loadTheme() {
+    if (hasStorage) {
+      try {
+        var v = window.localStorage.getItem(THEME_KEY);
+        if (v === 'auto' || v === 'light' || v === 'dark') return v;
+      } catch (e) { /* kein Storage */ }
+    }
+    return 'auto';
+  }
+
+  function saveTheme(v) {
+    if (!hasStorage) return;
+    try { window.localStorage.setItem(THEME_KEY, v); } catch (e) { /* nur Sitzung */ }
+  }
+
+  // Effektives Theme: dunkel wenn manuell dunkel oder auto und System dunkel.
+  function effectiveDark() {
+    return theme === 'dark' || (theme === 'auto' && systemDarkMQ.matches);
+  }
+
+  function updateThemeColor() {
+    if (themeColorEl) themeColorEl.setAttribute('content', effectiveDark() ? '#0a0c11' : '#f4f5f7');
+  }
+
+  // Theme anwenden: Attribut am Wurzelelement steuert das CSS, dazu Meta und Canvas.
+  function applyTheme() {
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeColor();
+    refreshThemeBar();
+    if (bgRefresh) bgRefresh(); // Canvas Eligibilitaet neu bewerten
+  }
+
+  function setTheme(v) {
+    if (THEMES.indexOf(v) === -1) return;
+    theme = v;
+    saveTheme(v);
+    applyTheme();
+  }
+
+  // Systemwechsel: nur im auto Modus relevant. Die Farben schaltet das CSS
+  // selbst (Media Query), JS gleicht nur theme-color Meta und Canvas an.
+  function onSystemSchemeChange() {
+    if (theme === 'auto') applyTheme();
+  }
+
+  function buildThemeBar() {
+    if (!themebarEl) return;
+    themebarEl.innerHTML = '';
+    themeButtons = [];
+    for (var i = 0; i < THEMES.length; i++) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'theme-btn';
+      b.dataset.theme = THEMES[i];
+      b.textContent = t('theme_' + THEMES[i]);
+      b.addEventListener('click', function () { setTheme(this.dataset.theme); });
+      themebarEl.appendChild(b);
+      themeButtons.push(b);
+    }
+  }
+
+  function refreshThemeBar() {
+    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
+    for (var i = 0; i < themeButtons.length; i++) {
+      themeButtons[i].textContent = t('theme_' + themeButtons[i].dataset.theme);
+      themeButtons[i].setAttribute('aria-pressed', themeButtons[i].dataset.theme === theme ? 'true' : 'false');
+    }
+  }
+
   /* ---------- DOM ---------- */
   var boardEl        = document.getElementById('board');
   var paletteEl      = document.getElementById('palette');
@@ -465,6 +550,8 @@
   var checkBtn       = document.getElementById('check');
   var clearBtn       = document.getElementById('clear');
   var langbarEl      = document.getElementById('langbar');
+  var themebarEl     = document.getElementById('themebar');
+  var themeColorEl   = document.getElementById('themeColor');
   var resultEl       = document.getElementById('result');
   var resultLineEl   = document.getElementById('resultLine');
   var shareGridEl    = document.getElementById('shareGrid');
@@ -480,6 +567,8 @@
   /* ---------- Zustand ---------- */
   var hasStorage = storageOK();
   var lang = loadLang();
+  var theme = loadTheme();
+  var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var stats = loadStats();
   var todayKey = dateKeyUTC();
   var code = makeCode(todayKey);
@@ -489,6 +578,8 @@
   var slotRefs = [];
   var paletteButtons = [];
   var langButtons = [];
+  var themeButtons = [];
+  var bgRefresh = null;       // wird von initBackground gesetzt, neu bewerten bei Themewechsel
   var playedGuesses = [];
   var shareText = '';
   var lastStatus = null;     // { key, params } fuer Neu Lokalisieren
@@ -985,6 +1076,7 @@
     document.documentElement.lang = lang;
     applyStaticI18n();
     refreshLangBar();
+    refreshThemeBar();
     setFooterLinks();
     refreshPaletteLabels();
     renderBoardFull();
@@ -1042,7 +1134,6 @@
     var ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    var darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
     var rafId = 0;
     var startTs = null;
     var blobs = [];
@@ -1055,7 +1146,7 @@
       [124, 122, 255]  // Blauviolett
     ];
 
-    function eligible() { return darkMQ.matches && !reduceMotion; }
+    function eligible() { return effectiveDark() && !reduceMotion; }
 
     function setup() {
       W = Math.max(1, Math.floor(window.innerWidth * SCALE));
@@ -1131,8 +1222,7 @@
       else play();
     });
 
-    if (darkMQ.addEventListener) darkMQ.addEventListener('change', refresh);
-    else if (darkMQ.addListener) darkMQ.addListener(refresh);
+    bgRefresh = refresh; // dem Theme Modul fuer manuelle Wechsel zugaenglich machen
 
     refresh();
   }
@@ -1140,6 +1230,7 @@
   /* ---------- Start ---------- */
   function init() {
     buildLangBar();
+    buildThemeBar();
     buildPalette();
     buildBoard();
 
@@ -1160,11 +1251,17 @@
     applyStaticI18n();
     refreshLangBar();
     setFooterLinks();
+    applyTheme();
 
     document.addEventListener('keydown', onKeydown);
     checkBtn.addEventListener('click', submitGuess);
     clearBtn.addEventListener('click', clearLast);
     if (copyBtn) copyBtn.addEventListener('click', onCopy);
+    if (systemDarkMQ.addEventListener) {
+      systemDarkMQ.addEventListener('change', onSystemSchemeChange);
+    } else if (systemDarkMQ.addListener) {
+      systemDarkMQ.addListener(onSystemSchemeChange);
+    }
     setupShareButton();
     registerServiceWorker();
     initBackground();

@@ -37,6 +37,14 @@
   --cell-edge:    rgba(255, 255, 255, .55);
   --accent-sweep: rgba(59, 91, 219, .14);
 
+  /* Glow und Halo (Hell: aus). Im Dark mit Werten gefuellt, alle Glow
+     Regeln sind token-getrieben und global, daher reagieren sie auf
+     manuell dunkel UND auto bei System dunkel. */
+  --halo:            transparent;
+  --btn-glow:        transparent;
+  --btn-glow-strong: transparent;
+  --focus-glow:      transparent;
+
   /* Form */
   --radius:      14px;
   --radius-sm:   10px;
@@ -45,8 +53,51 @@
   --ease:        180ms ease;
 }
 
+/* ============================================================
+   Dunkle Palette. Greift bei manuell dunkel (data-theme="dark")
+   ODER bei auto und System dunkel. Beide Bloecke sind absichtlich
+   identisch. Alle Glow und Halo Regeln weiter unten sind token
+   getrieben, daher reagieren sie automatisch auf beide Faelle.
+   ============================================================ */
+:root[data-theme="dark"] {
+  /* Tiefer, ruhiger Raum */
+  --bg:          #0a0c11;
+  --surface:     #14171f;
+  --surface-2:   #1b1f29;
+  --border:      #2a2f3b;
+  --text:        #e9ecf3;
+  --text-muted:  #8b93a3;
+
+  --accent:      #6b8cff;
+  --accent-ink:  #0a0c11;
+  --focus:       #9ab0ff;
+
+  /* Signal Tokens, lesbar auf tiefem Grund */
+  --correct-bg:  #34d399;
+  --present-bg:  #fbbf24;
+  --absent-bg:   #515a67;
+  --state-ink:   #ffffff;
+  --bar-hl:      #157f45;
+
+  /* Zell Tokens: Rahmen plus dezente Tonung statt Vollfüllung, mit Glow */
+  --cell-correct: #12281c; --edge-correct: #34d399; --ink-correct: #eafdf3; --glow-correct: rgba(52, 211, 153, .45);
+  --cell-present: #2a2110; --edge-present: #fbbf24; --ink-present: #fff7e6; --glow-present: rgba(251, 191, 36, .42);
+  --cell-absent:  #16181f; --edge-absent:  #3a4150; --ink-absent:  #c2c8d4; --glow-absent:  transparent;
+
+  /* Atmosphäre: Schwebewirkung und Lichtkante */
+  --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
+  --cell-edge:    rgba(255, 255, 255, .05);
+  --accent-sweep: rgba(108, 140, 255, .20);
+
+  /* Glow und Halo aktiv */
+  --halo:            rgba(255, 255, 255, .16);
+  --btn-glow:        rgba(108, 140, 255, .32);
+  --btn-glow-strong: rgba(108, 140, 255, .48);
+  --focus-glow:      rgba(108, 140, 255, .4);
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root[data-theme="auto"] {
     /* Tiefer, ruhiger Raum */
     --bg:          #0a0c11;
     --surface:     #14171f;
@@ -75,8 +126,18 @@
     --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
     --cell-edge:    rgba(255, 255, 255, .05);
     --accent-sweep: rgba(108, 140, 255, .20);
+
+    /* Glow und Halo aktiv */
+    --halo:            rgba(255, 255, 255, .16);
+    --btn-glow:        rgba(108, 140, 255, .32);
+    --btn-glow-strong: rgba(108, 140, 255, .48);
+    --focus-glow:      rgba(108, 140, 255, .4);
   }
 }
+
+/* Native UI (Scrollbars, Formularfelder) an erzwungenes Theme angleichen */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
 
 * { box-sizing: border-box; }
 
@@ -127,6 +188,34 @@ body {
 }
 .lang-btn:hover { border-color: var(--accent); }
 .lang-btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+/* Darstellungsumschalter (auto, hell, dunkel), gleiche Behandlung wie Sprache */
+.themebar {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 0 16px;
+}
+.theme-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.theme-btn:hover { border-color: var(--accent); }
+.theme-btn[aria-pressed="true"] {
   border-color: var(--accent);
   color: var(--text);
   background: var(--surface-2);
@@ -379,21 +468,22 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   animation-delay: var(--reveal-delay, 0ms);
 }
 
-/* ---------- Glow und Halo nur im Dark, Light bleibt flach ---------- */
-@media (prefers-color-scheme: dark) {
-  .slot[data-state="correct"],
-  .slot[data-state="present"] {
-    box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow), 0 0 14px var(--glow-color);
-  }
-  .slot.filled svg,
-  .slot[data-state] svg,
-  .sym-btn svg {
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, .16));
-  }
-  .btn-primary:not(:disabled) { box-shadow: 0 0 18px rgba(108, 140, 255, .32); }
-  .btn-primary:not(:disabled):hover { box-shadow: 0 0 24px rgba(108, 140, 255, .48); }
-  :where(button, summary, a):focus-visible { box-shadow: 0 0 16px rgba(108, 140, 255, .4); }
+/* ---------- Glow und Halo, token getrieben ----------
+   Light: alle Glow Tokens sind transparent, also optisch flach.
+   Dark (manuell oder auto): Tokens tragen Werte, daher reagieren
+   diese globalen Regeln zuverlaessig auf beide Faelle. */
+.slot[data-state="correct"],
+.slot[data-state="present"] {
+  box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow), 0 0 14px var(--glow-color);
 }
+.slot.filled svg,
+.slot[data-state] svg,
+.sym-btn svg {
+  filter: drop-shadow(0 0 5px var(--halo));
+}
+.btn-primary:not(:disabled) { box-shadow: 0 0 18px var(--btn-glow); }
+.btn-primary:not(:disabled):hover { box-shadow: 0 0 24px var(--btn-glow-strong); }
+:where(button, summary, a):focus-visible { box-shadow: 0 0 16px var(--focus-glow); }
 
 /* ---------- Driftender Lichthintergrund (Canvas, hinter dem Inhalt) ---------- */
 .bg-canvas {

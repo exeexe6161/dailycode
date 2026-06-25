@@ -9,13 +9,14 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-cache-v1';
+var CACHE = 'dailycode-cache-v2';
 
 var ASSETS = [
   './',
   './index.html',
   './style.css',
   './game.js',
+  './theme-init.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
