@@ -139,12 +139,33 @@
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"]  { color-scheme: dark; }
 
+/* ============================================================
+   Inter, selbst gehostet (NUR Portal). Zwei Gewichte, woff2, im
+   Ordner /fonts/. font-display swap plus Systemschrift-Fallback in
+   der font-family Kette, damit bei fehlender Datei nichts bricht.
+   font-src bleibt 'self', keine externe Quelle, kein CDN.
+   ============================================================ */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/Inter-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/Inter-Bold.woff2') format('woff2');
+}
+
 * { box-sizing: border-box; }
 
 html, body { margin: 0; }
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100dvh;
@@ -319,3 +340,53 @@ a.tile:active { transform: scale(.985); }
 @media (max-width: 360px) {
   .tiles { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   Lucide Bedien-Icons (inline SVG). Strich-Icons: fill none,
+   stroke currentColor, token getrieben, keine Inline-Styles.
+   Ein Icon-Button fuer Theme (zyklisch) und einer fuer Sprache
+   (Weltkugel plus Kuerzel). BFSG: 44px, focus-visible (global).
+   ============================================================ */
+.lucide {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--text); }
+.icon-btn .lucide { width: 22px; height: 22px; display: block; }
+.lang-toggle .lang-code { font-size: .9rem; letter-spacing: .5px; }
+
+/* Transiente Textrueckmeldung des neuen Theme-Modus (per Klasse, kein Inline-Style) */
+.toggle-feedback {
+  text-align: center;
+  min-height: 1.3em;
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--ease);
+}
+.toggle-feedback.show { opacity: 1; }
+
+/* Dezente Schmuck-Icons vor den Footer-Links (aria-hidden am SVG) */
+.footer-link { display: inline-flex; align-items: center; }
+.footer-ico { width: 16px; height: 16px; display: inline-block; margin-right: 6px; }

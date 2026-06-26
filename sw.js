@@ -12,7 +12,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-portal-v1';
+var CACHE = 'dailycode-portal-v2';
 var PREFIX = 'dailycode-portal-';
 var LEGACY = ['dailycode-cache-v2'];
 
@@ -26,6 +26,8 @@ var ASSETS = [
   './portal-icon-192.png',
   './portal-icon-512.png',
   './portal-icon-maskable-512.png',
+  './fonts/Inter-Regular.woff2',
+  './fonts/Inter-Bold.woff2',
   './datenschutz-de.html',
   './datenschutz-en.html',
   './datenschutz-tr.html',
@@ -69,10 +71,13 @@ self.addEventListener('fetch', function (event) {
   var req = event.request;
   if (req.method !== 'GET') { return; }
 
-  // Spiel Scope nicht anfassen: /code/ bedient der Spiel Worker allein.
+  // Spiel Scopes nicht anfassen: /code/ und /drift/ bedienen die
+  // jeweiligen Spiel Worker allein, damit der Portal Cache keine
+  // fremden Spielassets aufnimmt (Cache Storage ist origin weit).
   var path;
   try { path = new URL(req.url).pathname; } catch (e) { path = ''; }
   if (path === '/code' || path.indexOf('/code/') === 0) { return; }
+  if (path === '/drift' || path.indexOf('/drift/') === 0) { return; }
 
   event.respondWith(
     caches.match(req).then(function (cached) {

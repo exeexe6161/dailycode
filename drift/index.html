@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="auto">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" id="themeColor" content="#f4f5f7">
+  <script src="theme-init.js"></script>
+  <title>dailycode</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+  <main class="app">
+    <header class="head">
+      <h1 class="title">dailycode</h1>
+      <p class="subtitle" id="subtitle"></p>
+    </header>
+
+    <nav class="themebar" id="themebar"></nav>
+    <p class="toggle-feedback" id="themeFeedback" role="status" aria-live="polite"></p>
+
+    <!-- Punktanzeige als Text, Aenderungen werden angesagt -->
+    <p class="score" id="score" role="status" aria-live="polite"></p>
+
+    <section class="stage" id="stage">
+      <canvas class="playfield" id="playfield" aria-label=""></canvas>
+
+      <!-- Spielende und Pause Overlay, per hidden gesteuert, kein Inline-Style -->
+      <div class="overlay" id="overlay" hidden>
+        <p class="overlay-title" id="overlayTitle"></p>
+        <p class="overlay-score" id="overlayScore"></p>
+        <button type="button" class="btn btn-primary" id="overlayBtn"></button>
+      </div>
+    </section>
+
+    <div class="controls">
+      <button type="button" class="btn btn-ghost" id="pauseBtn"></button>
+      <button type="button" class="btn btn-ghost" id="restartBtn"></button>
+    </div>
+
+    <!-- Steuerkreuz fuer Touch, Ziele >= 44px, Tastatur erreichbar -->
+    <div class="dpad" id="dpad">
+      <button type="button" class="dpad-btn dpad-up" data-dir="up">
+        <svg class="lucide" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="dpad-btn dpad-left" data-dir="left">
+        <svg class="lucide" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button type="button" class="dpad-btn dpad-right" data-dir="right">
+        <svg class="lucide" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <button type="button" class="dpad-btn dpad-down" data-dir="down">
+        <svg class="lucide" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+
+    <details class="help">
+      <summary id="helpSummary"></summary>
+      <ul>
+        <li id="help1"></li>
+        <li id="help2"></li>
+        <li id="help3"></li>
+      </ul>
+    </details>
+
+    <footer class="footer">
+      <a class="footer-link" id="linkPrivacy" href="../datenschutz-de.html">
+        <svg class="footer-ico lucide" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+        <span id="navPrivacy"></span>
+      </a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a class="footer-link" id="linkImprint" href="../impressum-de.html">
+        <svg class="footer-ico lucide" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+        <span id="navImprint"></span>
+      </a>
+    </footer>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

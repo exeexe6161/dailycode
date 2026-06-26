@@ -35,6 +35,21 @@
     { code: 'tr', label: 'TR', name: 'Türkçe' }
   ];
 
+  /* ---------- Lucide Bedien-Icons (ISC), offizielle Pfade verbatim ----------
+     Quelle: https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/<name>.svg
+     Zur Buildzeit geholt und unveraendert eingebettet, kein Laufzeitnachladen. */
+  function lucide(inner) {
+    return '<svg viewBox="0 0 24 24" class="lucide" aria-hidden="true" focusable="false">' + inner + '</svg>';
+  }
+  var ICON = {
+    sun: lucide('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
+    moon: lucide('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
+    monitor: lucide('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+    globe: lucide('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
+  };
+  // Theme-Modus -> Icon des AKTUELL aktiven Zustands.
+  var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
+
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ---------- */
   // Werte sind Vorlagen mit {platzhalter} oder Funktionen (params) fuer Grammatik.
   var I18N = {
@@ -519,28 +534,40 @@
     if (theme === 'auto') applyTheme();
   }
 
+  // Ein Icon-Button schaltet zyklisch auto -> light -> dark -> auto.
+  // Das Icon zeigt den AKTUELL aktiven Modus, Funktion und Persistenz unveraendert.
   function buildThemeBar() {
     if (!themebarEl) return;
     themebarEl.innerHTML = '';
-    themeButtons = [];
-    for (var i = 0; i < THEMES.length; i++) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'theme-btn';
-      b.dataset.theme = THEMES[i];
-      b.textContent = t('theme_' + THEMES[i]);
-      b.addEventListener('click', function () { setTheme(this.dataset.theme); });
-      themebarEl.appendChild(b);
-      themeButtons.push(b);
-    }
+    themeToggleBtn = document.createElement('button');
+    themeToggleBtn.type = 'button';
+    themeToggleBtn.className = 'icon-btn theme-toggle';
+    themeToggleBtn.addEventListener('click', cycleTheme);
+    themebarEl.appendChild(themeToggleBtn);
+    refreshThemeBar();
+  }
+
+  function cycleTheme() {
+    var i = THEMES.indexOf(theme);
+    setTheme(THEMES[(i + 1) % THEMES.length]);
+    showThemeFeedback();
+  }
+
+  // Kurze sichtbare Textrueckmeldung des neuen Modus, blendet per Klasse aus.
+  function showThemeFeedback() {
+    if (!themeFeedbackEl) return;
+    themeFeedbackEl.textContent = t('theme_' + theme);
+    themeFeedbackEl.classList.add('show');
+    if (fbTimer) window.clearTimeout(fbTimer);
+    fbTimer = window.setTimeout(function () {
+      themeFeedbackEl.classList.remove('show');
+    }, 2200);
   }
 
   function refreshThemeBar() {
-    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
-    for (var i = 0; i < themeButtons.length; i++) {
-      themeButtons[i].textContent = t('theme_' + themeButtons[i].dataset.theme);
-      themeButtons[i].setAttribute('aria-pressed', themeButtons[i].dataset.theme === theme ? 'true' : 'false');
-    }
+    if (!themeToggleBtn) return;
+    themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
+    themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
   }
 
   /* ---------- DOM ---------- */
@@ -560,6 +587,7 @@
   var statsEl        = document.getElementById('stats');
   var linkPrivacyEl  = document.getElementById('linkPrivacy');
   var linkImprintEl  = document.getElementById('linkImprint');
+  var themeFeedbackEl = document.getElementById('themeFeedback');
   var shareActionsEl = resultEl ? resultEl.querySelector('.share-actions') : null;
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -577,8 +605,9 @@
   var phase = 'playing'; // 'playing' | 'won' | 'lost'
   var slotRefs = [];
   var paletteButtons = [];
-  var langButtons = [];
-  var themeButtons = [];
+  var themeToggleBtn = null;
+  var langToggleBtn = null;
+  var fbTimer = 0;
   var bgRefresh = null;       // wird von initBackground gesetzt, neu bewerten bei Themewechsel
   var playedGuesses = [];
   var shareText = '';
@@ -618,28 +647,33 @@
   }
 
   /* ---------- Sprachumschalter ---------- */
+  // Weltkugel plus aktuelles Kuerzel, zyklisch DE -> EN -> TR -> DE.
+  function langName(c) {
+    for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) return LANGS[i].name; }
+    return c;
+  }
+
   function buildLangBar() {
     if (!langbarEl) return;
     langbarEl.innerHTML = '';
-    langButtons = [];
-    for (var i = 0; i < LANGS.length; i++) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'lang-btn';
-      b.dataset.lang = LANGS[i].code;
-      b.textContent = LANGS[i].label;
-      b.setAttribute('aria-label', LANGS[i].name);
-      b.addEventListener('click', function () { setLang(this.dataset.lang); });
-      langbarEl.appendChild(b);
-      langButtons.push(b);
-    }
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(lang);
+    setLang(order[(i + 1) % order.length]);
   }
 
   function refreshLangBar() {
-    if (langbarEl) langbarEl.setAttribute('aria-label', t('aria_lang_group'));
-    for (var i = 0; i < langButtons.length; i++) {
-      langButtons[i].setAttribute('aria-pressed', langButtons[i].dataset.lang === lang ? 'true' : 'false');
-    }
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
   }
 
   /* ---------- Fusszeile: Rechtslinks sprachrichtig ---------- */

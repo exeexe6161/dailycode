@@ -20,6 +20,21 @@
     { code: 'tr', label: 'TR', name: 'Türkçe' }
   ];
 
+  /* ---------- Lucide Bedien-Icons (ISC), offizielle Pfade verbatim ----------
+     Quelle: https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/<name>.svg
+     Zur Buildzeit geholt und unveraendert eingebettet, kein Laufzeitnachladen. */
+  function svg(inner) {
+    return '<svg viewBox="0 0 24 24" class="lucide" aria-hidden="true" focusable="false">' + inner + '</svg>';
+  }
+  var ICON = {
+    sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
+    moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
+    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
+  };
+  // Theme-Modus -> Icon des AKTUELL aktiven Zustands.
+  var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
+
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ---------- */
   var I18N = {
     de: {
@@ -28,6 +43,9 @@
       tile_game_name: 'Code des Tages',
       tile_game_desc: 'Knacke den geheimen Code des Tages.',
       tile_game_aria: 'Öffnen: Code des Tages',
+      tile_drift_name: 'drift',
+      tile_drift_desc: 'Lenke die wachsende Kette über das Feld.',
+      tile_drift_aria: 'Öffnen: drift',
       tile_soon_name: 'Neues Rätsel',
       tile_soon_desc: 'In Vorbereitung.',
       tile_soon_aria: 'Neues Rätsel, bald verfügbar',
@@ -46,6 +64,9 @@
       tile_game_name: 'Daily code',
       tile_game_desc: 'Crack the secret code of the day.',
       tile_game_aria: 'Open: Daily code',
+      tile_drift_name: 'drift',
+      tile_drift_desc: 'Guide the growing chain across the grid.',
+      tile_drift_aria: 'Open: drift',
       tile_soon_name: 'New puzzle',
       tile_soon_desc: 'In preparation.',
       tile_soon_aria: 'New puzzle, available soon',
@@ -64,6 +85,9 @@
       tile_game_name: 'Günün kodu',
       tile_game_desc: 'Günün gizli kodunu çöz.',
       tile_game_aria: 'Aç: Günün kodu',
+      tile_drift_name: 'drift',
+      tile_drift_desc: 'Büyüyen zinciri ızgarada yönlendir.',
+      tile_drift_aria: 'Aç: drift',
       tile_soon_name: 'Yeni bulmaca',
       tile_soon_desc: 'Hazırlanıyor.',
       tile_soon_aria: 'Yeni bulmaca, yakında kullanılabilir',
@@ -90,6 +114,7 @@
   var langbarEl    = document.getElementById('langbar');
   var themebarEl   = document.getElementById('themebar');
   var themeColorEl = document.getElementById('themeColor');
+  var themeFeedbackEl = document.getElementById('themeFeedback');
   var linkPrivacyEl = document.getElementById('linkPrivacy');
   var linkImprintEl = document.getElementById('linkImprint');
 
@@ -98,8 +123,9 @@
   var lang = loadLang();
   var theme = loadTheme();
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
-  var langButtons = [];
-  var themeButtons = [];
+  var themeToggleBtn = null;
+  var langToggleBtn = null;
+  var fbTimer = 0;
 
   function storageOK() {
     try {
@@ -182,53 +208,69 @@
     if (theme === 'auto') applyTheme();
   }
 
+  // Ein Icon-Button schaltet zyklisch auto -> light -> dark -> auto.
+  // Das Icon zeigt den AKTUELL aktiven Modus, Funktion und Persistenz unveraendert.
   function buildThemeBar() {
     if (!themebarEl) return;
     themebarEl.innerHTML = '';
-    themeButtons = [];
-    for (var i = 0; i < THEMES.length; i++) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'theme-btn';
-      b.dataset.theme = THEMES[i];
-      b.textContent = t('theme_' + THEMES[i]);
-      b.addEventListener('click', function () { setTheme(this.dataset.theme); });
-      themebarEl.appendChild(b);
-      themeButtons.push(b);
-    }
+    themeToggleBtn = document.createElement('button');
+    themeToggleBtn.type = 'button';
+    themeToggleBtn.className = 'icon-btn theme-toggle';
+    themeToggleBtn.addEventListener('click', cycleTheme);
+    themebarEl.appendChild(themeToggleBtn);
+    refreshThemeBar();
+  }
+
+  function cycleTheme() {
+    var i = THEMES.indexOf(theme);
+    setTheme(THEMES[(i + 1) % THEMES.length]);
+    showThemeFeedback();
+  }
+
+  // Kurze sichtbare Textrueckmeldung des neuen Modus, blendet per Klasse aus.
+  function showThemeFeedback() {
+    if (!themeFeedbackEl) return;
+    themeFeedbackEl.textContent = t('theme_' + theme);
+    themeFeedbackEl.classList.add('show');
+    if (fbTimer) window.clearTimeout(fbTimer);
+    fbTimer = window.setTimeout(function () {
+      themeFeedbackEl.classList.remove('show');
+    }, 2200);
   }
 
   function refreshThemeBar() {
-    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
-    for (var i = 0; i < themeButtons.length; i++) {
-      themeButtons[i].textContent = t('theme_' + themeButtons[i].dataset.theme);
-      themeButtons[i].setAttribute('aria-pressed', themeButtons[i].dataset.theme === theme ? 'true' : 'false');
-    }
+    if (!themeToggleBtn) return;
+    themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
+    themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
   }
 
-  /* ---------- Sprachumschalter ---------- */
+  /* ---------- Sprachumschalter: Weltkugel plus Kuerzel, zyklisch ---------- */
+  function langName(code) {
+    for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === code) return LANGS[i].name; }
+    return code;
+  }
+
   function buildLangBar() {
     if (!langbarEl) return;
     langbarEl.innerHTML = '';
-    langButtons = [];
-    for (var i = 0; i < LANGS.length; i++) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'lang-btn';
-      b.dataset.lang = LANGS[i].code;
-      b.textContent = LANGS[i].label;
-      b.setAttribute('aria-label', LANGS[i].name);
-      b.addEventListener('click', function () { setLang(this.dataset.lang); });
-      langbarEl.appendChild(b);
-      langButtons.push(b);
-    }
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(lang);
+    setLang(order[(i + 1) % order.length]);
   }
 
   function refreshLangBar() {
-    if (langbarEl) langbarEl.setAttribute('aria-label', t('aria_lang_group'));
-    for (var i = 0; i < langButtons.length; i++) {
-      langButtons[i].setAttribute('aria-pressed', langButtons[i].dataset.lang === lang ? 'true' : 'false');
-    }
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
   }
 
   /* ---------- Statische Texte ---------- */

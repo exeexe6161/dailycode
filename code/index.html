@@ -49,6 +49,7 @@
 
     <nav class="langbar" id="langbar"></nav>
     <nav class="themebar" id="themebar"></nav>
+    <p class="toggle-feedback" id="themeFeedback" role="status" aria-live="polite"></p>
 
     <section class="board" id="board" data-i18n-aria="aria_board"></section>
 
@@ -84,9 +85,15 @@
     </details>
 
     <footer class="footer">
-      <a class="footer-link" id="linkPrivacy" href="../datenschutz-en.html" data-i18n="nav_privacy"></a>
+      <a class="footer-link" id="linkPrivacy" href="../datenschutz-en.html">
+        <svg class="footer-ico lucide" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+        <span data-i18n="nav_privacy"></span>
+      </a>
       <span class="footer-sep" aria-hidden="true">·</span>
-      <a class="footer-link" id="linkImprint" href="../impressum-en.html" data-i18n="nav_imprint"></a>
+      <a class="footer-link" id="linkImprint" href="../impressum-en.html">
+        <svg class="footer-ico lucide" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+        <span data-i18n="nav_imprint"></span>
+      </a>
     </footer>
   </main>
 
