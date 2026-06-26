@@ -71,13 +71,14 @@ self.addEventListener('fetch', function (event) {
   var req = event.request;
   if (req.method !== 'GET') { return; }
 
-  // Spiel Scopes nicht anfassen: /code/ und /drift/ bedienen die
-  // jeweiligen Spiel Worker allein, damit der Portal Cache keine
+  // Spiel Scopes nicht anfassen: /code/, /drift/ und /cluster/ bedienen
+  // die jeweiligen Spiel Worker allein, damit der Portal Cache keine
   // fremden Spielassets aufnimmt (Cache Storage ist origin weit).
   var path;
   try { path = new URL(req.url).pathname; } catch (e) { path = ''; }
   if (path === '/code' || path.indexOf('/code/') === 0) { return; }
   if (path === '/drift' || path.indexOf('/drift/') === 0) { return; }
+  if (path === '/cluster' || path.indexOf('/cluster/') === 0) { return; }
 
   event.respondWith(
     caches.match(req).then(function (cached) {
