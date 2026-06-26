@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="dailycode">
+  <!-- Selbst gezeichnet, dunkle Aesthetik mit sanftem Leuchten. Zwei
+       Karten, eine verdeckt, eine zeigt eine Form (formbasiert). -->
+  <rect width="512" height="512" rx="112" fill="#0a0c11"/>
+  <rect x="20" y="20" width="472" height="472" rx="96" fill="none" stroke="#2a2f3b" stroke-width="6"/>
+  <!-- verdeckte Karte -->
+  <rect x="96" y="150" width="150" height="212" rx="24" fill="#1b1f29" stroke="#2a2f3b" stroke-width="6"/>
+  <circle cx="171" cy="256" r="20" fill="#2a2f3b"/>
+  <!-- offene Karte mit Form -->
+  <rect x="266" y="150" width="150" height="212" rx="24" fill="#14171f" stroke="#6b8cff" stroke-width="6"/>
+  <polygon points="341,196 386,300 296,300" fill="#6b8cff"/>
+</svg>
