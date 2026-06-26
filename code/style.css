@@ -1,0 +1,586 @@
+/* ============================================================
+   dailycode  Tokens und Styles
+   Token Disziplin: Werte als CSS Variablen, Hell und Dunkel Parität.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Flächen und Text (Hell) */
+  --bg:          #f4f5f7;
+  --surface:     #ffffff;
+  --surface-2:   #eceef1;
+  --border:      #d2d6dc;
+  --text:        #1c1f24;
+  --text-muted:  #5b6470;
+
+  /* Aktion */
+  --accent:      #3b5bdb;
+  --accent-ink:  #ffffff;
+  --focus:       #1f6feb;
+
+  /* Feedback Signal Tokens (Statuszeile, Statistik, weiße Tinte) */
+  --correct-bg:  #15803d;
+  --present-bg:  #b45309;
+  --absent-bg:   #4b5563;
+  --state-ink:   #ffffff;
+  --bar-hl:      #15803d;
+
+  /* Feedback Zell Tokens (Hell: Vollfüllung wie bisher, kein Glow) */
+  --cell-correct: #15803d; --edge-correct: #15803d; --ink-correct: #ffffff; --glow-correct: transparent;
+  --cell-present: #b45309; --edge-present: #b45309; --ink-present: #ffffff; --glow-present: transparent;
+  --cell-absent:  #4b5563; --edge-absent:  #4b5563; --ink-absent:  #ffffff; --glow-absent:  transparent;
+  --glow-color:   transparent;
+
+  /* Atmosphäre (Hell: ruhig, ohne Glow) */
+  --cell-shadow:  0 2px 8px rgba(20, 30, 60, .08);
+  --cell-edge:    rgba(255, 255, 255, .55);
+  --accent-sweep: rgba(59, 91, 219, .14);
+
+  /* Glow und Halo (Hell: aus). Im Dark mit Werten gefuellt, alle Glow
+     Regeln sind token-getrieben und global, daher reagieren sie auf
+     manuell dunkel UND auto bei System dunkel. */
+  --halo:            transparent;
+  --btn-glow:        transparent;
+  --btn-glow-strong: transparent;
+  --focus-glow:      transparent;
+
+  /* Form */
+  --radius:      14px;
+  --radius-sm:   10px;
+  --gap:         10px;
+  --maxw:        460px;
+  --ease:        180ms ease;
+}
+
+/* ============================================================
+   Dunkle Palette. Greift bei manuell dunkel (data-theme="dark")
+   ODER bei auto und System dunkel. Beide Bloecke sind absichtlich
+   identisch. Alle Glow und Halo Regeln weiter unten sind token
+   getrieben, daher reagieren sie automatisch auf beide Faelle.
+   ============================================================ */
+:root[data-theme="dark"] {
+  /* Tiefer, ruhiger Raum */
+  --bg:          #0a0c11;
+  --surface:     #14171f;
+  --surface-2:   #1b1f29;
+  --border:      #2a2f3b;
+  --text:        #e9ecf3;
+  --text-muted:  #8b93a3;
+
+  --accent:      #6b8cff;
+  --accent-ink:  #0a0c11;
+  --focus:       #9ab0ff;
+
+  /* Signal Tokens, lesbar auf tiefem Grund */
+  --correct-bg:  #34d399;
+  --present-bg:  #fbbf24;
+  --absent-bg:   #515a67;
+  --state-ink:   #ffffff;
+  --bar-hl:      #157f45;
+
+  /* Zell Tokens: Rahmen plus dezente Tonung statt Vollfüllung, mit Glow */
+  --cell-correct: #12281c; --edge-correct: #34d399; --ink-correct: #eafdf3; --glow-correct: rgba(52, 211, 153, .45);
+  --cell-present: #2a2110; --edge-present: #fbbf24; --ink-present: #fff7e6; --glow-present: rgba(251, 191, 36, .42);
+  --cell-absent:  #16181f; --edge-absent:  #3a4150; --ink-absent:  #c2c8d4; --glow-absent:  transparent;
+
+  /* Atmosphäre: Schwebewirkung und Lichtkante */
+  --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
+  --cell-edge:    rgba(255, 255, 255, .05);
+  --accent-sweep: rgba(108, 140, 255, .20);
+
+  /* Glow und Halo aktiv */
+  --halo:            rgba(255, 255, 255, .16);
+  --btn-glow:        rgba(108, 140, 255, .32);
+  --btn-glow-strong: rgba(108, 140, 255, .48);
+  --focus-glow:      rgba(108, 140, 255, .4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    /* Tiefer, ruhiger Raum */
+    --bg:          #0a0c11;
+    --surface:     #14171f;
+    --surface-2:   #1b1f29;
+    --border:      #2a2f3b;
+    --text:        #e9ecf3;
+    --text-muted:  #8b93a3;
+
+    --accent:      #6b8cff;
+    --accent-ink:  #0a0c11;
+    --focus:       #9ab0ff;
+
+    /* Signal Tokens, lesbar auf tiefem Grund */
+    --correct-bg:  #34d399;
+    --present-bg:  #fbbf24;
+    --absent-bg:   #515a67;
+    --state-ink:   #ffffff;
+    --bar-hl:      #157f45;
+
+    /* Zell Tokens: Rahmen plus dezente Tonung statt Vollfüllung, mit Glow */
+    --cell-correct: #12281c; --edge-correct: #34d399; --ink-correct: #eafdf3; --glow-correct: rgba(52, 211, 153, .45);
+    --cell-present: #2a2110; --edge-present: #fbbf24; --ink-present: #fff7e6; --glow-present: rgba(251, 191, 36, .42);
+    --cell-absent:  #16181f; --edge-absent:  #3a4150; --ink-absent:  #c2c8d4; --glow-absent:  transparent;
+
+    /* Atmosphäre: Schwebewirkung und Lichtkante */
+    --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
+    --cell-edge:    rgba(255, 255, 255, .05);
+    --accent-sweep: rgba(108, 140, 255, .20);
+
+    /* Glow und Halo aktiv */
+    --halo:            rgba(255, 255, 255, .16);
+    --btn-glow:        rgba(108, 140, 255, .32);
+    --btn-glow-strong: rgba(108, 140, 255, .48);
+    --focus-glow:      rgba(108, 140, 255, .4);
+  }
+}
+
+/* Native UI (Scrollbars, Formularfelder) an erzwungenes Theme angleichen */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: clamp(12px, 4vw, 28px) 14px 44px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app { width: 100%; max-width: var(--maxw); }
+
+/* Kopf */
+.head { text-align: center; margin-bottom: 16px; }
+.title {
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  margin: 0 0 4px;
+  letter-spacing: .5px;
+}
+.subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; }
+
+/* Sprachumschalter */
+.langbar {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 0 14px;
+}
+.lang-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.lang-btn:hover { border-color: var(--accent); }
+.lang-btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+/* Darstellungsumschalter (auto, hell, dunkel), gleiche Behandlung wie Sprache */
+.themebar {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 0 16px;
+}
+.theme-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.theme-btn:hover { border-color: var(--accent); }
+.theme-btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+/* Spielfeld */
+.board { display: grid; gap: var(--gap); margin: 8px 0 14px; }
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+}
+
+.slot {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font: inherit;
+  cursor: default;
+  box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow);
+  transition: border-color var(--ease), background var(--ease), box-shadow var(--ease), transform var(--ease);
+}
+.slot svg { width: 100%; height: 100%; display: block; fill: currentColor; }
+
+.slot.empty { background: var(--surface); border-style: dashed; }
+.slot.filled { background: var(--surface-2); }
+
+button.slot:not(:disabled) { cursor: pointer; }
+button.slot:not(:disabled):active { transform: scale(.96); }
+
+.row[data-active="true"] .slot.empty { border-color: var(--accent); }
+
+.slot[data-state="correct"] { background: var(--cell-correct); border-color: var(--edge-correct); color: var(--ink-correct); --glow-color: var(--glow-correct); }
+.slot[data-state="present"] { background: var(--cell-present); border-color: var(--edge-present); color: var(--ink-present); --glow-color: var(--glow-present); }
+.slot[data-state="absent"]  { background: var(--cell-absent);  border-color: var(--edge-absent);  color: var(--ink-absent);  --glow-color: var(--glow-absent); }
+
+/* Nicht von Farbe allein abhängiges Zeichen, folgt der Zelltinte */
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: .7rem;
+  line-height: 1;
+  font-weight: 700;
+  opacity: .92;
+  color: inherit;
+}
+
+/* Status */
+.status {
+  text-align: center;
+  min-height: 1.4em;
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.status[data-tone="win"]  { color: var(--correct-bg); }
+.status[data-tone="lose"] { color: var(--present-bg); }
+
+/* Aufgedeckter Code bei Niederlage */
+.reveal-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+.reveal-label { color: var(--text-muted); font-weight: 600; }
+.slot.mini {
+  width: 42px;
+  height: 42px;
+  min-height: 0;
+  padding: 10px;
+  border-width: 2px;
+}
+
+/* Palette */
+.palette {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--gap);
+  margin-bottom: 16px;
+}
+.sym-btn {
+  aspect-ratio: 1 / 1;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18%;
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), transform var(--ease);
+}
+.sym-btn svg { width: 100%; height: 100%; fill: currentColor; }
+.sym-btn:hover:not(:disabled) { border-color: var(--accent); }
+.sym-btn:active:not(:disabled) { transform: scale(.93); }
+.sym-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* Sehr schmale Viewports: Palette auf zwei Reihen, Touch Ziele bleiben mindestens 44px */
+@media (max-width: 344px) {
+  .palette { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Steuerung */
+.controls { display: flex; gap: 10px; }
+.btn {
+  flex: 1;
+  min-height: 50px;
+  border-radius: var(--radius);
+  font: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background var(--ease), border-color var(--ease), opacity var(--ease), transform var(--ease);
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
+
+/* Hilfe */
+.help { margin-top: 22px; color: var(--text-muted); font-size: .9rem; }
+.help summary { cursor: pointer; color: var(--text); font-weight: 600; }
+.help ul { margin: 10px 0 0; padding-left: 18px; }
+.help li { margin: 5px 0; }
+
+/* Fusszeile mit Rechtslinks */
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: .85rem;
+}
+.footer-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 2px;
+}
+.footer-link:hover { color: var(--accent); }
+.footer-sep { color: var(--text-muted); }
+
+/* Fokus sichtbar */
+:where(button, summary, a):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Bewegung. Nur transform und opacity (GPU freundlich), Glow als
+   kurze ::after Blende in Zustandsfarbe (var --glow-color, hell
+   transparent). Alles per @keyframes, Stagger via --reveal-delay
+   (CSSOM). prefers-reduced-motion schaltet unten alles ab.
+   ============================================================ */
+
+/* Enthüllung beim Prüfen: Scale Pop plus aufklingendes Leuchten */
+@keyframes reveal-pop {
+  0%   { transform: scale(.8);  opacity: .25; }
+  55%  { transform: scale(1.05); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+@keyframes reveal-glow {
+  0%   { opacity: 0; }
+  45%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.slot.reveal {
+  animation: reveal-pop 360ms cubic-bezier(.2, .7, .2, 1) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+.slot.reveal::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 18px var(--glow-color);
+  opacity: 0;
+  pointer-events: none;
+  animation: reveal-glow 600ms ease both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+/* Symbol setzen: Pop plus dezenter Ripple Ring */
+@keyframes place-pop {
+  0%   { transform: scale(.85); }
+  55%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes place-ripple {
+  0%   { transform: scale(.96); opacity: .5; }
+  100% { transform: scale(1.22); opacity: 0; }
+}
+.slot.place { animation: place-pop 240ms ease; }
+.slot.place::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: place-ripple 440ms ease-out;
+}
+
+/* Sieg: ruhiger Lichtimpuls über die Reihe, kein Konfetti */
+@keyframes win-sweep {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  25%  { opacity: 1; }
+  100% { transform: translateX(120%);  opacity: 0; }
+}
+.row.win-row::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, transparent, var(--accent-sweep), transparent);
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  animation: win-sweep 1100ms ease both;
+}
+
+/* Niederlage: aufgedeckter Code klingt ruhig leuchtend ein */
+@keyframes reveal-soft {
+  from { opacity: 0; transform: scale(.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.reveal-code .slot.mini {
+  animation: reveal-soft 700ms ease both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+/* ---------- Glow und Halo, token getrieben ----------
+   Light: alle Glow Tokens sind transparent, also optisch flach.
+   Dark (manuell oder auto): Tokens tragen Werte, daher reagieren
+   diese globalen Regeln zuverlaessig auf beide Faelle. */
+.slot[data-state="correct"],
+.slot[data-state="present"] {
+  box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow), 0 0 14px var(--glow-color);
+}
+.slot.filled svg,
+.slot[data-state] svg,
+.sym-btn svg {
+  filter: drop-shadow(0 0 5px var(--halo));
+}
+.btn-primary:not(:disabled) { box-shadow: 0 0 18px var(--btn-glow); }
+.btn-primary:not(:disabled):hover { box-shadow: 0 0 24px var(--btn-glow-strong); }
+:where(button, summary, a):focus-visible { box-shadow: 0 0 16px var(--focus-glow); }
+
+/* ---------- Driftender Lichthintergrund (Canvas, hinter dem Inhalt) ---------- */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  display: block;
+}
+
+/* Ergebnis, Teilen, Statistik */
+.result {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.result-line {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 12px;
+}
+.share-grid {
+  margin: 0 0 12px;
+  font-family: inherit;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  text-align: center;
+  white-space: pre;
+  letter-spacing: 2px;
+}
+.share-actions { display: flex; gap: 10px; }
+.copy-feedback {
+  text-align: center;
+  min-height: 1.3em;
+  margin: 8px 0 0;
+  font-weight: 600;
+  color: var(--correct-bg);
+}
+.stats { margin-top: 18px; }
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.stat-num { font-size: 1.35rem; font-weight: 700; }
+.stat-cap { font-size: .72rem; color: var(--text-muted); }
+.dist-title { font-size: .95rem; margin: 0 0 8px; }
+.dist-row {
+  display: grid;
+  grid-template-columns: 1.4em 1fr;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+.dist-label { text-align: center; color: var(--text-muted); font-weight: 600; }
+.dist-bar {
+  background: var(--absent-bg);
+  color: var(--state-ink);
+  border-radius: 6px;
+  padding: 2px 8px;
+  text-align: right;
+  font-size: .85rem;
+  font-weight: 700;
+  transition: width var(--ease);
+}
+.dist-bar.hl { background: var(--bar-hl); }
+.stats-hint { color: var(--text-muted); font-size: .9rem; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Versteckte SVG Symboldefinitionen (zuvor Inline Style in index.html) */
+.svg-defs { position: absolute; }
+
+/* ============================================================
+   Rechtstexte (zuvor Inline <style> in den sechs Rechtsseiten).
+   Hierher gezogen, damit die strikte CSP ohne 'unsafe-inline'
+   fuer styles auskommt.
+   ============================================================ */
+.legal { width: 100%; max-width: 640px; }
+.legal h1 { font-size: clamp(1.4rem, 5vw, 1.9rem); margin: 0 0 4px; }
+.legal .updated { color: var(--text-muted); font-size: .85rem; margin: 0 0 22px; }
+.legal h2 { font-size: 1.1rem; margin: 26px 0 8px; }
+.legal p { margin: 8px 0; }
+.legal a { color: var(--accent); }
+.legal .muted { color: var(--text-muted); }
+.legal-langs { display: flex; gap: 12px; margin: 0 0 18px; font-size: .85rem; }
+.legal-langs a, .legal-langs span { color: var(--text-muted); text-decoration: none; }
+.legal-langs a:hover { color: var(--accent); }
+.legal-langs span[aria-current="page"] { color: var(--text); font-weight: 700; }
+.legal-nav { display: flex; flex-wrap: wrap; gap: 16px; margin: 30px 0 0; padding-top: 16px; border-top: 1px solid var(--border); font-weight: 600; }

@@ -1,26 +1,31 @@
 /* ============================================================
-   dailycode  Service Worker
-   Cache first fuer die App Shell. Versionierter Cache, alte
-   Caches werden beim Aktivieren entfernt. Der Tagescode wird
-   rein clientseitig aus dem Datum berechnet, daher ist cache
-   first unkritisch: das Raetsel wechselt ueber das Datum, nicht
-   ueber das Netz. Es werden nur statische Dateien gecacht, keine
-   personenbezogene Datenuebertragung.
+   dailycode  Service Worker (Portal, Scope /)
+   Cache first fuer die Portal Shell und die Rechtstexte. Es werden
+   NUR Caches des eigenen Praefix (dailycode-portal-) aufgeraeumt,
+   dazu der Legacy Cache der alten Wurzel Installation. Der Spiel
+   Worker (dailycode-game-) bleibt unberuehrt. Cache Storage ist
+   origin weit, daher ist diese Praefix Trennung noetig, um eine
+   gegenseitige Loeschung der beiden Worker zu verhindern.
+   Pfade unter /code/ werden bewusst nicht behandelt, damit der
+   Spiel Worker seinen Scope allein bedient. Nur statische Dateien,
+   keine personenbezogene Datenuebertragung.
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-cache-v2';
+var CACHE = 'dailycode-portal-v1';
+var PREFIX = 'dailycode-portal-';
+var LEGACY = ['dailycode-cache-v2'];
 
 var ASSETS = [
   './',
   './index.html',
   './style.css',
-  './game.js',
+  './portal.js',
   './theme-init.js',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './icon-maskable-512.png',
+  './portal-icon-192.png',
+  './portal-icon-512.png',
+  './portal-icon-maskable-512.png',
   './datenschutz-de.html',
   './datenschutz-en.html',
   './datenschutz-tr.html',
@@ -46,7 +51,12 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(keys.map(function (key) {
-        if (key !== CACHE) { return caches.delete(key); }
+        // Nur eigenen Namespace (Praefix dailycode-portal-, nicht aktuelle Version)
+        // plus den Legacy Cache der alten Wurzel Installation aufraeumen.
+        // Der Spiel Cache (dailycode-game-) bleibt ausdruecklich erhalten.
+        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) {
+          return caches.delete(key);
+        }
         return null;
       }));
     }).then(function () {
@@ -59,6 +69,11 @@ self.addEventListener('fetch', function (event) {
   var req = event.request;
   if (req.method !== 'GET') { return; }
 
+  // Spiel Scope nicht anfassen: /code/ bedient der Spiel Worker allein.
+  var path;
+  try { path = new URL(req.url).pathname; } catch (e) { path = ''; }
+  if (path === '/code' || path.indexOf('/code/') === 0) { return; }
+
   event.respondWith(
     caches.match(req).then(function (cached) {
       if (cached) { return cached; }
@@ -70,7 +85,7 @@ self.addEventListener('fetch', function (event) {
         }
         return res;
       }).catch(function () {
-        // Offline und nicht im Cache: bei Navigationen die App Shell liefern.
+        // Offline und nicht im Cache: bei Navigationen die Portal Shell liefern.
         if (req.mode === 'navigate') { return caches.match('./index.html'); }
         return undefined;
       });

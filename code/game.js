@@ -645,8 +645,9 @@
   /* ---------- Fusszeile: Rechtslinks sprachrichtig ---------- */
   // Beschriftung kommt ueber data-i18n (applyStaticI18n). Hier nur das Ziel je Sprache.
   function setFooterLinks() {
-    if (linkPrivacyEl) linkPrivacyEl.setAttribute('href', 'datenschutz-' + lang + '.html');
-    if (linkImprintEl) linkImprintEl.setAttribute('href', 'impressum-' + lang + '.html');
+    // Rechtstexte liegen auf Portal Ebene (Wurzel), das Spiel liegt unter /code/.
+    if (linkPrivacyEl) linkPrivacyEl.setAttribute('href', '../datenschutz-' + lang + '.html');
+    if (linkImprintEl) linkImprintEl.setAttribute('href', '../impressum-' + lang + '.html');
   }
 
   /* ---------- Aufbau ---------- */
