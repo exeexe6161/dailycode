@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-glyph-v2';
+var CACHE = 'dailycode-glyph-v3';
 var PREFIX = 'dailycode-glyph-';
 
 var ASSETS = [

@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-game-v4';
+var CACHE = 'dailycode-game-v5';
 var PREFIX = 'dailycode-game-';
 
 var ASSETS = [

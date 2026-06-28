@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-cluster-v2';
+var CACHE = 'dailycode-cluster-v3';
 var PREFIX = 'dailycode-cluster-';
 
 var ASSETS = [
