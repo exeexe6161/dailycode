@@ -15,3 +15,7 @@ node_modules/
 venv/
 .venv/
 __pycache__/
+
+# Cover Originale (schwere UUID PNGs), nur aufbereitete assets/cover/ ins Repo
+# Fuehrender Slash: nur der Wurzel-Ordner, NICHT assets/cover/
+/cover/

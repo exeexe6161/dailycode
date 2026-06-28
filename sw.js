@@ -12,7 +12,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-portal-v3';
+var CACHE = 'dailycode-portal-v4';
 var PREFIX = 'dailycode-portal-';
 var LEGACY = ['dailycode-cache-v2'];
 
@@ -33,7 +33,12 @@ var ASSETS = [
   './datenschutz-tr.html',
   './impressum-de.html',
   './impressum-en.html',
-  './impressum-tr.html'
+  './impressum-tr.html',
+  './assets/cover/code.jpg',
+  './assets/cover/drift.jpg',
+  './assets/cover/cluster.jpg',
+  './assets/cover/echo.jpg',
+  './assets/cover/glyph.jpg'
 ];
 
 self.addEventListener('install', function (event) {
