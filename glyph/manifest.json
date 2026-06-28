@@ -1,0 +1,23 @@
+{
+  "id": "dailycode-glyph",
+  "name": "Glyph",
+  "short_name": "Glyph",
+  "description": "Build as many words as you can from the letters before time runs out.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#f4f5f7",
+  "background_color": "#f4f5f7",
+  "categories": ["games"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
