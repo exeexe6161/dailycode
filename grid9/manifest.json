@@ -1,0 +1,23 @@
+{
+  "id": "dailycode-grid9",
+  "name": "dailycode",
+  "short_name": "dailycode",
+  "description": "Fill the grid so every row, column and block holds the numbers one to nine exactly once.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#f4f5f7",
+  "background_color": "#f4f5f7",
+  "categories": ["games"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

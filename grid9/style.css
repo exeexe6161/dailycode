@@ -1,0 +1,410 @@
+/* ============================================================
+   dailycode  Sechstes Spiel (Arbeitstitel grid9)  Tokens und Styles
+   Token Disziplin: Werte als CSS Variablen, Hell und Dunkel Paritaet.
+   Der Token Block ist aus dem System uebernommen, damit Portal und
+   alle Spiele dieselben Themewerte zeigen. Keine Inline-Styles,
+   Zellzustaende ausschliesslich ueber Klassen. Das 9x9 Raster steht
+   statisch im CSS (neun Spalten), Blockkanten ueber Klassen.
+   Konflikte werden NICHT nur farblich markiert (zusaetzlich ein
+   Ausrufezeichen je Konfliktfeld), damit das Spiel bei Farbsehschwaeche
+   nutzbar bleibt. Vorgegebene Felder sind fett und getoent.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+
+  --bg:          #f4f5f7;
+  --surface:     #ffffff;
+  --surface-2:   #eceef1;
+  --border:      #d2d6dc;
+  --text:        #1c1f24;
+  --text-muted:  #5b6470;
+
+  --accent:      #3b5bdb;
+  --accent-ink:  #ffffff;
+  --focus:       #1f6feb;
+
+  /* Gitter Tokens (Hell) */
+  --grid-strong: #9aa1ad;
+  --given-ink:   #1c1f24;
+  --given-bg:    #eef0f3;
+  --user-ink:    #3b5bdb;
+  --sel-bg:      rgba(59, 91, 219, .14);
+  --conflict-bg: rgba(220, 38, 38, .12);
+  --conflict-ink:#b91c1c;
+
+  --cell-shadow:  0 2px 8px rgba(20, 30, 60, .08);
+  --cell-edge:    rgba(255, 255, 255, .55);
+
+  --halo:            transparent;
+  --btn-glow:        transparent;
+  --focus-glow:      transparent;
+
+  --radius:      14px;
+  --radius-sm:   10px;
+  --gap:         10px;
+  --maxw:        460px;
+  --ease:        180ms ease;
+}
+
+:root[data-theme="dark"] {
+  --bg:          #0a0c11;
+  --surface:     #14171f;
+  --surface-2:   #1b1f29;
+  --border:      #2a2f3b;
+  --text:        #e9ecf3;
+  --text-muted:  #8b93a3;
+
+  --accent:      #6b8cff;
+  --accent-ink:  #0a0c11;
+  --focus:       #9ab0ff;
+
+  --grid-strong: #3f4654;
+  --given-ink:   #e9ecf3;
+  --given-bg:    #1b1f29;
+  --user-ink:    #6b8cff;
+  --sel-bg:      rgba(108, 140, 255, .20);
+  --conflict-bg: rgba(248, 113, 113, .16);
+  --conflict-ink:#fca5a5;
+
+  --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
+  --cell-edge:    rgba(255, 255, 255, .05);
+
+  --halo:            rgba(255, 255, 255, .16);
+  --btn-glow:        rgba(108, 140, 255, .32);
+  --focus-glow:      rgba(108, 140, 255, .4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg:          #0a0c11;
+    --surface:     #14171f;
+    --surface-2:   #1b1f29;
+    --border:      #2a2f3b;
+    --text:        #e9ecf3;
+    --text-muted:  #8b93a3;
+
+    --accent:      #6b8cff;
+    --accent-ink:  #0a0c11;
+    --focus:       #9ab0ff;
+
+    --grid-strong: #3f4654;
+    --given-ink:   #e9ecf3;
+    --given-bg:    #1b1f29;
+    --user-ink:    #6b8cff;
+    --sel-bg:      rgba(108, 140, 255, .20);
+    --conflict-bg: rgba(248, 113, 113, .16);
+    --conflict-ink:#fca5a5;
+
+    --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
+    --cell-edge:    rgba(255, 255, 255, .05);
+
+    --halo:            rgba(255, 255, 255, .16);
+    --btn-glow:        rgba(108, 140, 255, .32);
+    --focus-glow:      rgba(108, 140, 255, .4);
+  }
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: clamp(12px, 4vw, 28px) 14px 44px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app { width: 100%; max-width: var(--maxw); }
+
+.head { text-align: center; margin-bottom: 16px; position: relative; }
+.title {
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  margin: 0 0 4px;
+  letter-spacing: .5px;
+}
+.subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; }
+
+.themebar { display: flex; justify-content: center; gap: 6px; margin: 0 0 16px; }
+
+.lucide {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--text); }
+.icon-btn .lucide { width: 22px; height: 22px; display: block; }
+
+.toggle-feedback {
+  text-align: center;
+  min-height: 1.3em;
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--ease);
+}
+.toggle-feedback.show { opacity: 1; }
+
+/* Schwierigkeitsleiste */
+.diffbar { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.diff-btn {
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.diff-btn:hover { border-color: var(--accent); color: var(--text); }
+.diff-btn.is-active { border-color: var(--accent); color: var(--text); background: var(--surface-2); }
+
+.hud {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+.hud-label { color: var(--text-muted); font-weight: 600; }
+.hud-val { color: var(--text); }
+
+.status {
+  text-align: center;
+  margin: 0 0 12px;
+  min-height: 1.4em;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   9x9 Zahlengitter aus echten Knoepfen. Native Fokussierung und
+   Tastatur. Neun Spalten statisch, Blockkanten ueber Klassen.
+   ============================================================ */
+.stage { position: relative; width: 100%; margin: 0 auto 14px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  width: 100%;
+  margin: 0 auto;
+  border: 2px solid var(--grid-strong);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow);
+}
+.cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--user-ink);
+  font: inherit;
+  font-weight: 600;
+  font-size: clamp(.95rem, 4.6vw, 1.4rem);
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--ease);
+}
+.cell:nth-child(9n) { border-right: none; }
+.cell:nth-child(n+73) { border-bottom: none; }
+.cell.blk-right  { border-right: 2px solid var(--grid-strong); }
+.cell.blk-bottom { border-bottom: 2px solid var(--grid-strong); }
+
+.cell.is-given {
+  color: var(--given-ink);
+  font-weight: 800;
+  background: var(--given-bg);
+  cursor: default;
+}
+.cell.is-selected {
+  background: var(--sel-bg);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+.cell.is-conflict {
+  color: var(--conflict-ink);
+  background: var(--conflict-bg);
+}
+/* Konflikt zusaetzlich nicht-farblich markieren (Ausrufezeichen, Ecke) */
+.cell.is-conflict::after {
+  content: "!";
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  font-size: .62rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--conflict-ink);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  border-radius: var(--radius);
+  backdrop-filter: blur(2px);
+}
+.overlay[hidden] { display: none; }
+.overlay-title { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.overlay-score { margin: 0; color: var(--text-muted); font-weight: 600; }
+
+/* Zahlenleiste */
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  max-width: 460px;
+  margin: 0 auto 14px;
+}
+.num-btn {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+.num-btn:hover { border-color: var(--accent); }
+.num-erase { color: var(--text-muted); }
+.num-erase .lucide { width: 22px; height: 22px; display: block; }
+
+.controls { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--gap); margin: 0 0 16px; }
+.btn {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 0 18px var(--btn-glow); }
+.btn-ghost { color: var(--text-muted); }
+.btn-ghost:hover { color: var(--text); }
+
+.help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
+.help summary { cursor: pointer; font-weight: 600; }
+.help ul { margin: 8px 0 0; padding-left: 18px; }
+.help li { margin: 4px 0; }
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: .85rem;
+}
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 2px;
+}
+.footer-link:hover { color: var(--accent); }
+.footer-sep { color: var(--text-muted); }
+.footer-ico { width: 16px; height: 16px; display: inline-block; margin-right: 6px; }
+
+/* Fokus sichtbar (BFSG) */
+:where(button, summary, a):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 16px var(--focus-glow);
+}
+
+/* ============================================================
+   prefers-reduced-motion: Uebergaenge abschalten, der Spielkern
+   (Zahlen setzen, Konfliktmarkierung) bleibt vollstaendig erhalten.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ============================================================
+   Zurueck zum Portal: fester Link oben links im Kopf (Pfeil plus Wort).
+   Festes Ziel ../index.html (kein history.back), Touch-Ziel >= 44px,
+   Fokus ueber die globale :focus-visible Regel.
+   ============================================================ */
+.back-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .95rem;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.back-link:hover { border-color: var(--accent); color: var(--text); }
+.back-link .lucide { width: 20px; height: 20px; display: block; }
