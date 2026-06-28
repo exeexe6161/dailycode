@@ -413,35 +413,19 @@ a.tile:active { transform: translateY(-1px) scale(.99); }
    aria-label der Kachel. Bild quadratisch ohne Verzerrung: Container und
    Bild sind 1:1, daher zeigt object-fit cover das ganze Bild ohne Crop. */
 .tile-img { gap: 8px; }
-/* Quadratischer Kopfbereich, fuer Bildkacheln UND die grid9 Textkachel.
-   flex: none verhindert vertikales Schrumpfen im Flex-Spalten-Layout,
-   aspect-ratio haelt das Quadrat. So sind alle sechs Kacheln gleich
-   proportioniert. */
-.tile-cover,
-.tile-cover-name {
+/* Quadratischer Bildkopf aller Kacheln. flex: none verhindert vertikales
+   Schrumpfen im Flex-Spalten-Layout, aspect-ratio haelt das Quadrat, sodass
+   alle sechs Kacheln gleich proportioniert sind. object-fit contain zeigt das
+   ganze quadratische Bild ohne Beschnitt und ohne Verzerrung. */
+.tile-cover {
   flex: none;
   display: block;
   width: 100%;
+  height: auto;
   aspect-ratio: 1 / 1;
+  object-fit: contain;
   border-radius: var(--radius-sm);
   background: var(--surface-2);
-}
-/* Bild: ganzes quadratisches Bild ohne Beschnitt und ohne Verzerrung. */
-.tile-cover {
-  height: auto;
-  object-fit: contain;
-}
-/* grid9: Name typografisch mittig im quadratischen Kopf statt Bild. */
-.tile-cover-name {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 8px;
-  font-weight: 800;
-  font-size: 1.4rem;
-  letter-spacing: .5px;
-  color: var(--text);
 }
 .tile-badge {
   align-self: flex-start;
