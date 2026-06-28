@@ -37,6 +37,11 @@
   --cell-edge:    rgba(255, 255, 255, .55);
   --accent-sweep: rgba(59, 91, 219, .14);
 
+  /* Portal Akzent (Lebendig): zweiter Farbton, Hover-Glow, Licht-Sweep */
+  --accent-2:    #7c3aed;
+  --tile-glow:   rgba(59, 91, 219, .22);
+  --tile-sheen:  rgba(255, 255, 255, .65);
+
   /* Glow und Halo (Hell: aus). Im Dark mit Werten gefuellt, alle Glow
      Regeln sind token-getrieben und global, daher reagieren sie auf
      manuell dunkel UND auto bei System dunkel. */
@@ -89,6 +94,11 @@
   --cell-edge:    rgba(255, 255, 255, .05);
   --accent-sweep: rgba(108, 140, 255, .20);
 
+  /* Portal Akzent (Lebendig) */
+  --accent-2:    #a78bfa;
+  --tile-glow:   rgba(108, 140, 255, .42);
+  --tile-sheen:  rgba(255, 255, 255, .12);
+
   /* Glow und Halo aktiv */
   --halo:            rgba(255, 255, 255, .16);
   --btn-glow:        rgba(108, 140, 255, .32);
@@ -126,6 +136,11 @@
     --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
     --cell-edge:    rgba(255, 255, 255, .05);
     --accent-sweep: rgba(108, 140, 255, .20);
+
+    /* Portal Akzent (Lebendig) */
+    --accent-2:    #a78bfa;
+    --tile-glow:   rgba(108, 140, 255, .42);
+    --tile-sheen:  rgba(255, 255, 255, .12);
 
     /* Glow und Halo aktiv */
     --halo:            rgba(255, 255, 255, .16);
@@ -184,6 +199,11 @@ body {
   font-size: clamp(1.5rem, 6vw, 2rem);
   margin: 0 0 4px;
   letter-spacing: .5px;
+  color: var(--accent);
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; }
 
@@ -319,11 +339,71 @@ body {
   border-radius: var(--radius);
   color: var(--text);
   text-decoration: none;
+  overflow: hidden;
   box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow);
-  transition: border-color var(--ease), background var(--ease), transform var(--ease);
+  transition: border-color var(--ease), background var(--ease),
+              transform var(--ease), box-shadow var(--ease);
 }
-a.tile:hover { border-color: var(--accent); }
-a.tile:active { transform: scale(.985); }
+/* Akzent-Leiste oben (Farbverlauf) und Licht-Sweep, nur bei klickbaren Kacheln */
+a.tile::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity: .55;
+  transition: opacity var(--ease), height var(--ease);
+}
+a.tile::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, var(--tile-sheen), transparent);
+  transform: translateX(-180%) skewX(-18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+a.tile:hover {
+  border-color: transparent;
+  transform: translateY(-4px);
+  box-shadow: inset 0 1px 0 var(--cell-edge), 0 14px 30px var(--tile-glow);
+}
+a.tile:hover::before { opacity: 1; height: 4px; }
+a.tile:hover::after { animation: tileSheen 720ms ease; }
+a.tile:hover .tile-name {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+a.tile:active { transform: translateY(-1px) scale(.99); }
+
+@keyframes tileSheen {
+  from { opacity: 0; transform: translateX(-180%) skewX(-18deg); }
+  35%  { opacity: 1; }
+  to   { opacity: 0; transform: translateX(320%) skewX(-18deg); }
+}
+/* Gestaffeltes Einblenden der Kacheln beim Laden */
+@keyframes tileIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tiles .tile { animation: tileIn 460ms ease both; }
+.tiles .tile:nth-child(1) { animation-delay: 40ms; }
+.tiles .tile:nth-child(2) { animation-delay: 100ms; }
+.tiles .tile:nth-child(3) { animation-delay: 160ms; }
+.tiles .tile:nth-child(4) { animation-delay: 220ms; }
+.tiles .tile:nth-child(5) { animation-delay: 280ms; }
+
+/* Reduzierte Bewegung: alle Portal-Effekte als Aus-Schalter */
+@media (prefers-reduced-motion: reduce) {
+  .tiles .tile { animation: none; }
+  a.tile:hover { transform: none; }
+  a.tile:active { transform: none; }
+  a.tile:hover::after { animation: none; }
+}
 .tile-name { font-weight: 700; font-size: 1.05rem; }
 .tile-desc { color: var(--text-muted); font-size: .9rem; }
 .tile-badge {
