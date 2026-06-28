@@ -42,6 +42,13 @@
   --tile-glow:   rgba(59, 91, 219, .22);
   --tile-sheen:  rgba(255, 255, 255, .65);
 
+  /* Edler Startseiten-Look: Hintergrundschimmer, heller Ring, weiche Schatten */
+  --bg-glow-1:   rgba(124, 58, 237, .06);
+  --bg-glow-2:   rgba(255, 255, 255, .85);
+  --tile-ring:   rgba(255, 255, 255, .70);
+  --tile-shadow:       0 2px 6px rgba(20, 30, 60, .06), 0 14px 34px rgba(20, 30, 60, .10);
+  --tile-shadow-hover: 0 4px 10px rgba(20, 30, 60, .08), 0 22px 50px rgba(59, 91, 219, .16);
+
   /* Glow und Halo (Hell: aus). Im Dark mit Werten gefuellt, alle Glow
      Regeln sind token-getrieben und global, daher reagieren sie auf
      manuell dunkel UND auto bei System dunkel. */
@@ -54,7 +61,7 @@
   --radius:      14px;
   --radius-sm:   10px;
   --gap:         10px;
-  --maxw:        460px;
+  --maxw:        760px;
   --ease:        180ms ease;
 }
 
@@ -99,6 +106,12 @@
   --tile-glow:   rgba(108, 140, 255, .42);
   --tile-sheen:  rgba(255, 255, 255, .12);
 
+  --bg-glow-1:   rgba(108, 140, 255, .10);
+  --bg-glow-2:   rgba(255, 255, 255, .04);
+  --tile-ring:   rgba(255, 255, 255, .06);
+  --tile-shadow:       0 2px 6px rgba(0, 0, 0, .40), 0 16px 40px rgba(0, 0, 0, .50);
+  --tile-shadow-hover: 0 6px 14px rgba(0, 0, 0, .45), 0 26px 60px rgba(108, 140, 255, .28);
+
   /* Glow und Halo aktiv */
   --halo:            rgba(255, 255, 255, .16);
   --btn-glow:        rgba(108, 140, 255, .32);
@@ -141,6 +154,12 @@
     --accent-2:    #a78bfa;
     --tile-glow:   rgba(108, 140, 255, .42);
     --tile-sheen:  rgba(255, 255, 255, .12);
+
+    --bg-glow-1:   rgba(108, 140, 255, .10);
+    --bg-glow-2:   rgba(255, 255, 255, .04);
+    --tile-ring:   rgba(255, 255, 255, .06);
+    --tile-shadow:       0 2px 6px rgba(0, 0, 0, .40), 0 16px 40px rgba(0, 0, 0, .50);
+    --tile-shadow-hover: 0 6px 14px rgba(0, 0, 0, .45), 0 26px 60px rgba(108, 140, 255, .28);
 
     /* Glow und Halo aktiv */
     --halo:            rgba(255, 255, 255, .16);
@@ -190,22 +209,62 @@ body {
   line-height: 1.5;
   -webkit-text-size-adjust: 100%;
 }
+/* Feiner Hintergrundschimmer (hell und edel). Fixe Ebene hinter dem Inhalt,
+   token-getrieben mit Hell/Dunkel-Paritaet, keine Inline-Styles. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(62% 50% at 50% 0%, var(--bg-glow-2), transparent 72%),
+    radial-gradient(38% 38% at 84% 14%, var(--bg-glow-1), transparent 70%),
+    radial-gradient(42% 42% at 12% 88%, var(--bg-glow-1), transparent 72%);
+}
 
 .app { width: 100%; max-width: var(--maxw); }
 
-/* Kopf */
-.head { text-align: center; margin-bottom: 16px; }
+/* Kopf: gestalteter Header, Wortmarke links, Bedien-Cluster rechts, Haarlinie unten */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: left;
+  margin: 4px 0 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.head-brand { min-width: 0; }
 .title {
-  font-size: clamp(1.5rem, 6vw, 2rem);
-  margin: 0 0 4px;
-  letter-spacing: .5px;
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  margin: 0 0 2px;
+  letter-spacing: -.01em;
+  line-height: 1.1;
   color: var(--accent);
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; }
+.subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; letter-spacing: .01em; }
+
+/* Bedien-Cluster: Sprache und Theme als eine ruhige Sammelflaeche */
+.head-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.head-controls .langbar,
+.head-controls .themebar { margin: 0; gap: 0; }
+.head-controls .icon-btn { border-color: transparent; background: transparent; min-height: 44px; }
+.head-controls .icon-btn:hover { background: var(--surface-2); border-color: transparent; color: var(--text); }
 
 /* Sprachumschalter */
 .langbar {
@@ -316,44 +375,29 @@ body {
    dieselben Themewerte zeigen.
    ============================================================ */
 .tiles {
-  /* Responsives Kachelraster fuer 5 und mehr Kacheln. Flexbox mit
-     Umbruch und zentrierten Reihen: schmal eine Spalte (gestapelt),
-     breiter zwei Spalten, eine ungerade letzte Kachel bleibt zentriert. */
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--gap);
-  margin: 8px 0 16px;
+  /* Grosszuegiges Raster: Handy zwei Spalten, ab 560px drei Spalten. */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 10px 0 16px;
+}
+@media (min-width: 560px) {
+  .tiles { grid-template-columns: repeat(3, 1fr); gap: 20px; }
 }
 .tile {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 0 1 calc(50% - var(--gap));
-  min-width: 150px;
-  min-height: 120px;
-  padding: 16px;
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
   color: var(--text);
   text-decoration: none;
-  overflow: hidden;
-  box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow);
-  transition: border-color var(--ease), background var(--ease),
-              transform var(--ease), box-shadow var(--ease);
+  box-shadow: inset 0 0 0 1px var(--tile-ring), var(--tile-shadow);
+  transition: transform var(--ease), box-shadow var(--ease);
 }
-/* Akzent-Leiste oben (Farbverlauf) und Licht-Sweep, nur bei klickbaren Kacheln */
-a.tile::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  opacity: .55;
-  transition: opacity var(--ease), height var(--ease);
-}
+/* Weicher Licht-Sweep beim Hover (dezent), nur bei klickbaren Kacheln */
 a.tile::after {
   content: "";
   position: absolute;
@@ -366,19 +410,11 @@ a.tile::after {
   pointer-events: none;
 }
 a.tile:hover {
-  border-color: transparent;
-  transform: translateY(-4px);
-  box-shadow: inset 0 1px 0 var(--cell-edge), 0 14px 30px var(--tile-glow);
+  transform: translateY(-5px);
+  box-shadow: inset 0 0 0 1px var(--tile-ring), var(--tile-shadow-hover);
 }
-a.tile:hover::before { opacity: 1; height: 4px; }
-a.tile:hover::after { animation: tileSheen 720ms ease; }
-a.tile:hover .tile-name {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-a.tile:active { transform: translateY(-1px) scale(.99); }
+a.tile:hover::after { animation: tileSheen 760ms ease; }
+a.tile:active { transform: translateY(-2px) scale(.99); }
 
 @keyframes tileSheen {
   from { opacity: 0; transform: translateX(-180%) skewX(-18deg); }
@@ -405,26 +441,13 @@ a.tile:active { transform: translateY(-1px) scale(.99); }
   a.tile:active { transform: none; }
   a.tile:hover::after { animation: none; }
 }
-.tile-name { font-weight: 700; font-size: 1.05rem; }
-.tile-desc { color: var(--text-muted); font-size: .9rem; }
-
-/* Cover-Kacheln: das quadratische Bild ersetzt den sichtbaren Namen
-   (Name ist ins Bild eingebrannt). Der vorlesbare Name kommt ueber das
-   aria-label der Kachel. Bild quadratisch ohne Verzerrung: Container und
-   Bild sind 1:1, daher zeigt object-fit cover das ganze Bild ohne Crop. */
-.tile-img { gap: 8px; }
-/* Quadratischer Bildkopf aller Kacheln. flex: none verhindert vertikales
-   Schrumpfen im Flex-Spalten-Layout, aspect-ratio haelt das Quadrat, sodass
-   alle sechs Kacheln gleich proportioniert sind. object-fit contain zeigt das
-   ganze quadratische Bild ohne Beschnitt und ohne Verzerrung. */
+/* Das Cover fuellt die quadratische Kachel ganz, ohne Beschnitt (Kachel und
+   Bild sind beide 1:1). Der vorlesbare Name kommt ueber das aria-label. */
 .tile-cover {
-  flex: none;
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   object-fit: contain;
-  border-radius: var(--radius-sm);
   background: var(--surface-2);
 }
 .tile-badge {
