@@ -62,7 +62,9 @@
     help_2: 'Tippe zwei Felder an oder bewege den Rahmen mit den Pfeiltasten und bestaetige mit Enter.',
     help_3: 'Zwei gleiche bleiben offen. Geht das Fehlerbudget auf null, ist die Runde vorbei.',
     nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum'
+    nav_imprint: 'Impressum',
+    back: 'Zurueck',
+    back_aria: 'Zurueck zur Startseite'
   };
   function t(key) { var v = STR[key]; return v === undefined ? key : v; }
 
@@ -465,6 +467,9 @@
     setText('lblScore', t('lbl_score'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
+    setText('backLabel', t('back'));
+    var backLinkEl = document.getElementById('backLink');
+    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

@@ -52,7 +52,9 @@
     help_2: 'Sammle die leuchtenden Punkte, die Kette waechst und wird schneller.',
     help_3: 'Die Raender sind offen, nur der Lauf in den eigenen Koerper beendet das Spiel.',
     nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum'
+    nav_imprint: 'Impressum',
+    back: 'Zurueck',
+    back_aria: 'Zurueck zur Startseite'
   };
   function t(key) {
     var v = STR[key];
@@ -568,6 +570,9 @@
     if (subtitleEl) subtitleEl.textContent = t('subtitle');
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
+    setText('backLabel', t('back'));
+    var backLinkEl = document.getElementById('backLink');
+    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

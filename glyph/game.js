@@ -81,7 +81,8 @@
       help_1: 'Buchstaben antippen oder ueber die Tastatur tippen, dann mit Enter pruefen.',
       help_2: 'Jeder Buchstabe ist einmal nutzbar; nach einem Wort ruecken neue nach.',
       help_3: 'Laengere Woerter geben mehr Punkte und mehr Zeit. Leertaste pausiert.',
-      nav_privacy: 'Datenschutz', nav_imprint: 'Impressum'
+      nav_privacy: 'Datenschutz', nav_imprint: 'Impressum',
+      back: 'Zurueck', back_aria: 'Zurueck zur Startseite'
     },
     en: {
       subtitle: 'Build as many words from the letters as you can.',
@@ -103,7 +104,8 @@
       help_1: 'Tap letters or type them on the keyboard, then press Enter to check.',
       help_2: 'Each letter is used once; new letters slide in after a word.',
       help_3: 'Longer words give more points and more time. Space pauses.',
-      nav_privacy: 'Privacy', nav_imprint: 'Imprint'
+      nav_privacy: 'Privacy', nav_imprint: 'Imprint',
+      back: 'Back', back_aria: 'Back to start'
     }
   };
   function uiTable() { return STR[uiLang] || STR.en; }   // tr-UI faellt auf en zurueck
@@ -501,6 +503,9 @@
     setText('undoBtn', t('btn_undo')); setText('clearBtn', t('btn_clear')); setText('submitBtn', t('btn_submit'));
     setText('restartBtn', t('btn_restart'));
     setText('navPrivacy', t('nav_privacy')); setText('navImprint', t('nav_imprint'));
+    setText('backLabel', t('back'));
+    var backLinkEl = document.getElementById('backLink');
+    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
     setText('helpSummary', t('help_summary')); setText('help1', t('help_1')); setText('help2', t('help_2')); setText('help3', t('help_3'));
     if (rackEl) rackEl.setAttribute('aria-label', t('aria_rack'));
     setPauseLabel();

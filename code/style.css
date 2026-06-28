@@ -635,3 +635,28 @@ button.slot:not(:disabled):active { transform: scale(.96); }
 /* Dezente Schmuck-Icons vor den Footer-Links (aria-hidden am SVG) */
 .footer-link { display: inline-flex; align-items: center; }
 .footer-ico { width: 16px; height: 16px; display: inline-block; margin-right: 6px; }
+
+/* ============================================================
+   Zurueck zum Portal: fester Link oben links im Kopf (Pfeil plus Wort).
+   Festes Ziel ../index.html (kein history.back), Touch-Ziel >= 44px,
+   Fokus ueber die globale :focus-visible Regel.
+   ============================================================ */
+.head { position: relative; }
+.back-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .95rem;
+  transition: color var(--ease), background var(--ease);
+}
+.back-link:hover { color: var(--text); }
+.back-link .lucide { width: 20px; height: 20px; display: block; }

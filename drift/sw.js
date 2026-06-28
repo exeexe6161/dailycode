@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-drift-v1';
+var CACHE = 'dailycode-drift-v2';
 var PREFIX = 'dailycode-drift-';
 
 var ASSETS = [

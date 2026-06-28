@@ -58,7 +58,9 @@
     help_2: 'Drei oder mehr gleiche Formen, die sich beruehren, loesen sich auf und geben Punkte.',
     help_3: 'Ketten geben Bonus. Vorbei ist es, wenn oben kein Platz mehr bleibt.',
     nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum'
+    nav_imprint: 'Impressum',
+    back: 'Zurueck',
+    back_aria: 'Zurueck zur Startseite'
   };
   function t(key) {
     var v = STR[key];
@@ -694,6 +696,9 @@
     if (subtitleEl) subtitleEl.textContent = t('subtitle');
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
+    setText('backLabel', t('back'));
+    var backLinkEl = document.getElementById('backLink');
+    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));
