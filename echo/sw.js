@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-echo-v3';
+var CACHE = 'dailycode-echo-v4';
 var PREFIX = 'dailycode-echo-';
 
 var ASSETS = [

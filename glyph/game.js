@@ -63,7 +63,7 @@
   var STR = {
     de: {
       subtitle: 'Bilde Woerter aus den Buchstaben, so viele wie moeglich.',
-      lbl_score: 'Punkte', lbl_best: 'Bestwert', lbl_time: 'Zeit',
+      lbl_score: 'Punkte', lbl_best: 'Bestwert', best_none: 'noch keine', lbl_time: 'Zeit',
       btn_undo: 'Zurueck', btn_clear: 'Leeren', btn_submit: 'Pruefen',
       btn_pause: 'Pause', btn_resume: 'Weiter', btn_restart: 'Neu',
       loading: 'Lade Woerterbuch',
@@ -86,7 +86,7 @@
     },
     en: {
       subtitle: 'Build as many words from the letters as you can.',
-      lbl_score: 'Score', lbl_best: 'Best', lbl_time: 'Time',
+      lbl_score: 'Score', lbl_best: 'Best', best_none: 'none yet', lbl_time: 'Time',
       btn_undo: 'Undo', btn_clear: 'Clear', btn_submit: 'Check',
       btn_pause: 'Pause', btn_resume: 'Resume', btn_restart: 'New',
       loading: 'Loading dictionary',
@@ -217,7 +217,7 @@
   var rack = [];                // RACK Buchstaben (lowercase)
   var freshFlags = [];          // fuer die Nachschub-Animation
   var selection = [];           // Indizes in rack, in Auswahlreihenfolge
-  var score = 0, best = 0, remaining = START_TIME;
+  var score = 0, best = null, remaining = START_TIME;
   var warnedAt = {};            // Zeitwarnungen nur einmal
 
   /* ---------- Generator mit Spielbarkeitsgarantie ---------- */
@@ -312,7 +312,7 @@
   }
   function updateHud() {
     if (hudScoreEl) hudScoreEl.textContent = String(score);
-    if (hudBestEl) hudBestEl.textContent = String(best);
+    if (hudBestEl) hudBestEl.textContent = (best == null) ? t('best_none') : String(best);
     if (hudTimeEl) {
       hudTimeEl.textContent = String(Math.max(0, Math.ceil(remaining)));
       hudTimeEl.classList.toggle('low', remaining <= 10);
@@ -350,7 +350,7 @@
     var pts = scoreFor(word.length);
     score += pts;
     remaining = Math.min(TIME_CAP, remaining + bonusFor(word.length));
-    if (score > best) { best = score; saveBest(); }
+    if (best == null || score > best) { best = score; saveBest(); }
     var consumed = selection.slice();
     selection = [];
     refill(consumed);
@@ -384,12 +384,15 @@
 
   /* ---------- Highscore (pro Wortsprache, defensiv) ---------- */
   function bestKey() { return 'dailycode:glyph:best:' + wordLang; }
-  function loadBest() {
-    best = 0;
-    if (!hasStorage) return;
-    try { var v = window.localStorage.getItem(bestKey()); if (v != null) { var n = parseInt(v, 10); if (!isNaN(n) && n >= 0) best = n; } } catch (e) {}
+  // Einheitliches null-Muster (Vorbild grid9): kein gespeicherter Wert ergibt
+  // null, nicht 0, damit "noch keine" sauber von einem echten 0-Wert getrennt ist.
+  function loadBestVal() {
+    if (!hasStorage) return null;
+    try { var v = window.localStorage.getItem(bestKey()); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
+    catch (e) { return null; }
   }
-  function saveBest() { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(), String(best)); } catch (e) {} }
+  function loadBest() { best = loadBestVal(); }
+  function saveBest() { if (!hasStorage || best == null) return; try { window.localStorage.setItem(bestKey(), String(best)); } catch (e) {} }
 
   /* ---------- Lauf, Pause, Spielende ---------- */
   function setPauseLabel() { if (pauseBtn) pauseBtn.textContent = (phase === 'pause') ? t('btn_resume') : t('btn_pause'); }
@@ -415,9 +418,9 @@
   function gameOver() {
     phase = 'over';
     stopClock();
-    if (score > best) { best = score; saveBest(); }
+    if (best == null || score > best) { best = score; saveBest(); }
     updateHud();
-    showOverlay(t('over_title'), t('lbl_score') + ' ' + score + (best ? '  ·  ' + t('lbl_best') + ' ' + best : ''), t('over_restart'));
+    showOverlay(t('over_title'), t('lbl_score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''), t('over_restart'));
     announce(t('over_title') + ', ' + t('lbl_score') + ' ' + score);
   }
 

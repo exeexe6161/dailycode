@@ -41,6 +41,8 @@
     lbl_level: 'Stufe',
     lbl_lives: 'Fehler übrig',
     lbl_score: 'Punkte',
+    lbl_best: 'Bestwert',
+    best_none: 'noch keine',
     msg_memorize: 'Einpraegen',
     msg_go: 'Los, finde die Paare',
     msg_match: 'Paar gefunden',
@@ -115,6 +117,7 @@
   var hudLevelEl    = document.getElementById('hudLevel');
   var hudLivesEl    = document.getElementById('hudLives');
   var hudScoreEl    = document.getElementById('hudScore');
+  var hudBestEl     = document.getElementById('hudBest');
   var linkPrivacyEl = document.getElementById('linkPrivacy');
   var linkImprintEl = document.getElementById('linkImprint');
 
@@ -214,7 +217,6 @@
   var cols = 3;
   var level = 1;
   var score = 0;
-  var best = 0;                 // Highscore-Logik vorbereitet, Persistenz spaeter
   var mistakes = MISTAKES_START;
   var pairsThisLevel = START_PAIRS;
   var foundPairs = 0;
@@ -225,8 +227,22 @@
   function colsForPairs(p) { return (p <= 6) ? 3 : 4; }
   function previewMs(lvl) { return Math.max(PREVIEW_MIN, PREVIEW_BASE - (lvl - 1) * PREVIEW_STEP); }
 
-  /* ---------- Highscore-Logik vorbereitet (Persistenz folgt spaeter) ---------- */
-  function recordBest() { if (score > best) best = score; /* spaeter: lokal speichern */ }
+  /* ---------- Bestwert (einheitliches null-Muster, Vorbild grid9) ----------
+     Score, hoeher ist besser. Kein gespeicherter Wert ergibt null, daher
+     "noch keine" statt 0. hasStorage-Preflight, try/catch, Bereichspruefung. */
+  function bestKey() { return 'dailycode:echo:best'; }
+  function loadBestVal() {
+    if (!hasStorage) return null;
+    try { var v = window.localStorage.getItem(bestKey()); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
+    catch (e) { return null; }
+  }
+  function saveBest(val) { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(), String(val)); } catch (e) {} }
+  function updateBest() {
+    if (!hudBestEl) return;
+    var v = loadBestVal();
+    hudBestEl.textContent = (v == null) ? t('best_none') : String(v);
+  }
+  function recordBest() { var p = loadBestVal(); if (p == null || score > p) saveBest(score); updateBest(); }
 
   /* ---------- Brett aufbauen ---------- */
   function shuffle(arr) {
@@ -317,6 +333,7 @@
     if (hudLevelEl) hudLevelEl.textContent = String(level);
     if (hudLivesEl) hudLivesEl.textContent = String(mistakes);
     if (hudScoreEl) hudScoreEl.textContent = String(score);
+    updateBest();
   }
   function announce(msg) { if (statusEl) statusEl.textContent = msg; }
 
@@ -394,7 +411,8 @@
   function gameOver() {
     phase = 'over';
     recordBest();
-    showOverlay(t('over_title'), t('lbl_level') + ' ' + level + ', ' + t('lbl_score') + ' ' + score, t('over_restart'));
+    var best = loadBestVal();
+    showOverlay(t('over_title'), t('lbl_level') + ' ' + level + ', ' + t('lbl_score') + ' ' + score + (best != null ? ', ' + t('lbl_best') + ' ' + best : ''), t('over_restart'));
     announce(t('over_title') + ', ' + t('lbl_score') + ' ' + score);
   }
 
@@ -465,6 +483,7 @@
     setText('lblLevel', t('lbl_level'));
     setText('lblLives', t('lbl_lives'));
     setText('lblScore', t('lbl_score'));
+    setText('lblBest', t('lbl_best'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
     setText('backLabel', t('back'));

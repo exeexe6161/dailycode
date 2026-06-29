@@ -29,6 +29,8 @@
   var STR = {
     subtitle: 'Lenke die wachsende Kette ueber das Feld.',
     score: 'Punkte',
+    lbl_best: 'Bestwert',
+    best_none: 'noch keine',
     pause: 'Pause',
     resume: 'Weiter',
     restart: 'Neu',
@@ -79,6 +81,7 @@
   var themeFeedbackEl = document.getElementById('themeFeedback');
   var subtitleEl    = document.getElementById('subtitle');
   var scoreEl       = document.getElementById('score');
+  var bestEl        = document.getElementById('best');
   var canvas        = document.getElementById('playfield');
   var overlayEl     = document.getElementById('overlay');
   var overlayTitleEl = document.getElementById('overlayTitle');
@@ -263,6 +266,23 @@
 
   function updateScore() {
     if (scoreEl) scoreEl.textContent = t('score') + ' ' + score;
+    updateBest();
+  }
+
+  /* ---------- Bestwert (einheitliches null-Muster, Vorbild grid9) ----------
+     Score, hoeher ist besser. Kein gespeicherter Wert ergibt null, daher
+     "noch keine" statt 0. hasStorage-Preflight, try/catch, Bereichspruefung. */
+  function bestKey() { return 'dailycode:drift:best'; }
+  function loadBestVal() {
+    if (!hasStorage) return null;
+    try { var v = window.localStorage.getItem(bestKey()); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
+    catch (e) { return null; }
+  }
+  function saveBest(val) { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(), String(val)); } catch (e) {} }
+  function updateBest() {
+    if (!bestEl) return;
+    var v = loadBestVal();
+    bestEl.textContent = t('lbl_best') + ' ' + ((v == null) ? t('best_none') : v);
   }
 
   /* ---------- Richtungseingabe: 180 Grad Sperre und Entprellung ----------
@@ -462,7 +482,13 @@
     won = !!isWin;
     stopLoop();
     render();
-    showOverlay(won ? t('won_title') : t('over_title'), t('score') + ' ' + score, t('over_restart'));
+    var prev = loadBestVal();
+    if (prev == null || score > prev) saveBest(score);
+    var best = loadBestVal();
+    updateBest();
+    showOverlay(won ? t('won_title') : t('over_title'),
+      t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
+      t('over_restart'));
     if (scoreEl) scoreEl.textContent = (won ? t('won_title') : t('over_title')) + ', ' + t('score') + ' ' + score;
   }
 
