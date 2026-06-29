@@ -1,0 +1,344 @@
+/* ============================================================
+   dailycode  Achtes Spiel (Arbeitstitel flow8)  Tokens und Styles
+   Token Disziplin: Werte als CSS Variablen, Hell und Dunkel Paritaet.
+   Der Token Block ist aus dem System uebernommen, damit Portal und
+   alle Spiele dieselben Themewerte zeigen. Keine Inline-Styles. Das
+   Spielfeld ist ein Canvas; seine Farben werden zur Laufzeit aus CSS
+   Variablen gelesen (getComputedStyle) und im Canvas gezeichnet, der
+   einzige "dynamische" DOM Wert ist die Canvas Pixelgroesse (CSSOM).
+
+   Barrierefreiheit: Die Endpunkte tragen ZUSAETZLICH zur Farbe eine
+   Ziffer (1..K). Die Farbpalette ist farbsehschwaeche-sicher (kein
+   reines Rot/Gruen nebeneinander), die Ziffer reicht zum Unterscheiden.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+
+  --bg:          #f4f5f7;
+  --surface:     #ffffff;
+  --surface-2:   #eceef1;
+  --border:      #d2d6dc;
+  --text:        #1c1f24;
+  --text-muted:  #5b6470;
+
+  --accent:      #3b5bdb;
+  --accent-ink:  #ffffff;
+  --focus:       #1f6feb;
+
+  --good:        #0f7a4f;
+
+  /* Spielfeld (Hell) */
+  --field-bg:    #ffffff;
+  --field-grid:  rgba(20, 30, 60, .10);
+  --field-cell:  #f6f7f9;
+  --endpoint-ink:#ffffff;
+
+  /* Wegfarben (Hell), Okabe-Ito-nah, gut unterscheidbar,
+     kein reines Rot/Gruen nebeneinander. Ziffer 1..K als Zusatzmerkmal. */
+  --path-1: #2563c9;
+  --path-2: #c77400;
+  --path-3: #0e8f86;
+  --path-4: #7c3aed;
+  --path-5: #c026a8;
+  --path-6: #51607a;
+
+  --cell-shadow:  0 2px 8px rgba(20, 30, 60, .08);
+  --cell-edge:    rgba(255, 255, 255, .55);
+
+  --halo:            transparent;
+  --btn-glow:        transparent;
+  --focus-glow:      transparent;
+
+  --radius:      14px;
+  --radius-sm:   10px;
+  --gap:         10px;
+  --maxw:        460px;
+  --ease:        180ms ease;
+}
+
+:root[data-theme="dark"] {
+  --bg:          #0a0c11;
+  --surface:     #14171f;
+  --surface-2:   #1b1f29;
+  --border:      #2a2f3b;
+  --text:        #e9ecf3;
+  --text-muted:  #8b93a3;
+
+  --accent:      #6b8cff;
+  --accent-ink:  #0a0c11;
+  --focus:       #9ab0ff;
+
+  --good:        #4ade80;
+
+  --field-bg:    #0f131b;
+  --field-grid:  rgba(255, 255, 255, .07);
+  --field-cell:  #161b25;
+  --endpoint-ink:#0a0c11;
+
+  --path-1: #6b9bff;
+  --path-2: #f2a93b;
+  --path-3: #2dd4bf;
+  --path-4: #b794ff;
+  --path-5: #f06fd6;
+  --path-6: #9aa6be;
+
+  --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
+  --cell-edge:    rgba(255, 255, 255, .05);
+
+  --halo:            rgba(255, 255, 255, .16);
+  --btn-glow:        rgba(108, 140, 255, .32);
+  --focus-glow:      rgba(108, 140, 255, .4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg:          #0a0c11;
+    --surface:     #14171f;
+    --surface-2:   #1b1f29;
+    --border:      #2a2f3b;
+    --text:        #e9ecf3;
+    --text-muted:  #8b93a3;
+
+    --accent:      #6b8cff;
+    --accent-ink:  #0a0c11;
+    --focus:       #9ab0ff;
+
+    --good:        #4ade80;
+
+    --field-bg:    #0f131b;
+    --field-grid:  rgba(255, 255, 255, .07);
+    --field-cell:  #161b25;
+    --endpoint-ink:#0a0c11;
+
+    --path-1: #6b9bff;
+    --path-2: #f2a93b;
+    --path-3: #2dd4bf;
+    --path-4: #b794ff;
+    --path-5: #f06fd6;
+    --path-6: #9aa6be;
+
+    --cell-shadow:  0 6px 22px rgba(0, 0, 0, .45);
+    --cell-edge:    rgba(255, 255, 255, .05);
+
+    --halo:            rgba(255, 255, 255, .16);
+    --btn-glow:        rgba(108, 140, 255, .32);
+    --focus-glow:      rgba(108, 140, 255, .4);
+  }
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: clamp(12px, 4vw, 28px) 14px 44px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app { width: 100%; max-width: var(--maxw); }
+
+.head { text-align: center; margin-bottom: 16px; position: relative; }
+.title {
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  margin: 0 0 4px;
+  letter-spacing: .5px;
+}
+.subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; }
+
+.themebar { display: flex; justify-content: center; gap: 6px; margin: 0 0 16px; }
+
+.lucide {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--text); }
+.icon-btn .lucide { width: 22px; height: 22px; display: block; }
+
+.toggle-feedback {
+  text-align: center;
+  min-height: 1.3em;
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--ease);
+}
+.toggle-feedback.show { opacity: 1; }
+
+/* HUD: Stufe, Felder, Bestwert */
+.hud {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+.hud-label { color: var(--text-muted); font-weight: 600; }
+.hud-val { color: var(--text); }
+
+.status {
+  text-align: center;
+  margin: 0 0 12px;
+  min-height: 1.4em;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.status.is-good { color: var(--good); }
+
+/* ============================================================
+   Spielfeld: Canvas, quadratisch, skaliert mit der Breite. touch-action
+   none, damit das Ziehen nicht scrollt (fluessige Zeigereingabe).
+   ============================================================ */
+.stage { position: relative; width: 100%; margin: 0 auto 16px; }
+.board {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--field-bg);
+  box-shadow: inset 0 1px 0 var(--cell-edge), var(--cell-shadow);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border-radius: var(--radius);
+  backdrop-filter: blur(2px);
+}
+.overlay[hidden] { display: none; }
+.overlay-title { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.overlay-score { margin: 0; color: var(--text-muted); font-weight: 600; }
+
+.controls { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--gap); margin: 0 0 16px; }
+.btn {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 0 18px var(--btn-glow); }
+.btn-ghost { color: var(--text-muted); }
+.btn-ghost:hover { color: var(--text); }
+
+.help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
+.help summary { cursor: pointer; font-weight: 600; }
+.help ul { margin: 8px 0 0; padding-left: 18px; }
+.help li { margin: 4px 0; }
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: .85rem;
+}
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 2px;
+}
+.footer-link:hover { color: var(--accent); }
+.footer-sep { color: var(--text-muted); }
+.footer-ico { width: 16px; height: 16px; display: inline-block; margin-right: 6px; }
+
+/* Fokus sichtbar (BFSG) */
+:where(button, summary, a):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 16px var(--focus-glow);
+}
+.board:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   prefers-reduced-motion: Zier-Uebergaenge abschalten. Der Spielkern
+   (Zeichnen der Wege, Treffer) bleibt vollstaendig erhalten.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ============================================================
+   Zurueck zum Portal: fester Link oben links im Kopf (Pfeil plus Wort).
+   Festes Ziel ../index.html (kein history.back), Touch-Ziel >= 44px,
+   Fokus ueber die globale :focus-visible Regel.
+   ============================================================ */
+.back-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .95rem;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.back-link:hover { border-color: var(--accent); color: var(--text); }
+.back-link .lucide { width: 20px; height: 20px; display: block; }
