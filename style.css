@@ -270,8 +270,6 @@ body::before {
   /* zarter, edler Schimmer im violetten Akzent, ruhig */
   text-shadow: 0 1px 20px color-mix(in srgb, var(--accent-2) 20%, transparent);
 }
-.subtitle { margin: 0; color: var(--text-muted); font-size: .92rem; letter-spacing: .015em; }
-
 /* Bedien-Cluster: Sprache und Theme als eine ruhige Sammelflaeche */
 .head-controls {
   display: inline-flex;

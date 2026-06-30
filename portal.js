@@ -38,7 +38,6 @@
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ---------- */
   var I18N = {
     de: {
-      subtitle: 'Eine kleine Sammlung täglicher Rätsel.',
       aria_tiles: 'Spielesammlung',
       tile_game_name: 'Code des Tages',
       tile_game_aria: 'Öffnen: Code des Tages',
@@ -68,7 +67,6 @@
       nav_imprint: 'Impressum'
     },
     en: {
-      subtitle: 'A small collection of daily puzzles.',
       aria_tiles: 'Puzzle collection',
       tile_game_name: 'Daily code',
       tile_game_aria: 'Open: Daily code',
@@ -98,7 +96,6 @@
       nav_imprint: 'Imprint'
     },
     tr: {
-      subtitle: 'Küçük bir günlük bulmaca koleksiyonu.',
       aria_tiles: 'Bulmaca koleksiyonu',
       tile_game_name: 'Günün kodu',
       tile_game_aria: 'Aç: Günün kodu',
