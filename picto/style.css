@@ -1,0 +1,320 @@
+/* ============================================================
+   dailycode  Picto  Tokens und Styles
+   Token Disziplin: Werte als CSS Variablen, Hell und Dunkel Paritaet.
+   Der Token Block ist aus dem System uebernommen, damit Portal und
+   alle Spiele dieselben Themewerte zeigen. Keine Inline-Styles ausser
+   den strukturellen Gitter Massen (--picto-cols/rows), die game.js zur
+   Laufzeit setzt, das ist Layout, keine Designentscheidung.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+
+  --bg:          #f4f5f7;
+  --surface:     #ffffff;
+  --surface-2:   #eceef1;
+  --border:      #d2d6dc;
+  --text:        #1c1f24;
+  --text-muted:  #5b6470;
+
+  --accent:      #3b5bdb;
+  --accent-ink:  #ffffff;
+  --focus:       #1f6feb;
+
+  --good:        #0f7a4f;
+
+  --field-bg:    #ffffff;
+  --field-cell:  #f6f7f9;
+
+  --halo:            transparent;
+  --btn-glow:        transparent;
+  --focus-glow:      transparent;
+
+  --radius:      14px;
+  --radius-sm:   10px;
+  --gap:         10px;
+  --maxw:        460px;
+  --ease:        180ms ease;
+}
+
+:root[data-theme="dark"] {
+  --bg:          #0a0c11;
+  --surface:     #14171f;
+  --surface-2:   #1b1f29;
+  --border:      #2a2f3b;
+  --text:        #e9ecf3;
+  --text-muted:  #8b93a3;
+
+  --accent:      #6b8cff;
+  --accent-ink:  #0a0c11;
+  --focus:       #9ab0ff;
+
+  --good:        #4ade80;
+
+  --field-bg:    #0f131b;
+  --field-cell:  #161b25;
+
+  --halo:            rgba(255, 255, 255, .16);
+  --btn-glow:        rgba(108, 140, 255, .32);
+  --focus-glow:      rgba(108, 140, 255, .4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg:          #0a0c11;
+    --surface:     #14171f;
+    --surface-2:   #1b1f29;
+    --border:      #2a2f3b;
+    --text:        #e9ecf3;
+    --text-muted:  #8b93a3;
+
+    --accent:      #6b8cff;
+    --accent-ink:  #0a0c11;
+    --focus:       #9ab0ff;
+
+    --good:        #4ade80;
+
+    --field-bg:    #0f131b;
+    --field-cell:  #161b25;
+
+    --halo:            rgba(255, 255, 255, .16);
+    --btn-glow:        rgba(108, 140, 255, .32);
+    --focus-glow:      rgba(108, 140, 255, .4);
+  }
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: clamp(12px, 4vw, 28px) 14px 44px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app { width: 100%; max-width: var(--maxw); }
+
+.head { text-align: center; margin-bottom: 16px; position: relative; }
+.head-logo { display: inline-flex; align-items: center; margin: 0 0 3px; }
+.logo-light, .logo-dark { height: 3.5rem; width: auto; display: block; }
+.logo-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .logo-light { display: none; }
+  :root[data-theme="auto"] .logo-dark { display: block; }
+}
+:root[data-theme="dark"] .logo-light { display: none; }
+:root[data-theme="dark"] .logo-dark { display: block; }
+.subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; }
+
+.themebar { display: flex; justify-content: center; gap: 6px; margin: 0 0 16px; }
+
+.lucide {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--text); }
+.icon-btn .lucide { width: 22px; height: 22px; display: block; }
+
+.toggle-feedback {
+  text-align: center;
+  min-height: 1.3em;
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--ease);
+}
+.toggle-feedback.show { opacity: 1; }
+
+/* ============================================================
+   Picto Spielbereich: Stufenwahl, Status, Gitter mit Zeilen- und
+   Spaltenhinweisen, Aktionen, Gewinnbanner. Zellgroesse fest (28px),
+   bei groesseren Stufen scrollt picto-board-wrap horizontal statt
+   die Zellen unter Mindestgroesse (BFSG Touchziel) zu schrumpfen.
+   ============================================================ */
+.picto-root { margin: 0 0 16px; }
+
+.picto-levels { display: flex; justify-content: center; gap: 8px; margin: 0 0 12px; }
+.picto-level-btn {
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  min-height: 36px;
+  border-radius: 18px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+.picto-level-btn:hover { border-color: var(--accent); color: var(--text); }
+.picto-level-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.picto-status {
+  text-align: center;
+  margin: 0 0 12px;
+  min-height: 1.4em;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.picto-board-wrap { overflow: auto; margin: 0 auto 16px; width: max-content; max-width: 100%; }
+.picto-table {
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  grid-template-columns: auto repeat(var(--picto-cols), 28px);
+  grid-template-rows: auto repeat(var(--picto-rows), 28px);
+}
+.picto-corner { grid-column: 1; grid-row: 1; }
+.picto-col-clue {
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 11px;
+  line-height: 1.15;
+  color: var(--text-muted);
+  padding-bottom: 3px;
+}
+.picto-col-clue.is-satisfied { color: var(--border); }
+.picto-row-clue {
+  grid-column: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-right: 8px;
+  white-space: nowrap;
+}
+.picto-row-clue.is-satisfied { color: var(--border); }
+.picto-cell {
+  width: 28px;
+  height: 28px;
+  background: var(--field-cell);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+.picto-cell.is-filled { background: var(--accent); border-color: var(--accent); }
+.picto-cell.is-marked { background: var(--field-cell); position: relative; }
+.picto-cell.is-marked::before, .picto-cell.is-marked::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 50%;
+  height: 1px;
+  background: var(--text-muted);
+}
+.picto-cell.is-marked::before { transform: rotate(45deg); }
+.picto-cell.is-marked::after { transform: rotate(-45deg); }
+
+.picto-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--gap); margin: 0 0 16px; }
+.picto-win { text-align: center; margin: 0 0 8px; font-size: .95rem; font-weight: 700; color: var(--good); }
+
+.btn {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+.btn:hover { border-color: var(--accent); }
+.btn-ghost { color: var(--text-muted); }
+.btn-ghost:hover { color: var(--text); }
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: .85rem;
+}
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 2px;
+}
+.footer-link:hover { color: var(--accent); }
+.footer-sep { color: var(--text-muted); }
+.footer-ico { width: 16px; height: 16px; display: inline-block; margin-right: 6px; }
+
+/* Fokus sichtbar (BFSG) */
+:where(button, summary, a):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 16px var(--focus-glow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* Zurueck zum Portal: fester Link oben links im Kopf (Pfeil plus Wort). */
+.back-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .95rem;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.back-link:hover { border-color: var(--accent); color: var(--text); }
+.back-link .lucide { width: 20px; height: 20px; display: block; }
