@@ -249,7 +249,7 @@ body::before {
 }
 .head-brand { min-width: 0; }
 .head-logo { display: flex; align-items: center; margin: 0 0 3px; }
-.logo-light, .logo-dark { height: 2rem; width: auto; display: block; }
+.logo-light, .logo-dark { height: 3.5rem; width: auto; display: block; }
 .logo-dark { display: none; }
 @media (prefers-color-scheme: dark) {
   :root[data-theme="auto"] .logo-light { display: none; }

@@ -12,7 +12,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-portal-v9';
+var CACHE = 'dailycode-portal-v10';
 var PREFIX = 'dailycode-portal-';
 var LEGACY = ['dailycode-cache-v2'];
 
@@ -20,12 +20,18 @@ var ASSETS = [
   './',
   './index.html',
   './style.css',
+  './tokens.css',
   './portal.js',
   './theme-init.js',
-  './manifest.json',
-  './portal-icon-192.png',
-  './portal-icon-512.png',
-  './portal-icon-maskable-512.png',
+  './favicon.ico',
+  './favicon.svg',
+  './apple-touch-icon.png',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png',
+  './site.webmanifest',
+  './brand/puzzlepure-lockup-karbon.svg',
+  './brand/puzzlepure-lockup-white.svg',
   './fonts/Inter-Regular.woff2',
   './fonts/Inter-Bold.woff2',
   './datenschutz-de.html',
