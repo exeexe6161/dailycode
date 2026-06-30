@@ -1,0 +1,23 @@
+:root {
+  --pp-karbon: #16181B;
+  --pp-pur: #FFFFFF;
+  --pp-dunst: #F2F4F3;
+  --pp-stahl: #647069;
+  --pp-linie: #E2E7E4;
+  --pp-bernstein: #A85D12;
+  --pp-erfolg: #1E9E5A;
+  --pp-warnung: #D99413;
+  --pp-fehler: #D5453E;
+  --pp-bg: var(--pp-pur);
+  --pp-surface: var(--pp-dunst);
+  --pp-fg: var(--pp-karbon);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pp-bg: var(--pp-karbon);
+    --pp-surface: #1E2124;
+    --pp-fg: var(--pp-pur);
+    --pp-stahl: #9AA49E;
+    --pp-linie: #2A2F2C;
+  }
+}

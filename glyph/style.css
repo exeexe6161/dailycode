@@ -120,6 +120,15 @@ body {
 .app { width: 100%; max-width: var(--maxw); }
 
 .head { text-align: center; margin-bottom: 16px; }
+.head-logo { display: inline-flex; align-items: center; margin: 0 0 3px; }
+.logo-light, .logo-dark { height: 2rem; width: auto; display: block; }
+.logo-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .logo-light { display: none; }
+  :root[data-theme="auto"] .logo-dark { display: block; }
+}
+:root[data-theme="dark"] .logo-light { display: none; }
+:root[data-theme="dark"] .logo-dark { display: block; }
 .title { font-size: clamp(1.5rem, 6vw, 2rem); margin: 0 0 4px; letter-spacing: .5px; }
 .subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; }
 

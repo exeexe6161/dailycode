@@ -18,11 +18,10 @@
 
     root.setAttribute('data-theme', theme);
 
-    var dark = (theme === 'dark') ||
-      (theme === 'auto' && window.matchMedia &&
-       window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-    var meta = document.getElementById('themeColor');
-    if (meta) meta.setAttribute('content', dark ? '#0a0c11' : '#f4f5f7');
+    if (theme !== 'auto') {
+      var color = (theme === 'dark') ? '#16181B' : '#FFFFFF';
+      var metas = document.querySelectorAll('meta[name="theme-color"]');
+      for (var i = 0; i < metas.length; i++) { metas[i].setAttribute('content', color); }
+    }
   } catch (e) { /* niemals den Seitenaufbau aufhalten */ }
 })();

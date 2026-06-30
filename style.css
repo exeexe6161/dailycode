@@ -2,6 +2,7 @@
    dailycode  Tokens und Styles
    Token Disziplin: Werte als CSS Variablen, Hell und Dunkel Parität.
    ============================================================ */
+@import url('tokens.css');
 
 :root {
   color-scheme: light dark;
@@ -247,6 +248,15 @@ body::before {
   background: linear-gradient(90deg, transparent, var(--border) 16%, var(--border) 84%, transparent);
 }
 .head-brand { min-width: 0; }
+.head-logo { display: flex; align-items: center; margin: 0 0 3px; }
+.logo-light, .logo-dark { height: 2rem; width: auto; display: block; }
+.logo-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .logo-light { display: none; }
+  :root[data-theme="auto"] .logo-dark { display: block; }
+}
+:root[data-theme="dark"] .logo-light { display: none; }
+:root[data-theme="dark"] .logo-dark { display: block; }
 .title {
   font-size: clamp(1.6rem, 5vw, 2.15rem);
   margin: 0 0 3px;
