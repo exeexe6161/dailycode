@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Drittes Spiel  (Arbeitstitel cluster, kein Eigenname im Text)
+   dailycode  Drittes Spiel  (Nexa)
    Einzelne geometrische Symbole fallen in ein Raster. Beruehren sich
    drei oder mehr gleiche Symbole orthogonal zusammenhaengend, loesen
    sie sich auf (Flood-Fill), darueber liegende fallen nach, was

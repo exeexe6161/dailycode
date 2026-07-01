@@ -1,7 +1,7 @@
 /* ============================================================
    dailycode  Achtes Spiel  Service Worker (Scope /flow8/)
    Cache first fuer die App Shell. Versionierter Cache, es werden
-   NUR Caches des eigenen Praefix (dailycode-flow8-) aufgeraeumt,
+   NUR Caches des eigenen Praefix (dailycode-fluxa-) aufgeraeumt,
    damit der Portal Worker (dailycode-portal-) und die anderen Spiel
    Worker nicht beruehrt werden. Cache Storage ist origin weit, daher
    ist diese Praefix Trennung noetig, um eine gegenseitige Loeschung
@@ -10,8 +10,9 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-flow8-v1';
-var PREFIX = 'dailycode-flow8-';
+var CACHE = 'dailycode-fluxa-v1';
+var LEGACY = ['dailycode-flow8-v1'];
+var PREFIX = 'dailycode-fluxa-';
 
 var ASSETS = [
   './',
@@ -40,9 +41,9 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(keys.map(function (key) {
-        // Nur eigenen Namespace aufraeumen: Praefix dailycode-flow8-, aber
+        // Nur eigenen Namespace aufraeumen: Praefix dailycode-fluxa-, aber
         // nicht die aktuelle Version. Fremde Caches bleiben unberuehrt.
-        if (key.indexOf(PREFIX) === 0 && key !== CACHE) { return caches.delete(key); }
+        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) { return caches.delete(key); }
         return null;
       }));
     }).then(function () {

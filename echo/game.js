@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Viertes Spiel  (Arbeitstitel echo, kein Eigenname im Text)
+   dailycode  Viertes Spiel  (Memora)
    Gedaechtnis-Paare mit Vorab-Ansicht. Zu Beginn jeder Stufe werden
    alle Symbole kurz gezeigt, dann verdeckt. Der Spieler deckt zwei
    Felder auf, gleiche bleiben offen. Symbole werden PRIMAER ueber die

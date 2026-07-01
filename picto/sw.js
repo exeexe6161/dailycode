@@ -1,7 +1,7 @@
 /* ============================================================
    dailycode  Picto  Service Worker (Scope /picto/)
    Cache first fuer die App Shell. Versionierter Cache, es werden
-   NUR Caches des eigenen Praefix (dailycode-picto-) aufgeraeumt,
+   NUR Caches des eigenen Praefix (dailycode-pixela-) aufgeraeumt,
    damit der Portal Worker (dailycode-portal-) und die anderen Spiel
    Worker nicht beruehrt werden. Cache Storage ist origin weit, daher
    ist diese Praefix Trennung noetig, um eine gegenseitige Loeschung
@@ -10,8 +10,9 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-picto-v1';
-var PREFIX = 'dailycode-picto-';
+var CACHE = 'dailycode-pixela-v1';
+var LEGACY = ['dailycode-picto-v1'];
+var PREFIX = 'dailycode-pixela-';
 
 var ASSETS = [
   './',
@@ -40,7 +41,7 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(keys.map(function (key) {
-        if (key.indexOf(PREFIX) === 0 && key !== CACHE) {
+        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) {
           return caches.delete(key);
         }
         return null;

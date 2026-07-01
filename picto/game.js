@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Picto  Nonogram Tagesraetsel
+   dailycode  Pixela  Nonogram Tagesraetsel
    Deterministisches Tagesraetsel je Datum und Schwierigkeit, Eindeutigkeit
    der Loesung per Constraint-Solver garantiert (kein Raten noetig). Drei
    Stufen (8x8, 12x12, 15x15). Eingabe per Pointer Events, rechte Maustaste

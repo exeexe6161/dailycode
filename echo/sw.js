@@ -1,7 +1,7 @@
 /* ============================================================
    dailycode  Viertes Spiel  Service Worker (Scope /echo/)
    Cache first fuer die App Shell. Versionierter Cache, es werden
-   NUR Caches des eigenen Praefix (dailycode-echo-) aufgeraeumt,
+   NUR Caches des eigenen Praefix (dailycode-memora-) aufgeraeumt,
    damit der Portal Worker (dailycode-portal-) und die Spiel Worker
    (dailycode-game-, dailycode-drift-, dailycode-cluster-) nicht
    beruehrt werden. Cache Storage ist origin weit, daher ist diese
@@ -11,8 +11,9 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-echo-v4';
-var PREFIX = 'dailycode-echo-';
+var CACHE = 'dailycode-memora-v1';
+var LEGACY = ['dailycode-echo-v4'];
+var PREFIX = 'dailycode-memora-';
 
 var ASSETS = [
   './',
@@ -41,9 +42,9 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(keys.map(function (key) {
-        // Nur eigenen Namespace aufraeumen: Praefix dailycode-echo-, aber
+        // Nur eigenen Namespace aufraeumen: Praefix dailycode-memora-, aber
         // nicht die aktuelle Version. Fremde Caches bleiben unberuehrt.
-        if (key.indexOf(PREFIX) === 0 && key !== CACHE) { return caches.delete(key); }
+        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) { return caches.delete(key); }
         return null;
       }));
     }).then(function () {

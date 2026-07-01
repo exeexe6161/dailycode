@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Achtes Spiel  (Arbeitstitel flow8, kein Eigenname im Text)
+   dailycode  Achtes Spiel  (Fluxa)
    Wege-Verbindungsraetsel: Farbige Endpunktpaare auf einem Gitter mit
    zusammenhaengenden orthogonalen Wegen verbinden. Ziel (streng): alle
    Paare verbunden UND jedes Feld belegt (volles Gitter). Wege kreuzen

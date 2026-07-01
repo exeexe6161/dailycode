@@ -1,7 +1,7 @@
 /* ============================================================
    dailycode  Drittes Spiel  Service Worker (Scope /cluster/)
    Cache first fuer die App Shell. Versionierter Cache, es werden
-   NUR Caches des eigenen Praefix (dailycode-cluster-) aufgeraeumt,
+   NUR Caches des eigenen Praefix (dailycode-nexa-) aufgeraeumt,
    damit der Portal Worker (dailycode-portal-), das erste Spiel
    (dailycode-game-) und das zweite Spiel (dailycode-drift-) nicht
    beruehrt werden. Cache Storage ist origin weit, daher ist diese
@@ -11,8 +11,9 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-cluster-v4';
-var PREFIX = 'dailycode-cluster-';
+var CACHE = 'dailycode-nexa-v1';
+var LEGACY = ['dailycode-cluster-v4'];
+var PREFIX = 'dailycode-nexa-';
 
 var ASSETS = [
   './',
@@ -41,9 +42,9 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(keys.map(function (key) {
-        // Nur eigenen Namespace aufraeumen: Praefix dailycode-cluster-, aber
+        // Nur eigenen Namespace aufraeumen: Praefix dailycode-nexa-, aber
         // nicht die aktuelle Version. Fremde Caches (Portal, Spiel 1, Spiel 2) bleiben unberuehrt.
-        if (key.indexOf(PREFIX) === 0 && key !== CACHE) { return caches.delete(key); }
+        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) { return caches.delete(key); }
         return null;
       }));
     }).then(function () {

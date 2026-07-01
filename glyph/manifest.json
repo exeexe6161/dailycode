@@ -1,7 +1,7 @@
 {
-  "id": "dailycode-glyph",
-  "name": "Glyph",
-  "short_name": "Glyph",
+  "id": "dailycode-lexiq",
+  "name": "Lexiq",
+  "short_name": "Lexiq",
   "description": "Build as many words as you can from the letters before time runs out.",
   "lang": "en",
   "dir": "ltr",

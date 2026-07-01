@@ -12,7 +12,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-portal-v11';
+var CACHE = 'dailycode-portal-v13';
 var PREFIX = 'dailycode-portal-';
 var LEGACY = ['dailycode-cache-v2'];
 
@@ -40,14 +40,15 @@ var ASSETS = [
   './impressum-de.html',
   './impressum-en.html',
   './impressum-tr.html',
-  './assets/cover/code.jpg',
-  './assets/cover/drift.jpg',
-  './assets/cover/cluster.jpg',
-  './assets/cover/echo.jpg',
-  './assets/cover/glyph.jpg',
-  './assets/cover/grid9.jpg',
-  './assets/cover/react7.jpg',
-  './assets/cover/flow8.jpg'
+  './assets/games/ciphera.png',
+  './assets/games/serpix.png',
+  './assets/games/nexa.png',
+  './assets/games/memora.png',
+  './assets/games/lexiq.png',
+  './assets/games/numora.png',
+  './assets/games/reflexa.png',
+  './assets/games/fluxa.png',
+  './assets/games/pixela.png'
 ];
 
 self.addEventListener('install', function (event) {

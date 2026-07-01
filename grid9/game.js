@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Sechstes Spiel  (Arbeitstitel grid9, kein Eigenname im Text)
+   dailycode  Sechstes Spiel  (Numora)
    Ruhiges Logikgitter: 9x9 Felder, Zahlen 1 bis 9, jede Zahl genau
    einmal pro Zeile, Spalte und 3x3 Block. Vorgegebene Felder (Givens)
    sind fest. Eingabe per Klick und Tastatur, Zahlenleiste 1 bis 9 plus

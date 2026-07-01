@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Siebtes Spiel  (Arbeitstitel react7, kein Eigenname im Text)
+   dailycode  Siebtes Spiel  (Reflexa)
    Schnell-Reaktionsspiel: Oben ein ZIEL aus Form und Farbe (z. B. Dreieck
    in Blau). Unten Optionen als antippbare Knoepfe. Genau EINE Option passt.
 

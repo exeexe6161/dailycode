@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Zweites Spiel  (Arbeitstitel, kein Eigenname im Text)
+   dailycode  Zweites Spiel  (Serpix)
    Eine wachsende Kette aus Segmenten zieht in Schrittrichtung ueber
    ein Raster. Durchlaessige Raender (Wrap-around), Niederlage nur bei
    Selbstkollision. Vanilla JS, keine Libraries, keine externen

@@ -1,7 +1,7 @@
 /* ============================================================
    dailycode  Fuenftes Spiel  Service Worker (Scope /glyph/)
    Cache first fuer die App Shell. Versionierter Cache, es werden
-   NUR Caches des eigenen Praefix (dailycode-glyph-) aufgeraeumt,
+   NUR Caches des eigenen Praefix (dailycode-lexiq-) aufgeraeumt,
    damit Portal und die anderen Spiel Worker nicht beruehrt werden.
    Die Wortlisten (words-de.txt, words-en.txt) sind GROSS und werden
    NICHT vorab gecacht, sondern landen beim ersten Laden ueber den
@@ -11,8 +11,9 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-glyph-v4';
-var PREFIX = 'dailycode-glyph-';
+var CACHE = 'dailycode-lexiq-v1';
+var LEGACY = ['dailycode-glyph-v4'];
+var PREFIX = 'dailycode-lexiq-';
 
 var ASSETS = [
   './',
@@ -40,9 +41,9 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(keys.map(function (key) {
-        // Nur eigenen Namespace aufraeumen: Praefix dailycode-glyph-, aber
+        // Nur eigenen Namespace aufraeumen: Praefix dailycode-lexiq-, aber
         // nicht die aktuelle Version. Fremde Caches bleiben unberuehrt.
-        if (key.indexOf(PREFIX) === 0 && key !== CACHE) { return caches.delete(key); }
+        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) { return caches.delete(key); }
         return null;
       }));
     }).then(function () {

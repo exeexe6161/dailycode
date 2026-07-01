@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Fuenftes Spiel  (Glyph)
+   dailycode  Fuenftes Spiel  (Lexiq)
    Wortbildung gegen die Uhr. Aus acht Buchstabenkacheln bildet der
    Spieler Woerter; gueltige Woerter geben Punkte und etwas Zeit
    zurueck. Wortlisten lokal (DE enz CC0, EN dwyl Unlicense), nur die

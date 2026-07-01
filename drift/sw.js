@@ -1,7 +1,7 @@
 /* ============================================================
    dailycode  Service Worker (zweites Spiel, Scope /drift/)
    Cache first fuer die App Shell. Versionierter Cache, es werden
-   NUR Caches des eigenen Praefix (dailycode-drift-) aufgeraeumt,
+   NUR Caches des eigenen Praefix (dailycode-serpix-) aufgeraeumt,
    damit der Portal Worker (dailycode-portal-) und der erste Spiel
    Worker (dailycode-game-) nicht beruehrt werden. Cache Storage ist
    origin weit, daher ist diese Praefix Trennung noetig, um eine
@@ -10,8 +10,9 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-drift-v4';
-var PREFIX = 'dailycode-drift-';
+var CACHE = 'dailycode-serpix-v1';
+var LEGACY = ['dailycode-drift-v4'];
+var PREFIX = 'dailycode-serpix-';
 
 var ASSETS = [
   './',
@@ -40,9 +41,9 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(keys.map(function (key) {
-        // Nur eigenen Namespace aufraeumen: Praefix dailycode-drift-, aber
+        // Nur eigenen Namespace aufraeumen: Praefix dailycode-serpix-, aber
         // nicht die aktuelle Version. Fremde Caches (Portal, erstes Spiel) bleiben unberuehrt.
-        if (key.indexOf(PREFIX) === 0 && key !== CACHE) { return caches.delete(key); }
+        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) { return caches.delete(key); }
         return null;
       }));
     }).then(function () {

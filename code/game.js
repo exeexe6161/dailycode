@@ -54,7 +54,7 @@
   // Werte sind Vorlagen mit {platzhalter} oder Funktionen (params) fuer Grammatik.
   var I18N = {
     de: {
-      subtitle: 'Knacke den geheimen Code des Tages.',
+      subtitle: 'Knacke den geheimen Code von Ciphera.',
       aria_board: 'Spielfeld',
       aria_palette: 'Symbolauswahl',
       btn_clear: 'Letztes entfernen',
@@ -86,7 +86,7 @@
       aria_sym_plain: 'Symbol {name}',
       aria_reveal: 'Geheimer Code: {code}',
       reveal_label: 'Code:',
-      status_fresh: 'Tagescode vom {date} nach UTC. {pos} Positionen, {sym} Symbole, {max} Versuche.',
+      status_fresh: 'Ciphera Code vom {date} nach UTC. {pos} Positionen, {sym} Symbole, {max} Versuche.',
       status_win: 'Geknackt in {n} von {max} Versuchen.',
       status_lose: 'Keine Versuche mehr. Der Code war: {code}.',
       status_evaluated: function (p) {
@@ -119,7 +119,7 @@
       theme_dark: 'Dunkel'
     },
     en: {
-      subtitle: 'Crack the secret code of the day.',
+      subtitle: 'Crack the secret code of Ciphera.',
       aria_board: 'Game board',
       aria_palette: 'Symbol picker',
       btn_clear: 'Remove last',
@@ -151,7 +151,7 @@
       aria_sym_plain: 'Symbol {name}',
       aria_reveal: 'Secret code: {code}',
       reveal_label: 'Code:',
-      status_fresh: 'Daily code for {date} in UTC. {pos} positions, {sym} symbols, {max} tries.',
+      status_fresh: 'Ciphera code for {date} in UTC. {pos} positions, {sym} symbols, {max} tries.',
       status_win: 'Cracked in {n} of {max} tries.',
       status_lose: 'No tries left. The code was: {code}.',
       status_evaluated: function (p) {
@@ -184,7 +184,7 @@
       theme_dark: 'Dark'
     },
     tr: {
-      subtitle: 'Günün gizli kodunu çöz.',
+      subtitle: 'Ciphera\'nın gizli kodunu çöz.',
       aria_board: 'Oyun alanı',
       aria_palette: 'Simge seçimi',
       btn_clear: 'Sonuncuyu sil',
@@ -216,7 +216,7 @@
       aria_sym_plain: '{name} simgesi',
       aria_reveal: 'Gizli kod: {code}',
       reveal_label: 'Kod:',
-      status_fresh: '{date} için UTC günlük kodu. {pos} konum, {sym} simge, {max} deneme.',
+      status_fresh: '{date} için UTC Ciphera kodu. {pos} konum, {sym} simge, {max} deneme.',
       status_win: '{n}. denemede çözüldü.',
       status_lose: 'Deneme kalmadı. Kod şuydu: {code}.',
       status_evaluated: 'Deneme {n} değerlendirildi. {rest} deneme kaldı.',

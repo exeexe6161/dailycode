@@ -1,8 +1,8 @@
 {
-  "id": "dailycode-game",
+  "id": "dailycode-ciphera",
   "name": "dailycode",
   "short_name": "dailycode",
-  "description": "Solve the secret daily code made of six symbols.",
+  "description": "Solve Ciphera's secret code of the day, made of six symbols.",
   "lang": "en",
   "dir": "ltr",
   "start_url": "./index.html",
