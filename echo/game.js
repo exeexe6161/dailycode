@@ -28,47 +28,152 @@
   var MAX_PAIRS = 12;           // Obergrenze (sechs Formen mal zwei Varianten)
   var PREVIEW_BASE = 3000;      // ms Vorab-Ansicht bei Stufe 1
   var PREVIEW_STEP = 400;       // ms kuerzer je Stufe
-  var PREVIEW_MIN = 1000;       // Untergrenze der Vorab-Ansicht (Konstante)
+  var PREVIEW_MIN = 1800;       // Untergrenze der Vorab-Ansicht (Konstante)
   var FLIP_BACK_MS = 850;       // wie lange ein Fehlpaar sichtbar bleibt
   var LEVEL_CLEAR_MS = 700;     // kurze Pause nach geschaffter Stufe
   var MISTAKES_START = 5;       // laufweites Fehlerbudget
   var MISTAKES_REFILL = 3;      // Nachschlag je geschaffter Stufe
   var MISTAKES_CAP = 9;         // Obergrenze des Budgets
 
-  /* ---------- Sprache: minimaler t() Tisch (Deutsch) ---------- */
-  var STR = {
-    subtitle: 'Praege dir die Paare ein und finde sie wieder.',
-    lbl_level: 'Stufe',
-    lbl_lives: 'Fehler übrig',
-    lbl_score: 'Punkte',
-    lbl_best: 'Bestwert',
-    best_none: 'noch keine',
-    msg_memorize: 'Einpraegen',
-    msg_go: 'Los, finde die Paare',
-    msg_match: 'Paar gefunden',
-    msg_nomatch: 'Kein Paar',
-    msg_levelup: 'Stufe geschafft',
-    over_title: 'Spiel vorbei',
-    over_restart: 'Neu starten',
-    restart: 'Neu',
-    theme_group: 'Darstellung',
-    theme_auto: 'Auto',
-    theme_light: 'Hell',
-    theme_dark: 'Dunkel',
-    aria_board: 'Spielfeld mit Karten. Mit den Pfeiltasten bewegen, mit Enter aufdecken.',
-    aria_restart: 'Neu starten',
-    aria_hidden: 'Verdecktes Feld',
-    aria_found: 'gefunden',
-    help_summary: 'Hilfe',
-    help_1: 'Zu Beginn jeder Stufe siehst du kurz alle Symbole, dann werden sie verdeckt.',
-    help_2: 'Tippe zwei Felder an oder bewege den Rahmen mit den Pfeiltasten und bestaetige mit Enter.',
-    help_3: 'Zwei gleiche bleiben offen. Geht das Fehlerbudget auf null, ist die Runde vorbei.',
-    nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum',
-    back: 'Zurueck',
-    back_aria: 'Zurueck zur Startseite'
+  /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ---------- */
+  var LANGS = [
+    { code: 'de', label: 'DE', name: 'Deutsch' },
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'tr', label: 'TR', name: 'Türkçe' }
+  ];
+
+  var I18N = {
+    de: {
+      subtitle: 'Praege dir die Paare ein und finde sie wieder.',
+      lbl_level: 'Stufe',
+      lbl_lives: 'Fehler übrig',
+      lbl_score: 'Punkte',
+      lbl_best: 'Bestwert',
+      best_none: 'noch keine',
+      msg_memorize: 'Einpraegen',
+      msg_go: 'Los, finde die Paare',
+      msg_match: 'Paar gefunden',
+      msg_nomatch: 'Kein Paar',
+      msg_levelup: 'Stufe geschafft',
+      over_title: 'Spiel vorbei',
+      over_restart: 'Neu starten',
+      restart: 'Neu',
+      theme_group: 'Darstellung',
+      theme_auto: 'Auto',
+      theme_light: 'Hell',
+      theme_dark: 'Dunkel',
+      aria_lang_group: 'Sprache',
+      aria_board: 'Spielfeld mit Karten. Mit den Pfeiltasten bewegen, mit Enter aufdecken.',
+      aria_restart: 'Neu starten',
+      aria_hidden: 'Verdecktes Feld',
+      aria_found: 'gefunden',
+      help_summary: 'Hilfe',
+      help_1: 'Zu Beginn jeder Stufe siehst du kurz alle Symbole, dann werden sie verdeckt.',
+      help_2: 'Tippe zwei Felder an oder bewege den Rahmen mit den Pfeiltasten und bestaetige mit Enter.',
+      help_3: 'Zwei gleiche bleiben offen. Geht das Fehlerbudget auf null, ist die Runde vorbei.',
+      nav_privacy: 'Datenschutz',
+      nav_imprint: 'Impressum',
+      back: 'Zurueck',
+      back_aria: 'Zurueck zur Startseite',
+      sym_circle: 'Kreis',
+      sym_triangle: 'Dreieck',
+      sym_square: 'Quadrat',
+      sym_diamond: 'Raute',
+      sym_star: 'Stern',
+      sym_hexagon: 'Sechseck',
+      sym_solid: 'gefüllt',
+      sym_outline: 'Umriss'
+    },
+    en: {
+      subtitle: 'Memorize the pairs and find them again.',
+      lbl_level: 'Level',
+      lbl_lives: 'Mistakes left',
+      lbl_score: 'Points',
+      lbl_best: 'Best',
+      best_none: 'none yet',
+      msg_memorize: 'Memorize',
+      msg_go: 'Go, find the pairs',
+      msg_match: 'Pair found',
+      msg_nomatch: 'No match',
+      msg_levelup: 'Level cleared',
+      over_title: 'Game over',
+      over_restart: 'Restart',
+      restart: 'New',
+      theme_group: 'Appearance',
+      theme_auto: 'Auto',
+      theme_light: 'Light',
+      theme_dark: 'Dark',
+      aria_lang_group: 'Language',
+      aria_board: 'Game board with cards. Move with the arrow keys, reveal with Enter.',
+      aria_restart: 'Restart',
+      aria_hidden: 'Hidden card',
+      aria_found: 'found',
+      help_summary: 'Help',
+      help_1: 'At the start of each level you briefly see all symbols, then they are hidden.',
+      help_2: 'Tap two cards, or move the frame with the arrow keys and confirm with Enter.',
+      help_3: 'Two matching cards stay open. When the mistake budget reaches zero, the round ends.',
+      nav_privacy: 'Privacy',
+      nav_imprint: 'Imprint',
+      back: 'Back',
+      back_aria: 'Back to start',
+      sym_circle: 'Circle',
+      sym_triangle: 'Triangle',
+      sym_square: 'Square',
+      sym_diamond: 'Diamond',
+      sym_star: 'Star',
+      sym_hexagon: 'Hexagon',
+      sym_solid: 'filled',
+      sym_outline: 'outline'
+    },
+    tr: {
+      subtitle: 'Çiftleri aklında tut ve tekrar bul.',
+      lbl_level: 'Seviye',
+      lbl_lives: 'Kalan hata',
+      lbl_score: 'Puan',
+      lbl_best: 'En iyi',
+      best_none: 'henüz yok',
+      msg_memorize: 'Ezberle',
+      msg_go: 'Haydi, çiftleri bul',
+      msg_match: 'Çift bulundu',
+      msg_nomatch: 'Eşleşme yok',
+      msg_levelup: 'Seviye tamamlandı',
+      over_title: 'Oyun bitti',
+      over_restart: 'Yeniden başlat',
+      restart: 'Yeni',
+      theme_group: 'Görünüm',
+      theme_auto: 'Otomatik',
+      theme_light: 'Açık',
+      theme_dark: 'Koyu',
+      aria_lang_group: 'Dil',
+      aria_board: 'Kartlı oyun alanı. Ok tuşlarıyla hareket et, Enter ile aç.',
+      aria_restart: 'Yeniden başlat',
+      aria_hidden: 'Kapalı kart',
+      aria_found: 'bulundu',
+      help_summary: 'Yardım',
+      help_1: 'Her seviyenin başında tüm simgeleri kısaca görürsün, sonra kapanırlar.',
+      help_2: 'İki karta dokun veya çerçeveyi ok tuşlarıyla hareket ettirip Enter ile onayla.',
+      help_3: 'Eşleşen iki kart açık kalır. Hata bütçesi sıfırlanınca tur biter.',
+      nav_privacy: 'Gizlilik',
+      nav_imprint: 'Künye',
+      back: 'Geri',
+      back_aria: 'Geri, ana sayfaya',
+      sym_circle: 'Daire',
+      sym_triangle: 'Üçgen',
+      sym_square: 'Kare',
+      sym_diamond: 'Karo',
+      sym_star: 'Yıldız',
+      sym_hexagon: 'Altıgen',
+      sym_solid: 'dolu',
+      sym_outline: 'anahat'
+    }
   };
-  function t(key) { var v = STR[key]; return v === undefined ? key : v; }
+
+  function t(key) {
+    var table = I18N[lang] || I18N.en;
+    var v = table[key];
+    if (v === undefined) v = I18N.en[key]; // Fallback en
+    return v === undefined ? key : v;
+  }
 
   /* ---------- Symbole: sechs Formen (verbatim) mal zwei Varianten ---------- */
   var SHAPES = [
@@ -79,7 +184,7 @@
     '<polygon points="50,10 59.4,37.1 88,37.6 65.2,54.9 73.5,82.4 50,66 26.5,82.4 34.8,54.9 12,37.6 40.6,37.1"/>', // 4 Stern
     '<polygon points="50,10 84.6,30 84.6,70 50,90 15.4,70 15.4,30"/>'                                    // 5 Sechseck
   ];
-  var SHAPE_NAMES = ['Kreis', 'Dreieck', 'Quadrat', 'Raute', 'Stern', 'Sechseck'];
+  var SHAPE_KEYS = ['sym_circle', 'sym_triangle', 'sym_square', 'sym_diamond', 'sym_star', 'sym_hexagon'];
   // Symbol-Id 0..11: shape = id % 6, variant = floor(id / 6) (0 gefuellt, 1 Umriss)
   function shapeOf(id) { return id % 6; }
   function variantOf(id) { return Math.floor(id / 6); }
@@ -88,7 +193,7 @@
     return '<svg class="' + cls + '" viewBox="0 0 100 100" aria-hidden="true" focusable="false">' + SHAPES[shapeOf(id)] + '</svg>';
   }
   function symbolName(id) {
-    return SHAPE_NAMES[shapeOf(id)] + ' ' + (variantOf(id) === 0 ? 'gefüllt' : 'Umriss');
+    return t(SHAPE_KEYS[shapeOf(id)]) + ' ' + t(variantOf(id) === 0 ? 'sym_solid' : 'sym_outline');
   }
 
   /* ---------- Lucide Bedien-Icons (ISC) ---------- */
@@ -98,11 +203,13 @@
   var ICON = {
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
-    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>')
+    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
   };
   var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
 
   /* ---------- DOM ---------- */
+  var langbarEl     = document.getElementById('langbar');
   var themebarEl    = document.getElementById('themebar');
   var themeColorEl  = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
@@ -127,10 +234,13 @@
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
   var theme = loadTheme();
+  var lang = loadLang();
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
   var themeToggleBtn = null;
+  var langToggleBtn = null;
   var fbTimer = 0;
+  var lastAnnounceKind = null; // fuer Neu-Ansage bei Sprachwechsel
 
   function storageOK() {
     try { var k = '__dc_test__'; window.localStorage.setItem(k, '1'); window.localStorage.removeItem(k); return true; }
@@ -144,6 +254,13 @@
   function loadLang() {
     if (hasStorage) { try { var v = window.localStorage.getItem(LANG_KEY); if (v === 'de' || v === 'en' || v === 'tr') return v; } catch (e) {} }
     return 'de';
+  }
+  function saveLang(l) { if (!hasStorage) return; try { window.localStorage.setItem(LANG_KEY, l); } catch (e) {} }
+  function setLang(l) {
+    if (!I18N[l]) return;
+    lang = l;
+    saveLang(l);
+    relocalize();
   }
   function effectiveDark() { return theme === 'dark' || (theme === 'auto' && systemDarkMQ.matches); }
   function updateThemeColor() { if (themeColorEl) themeColorEl.setAttribute('content', effectiveDark() ? '#0a0c11' : '#f4f5f7'); }
@@ -177,6 +294,33 @@
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
+  }
+
+  /* ---------- Sprachumschalter ---------- */
+  // Weltkugel plus aktuelles Kuerzel, zyklisch DE -> EN -> TR -> DE.
+  function langName(c) {
+    for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) return LANGS[i].name; }
+    return c;
+  }
+  function buildLangBar() {
+    if (!langbarEl) return;
+    langbarEl.innerHTML = '';
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(lang);
+    setLang(order[(i + 1) % order.length]);
+  }
+  function refreshLangBar() {
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
   }
 
   /* ---------- Pausierbarer Timer ----------
@@ -310,6 +454,7 @@
     if (card.state === 'matched') el.setAttribute('aria-label', symbolName(card.id) + ', ' + t('aria_found'));
     else if (card.state === 'up') el.setAttribute('aria-label', symbolName(card.id));
     else el.setAttribute('aria-label', t('aria_hidden'));
+    el.setAttribute('aria-pressed', String(card.state !== 'down'));
   }
 
   function setCardState(i, state) {
@@ -337,6 +482,25 @@
   }
   function announce(msg) { if (statusEl) statusEl.textContent = msg; }
 
+  // Baut den Ansagetext je nach Ereignistyp aus dem AKTUELLEN Sprachstand.
+  // lastAnnounceKind haelt den Typ fest, damit ein Sprachwechsel dieselbe
+  // Ansage in der neuen Sprache neu rendern kann (siehe relocalize()).
+  function statusText(kind) {
+    switch (kind) {
+      case 'memorize': return t('lbl_level') + ' ' + level + ', ' + t('msg_memorize');
+      case 'go': return t('msg_go');
+      case 'match': return t('msg_match');
+      case 'nomatch': return t('msg_nomatch');
+      case 'levelup': return t('msg_levelup');
+      case 'over': return t('over_title') + ', ' + t('lbl_score') + ' ' + score;
+      default: return '';
+    }
+  }
+  function announceKind(kind) {
+    lastAnnounceKind = kind;
+    announce(statusText(kind));
+  }
+
   /* ---------- Stufenablauf ---------- */
   function startLevel() {
     makeBoard();
@@ -344,7 +508,7 @@
     // Vorab-Ansicht: alle Karten offen zeigen, Eingaben gesperrt.
     phase = 'preview';
     for (var i = 0; i < cards.length; i++) setCardState(i, 'up');
-    announce(t('lbl_level') + ' ' + level + ', ' + t('msg_memorize'));
+    announceKind('memorize');
     tStart(previewMs(level), previewDone);
   }
   function previewDone() {
@@ -352,7 +516,7 @@
       if (cards[i].state !== 'matched') setCardState(i, 'down');
     }
     phase = 'play';
-    announce(t('msg_go'));
+    announceKind('go');
   }
 
   /* ---------- Karte aufdecken (einziger Eingang fuer Klick UND Tastatur) ----------
@@ -377,7 +541,7 @@
       foundPairs += 1;
       score += 10 * level;
       updateHud();
-      announce(t('msg_match'));
+      announceKind('match');
       if (foundPairs >= pairsThisLevel) levelClear();
     } else {
       // Fehlpaar: sperren, kurz zeigen, dann beide zu. Budget minus eins.
@@ -390,7 +554,7 @@
         mistakes -= 1;
         updateHud();
         if (mistakes <= 0) { gameOver(); return; }
-        announce(t('msg_nomatch'));
+        announceKind('nomatch');
         phase = 'play';
       });
     }
@@ -400,7 +564,7 @@
     phase = 'levelclear';
     score += 50 * level;
     updateHud();
-    announce(t('msg_levelup'));
+    announceKind('levelup');
     tStart(LEVEL_CLEAR_MS, function () {
       level += 1;
       mistakes = Math.min(MISTAKES_CAP, mistakes + MISTAKES_REFILL);
@@ -408,12 +572,18 @@
     });
   }
 
+  // Baut den Overlay Inhalt aus dem AKTUELLEN Sprachstand. Wird bei
+  // Spielende UND bei Sprachwechsel waehrend offenem Overlay aufgerufen.
+  function renderOverlayTexts() {
+    var best = loadBestVal();
+    showOverlay(t('over_title'), t('lbl_level') + ' ' + level + ', ' + t('lbl_score') + ' ' + score + (best != null ? ', ' + t('lbl_best') + ' ' + best : ''), t('over_restart'));
+  }
+
   function gameOver() {
     phase = 'over';
     recordBest();
-    var best = loadBestVal();
-    showOverlay(t('over_title'), t('lbl_level') + ' ' + level + ', ' + t('lbl_score') + ' ' + score + (best != null ? ', ' + t('lbl_best') + ' ' + best : ''), t('over_restart'));
-    announce(t('over_title') + ', ' + t('lbl_score') + ' ' + score);
+    renderOverlayTexts();
+    announceKind('over');
   }
 
   function showOverlay(title, scoreText, btnText) {
@@ -499,9 +669,24 @@
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
   function setFooterLinks() {
-    var lang = loadLang();
     if (linkPrivacyEl) linkPrivacyEl.setAttribute('href', '../datenschutz-' + lang + '.html');
     if (linkImprintEl) linkImprintEl.setAttribute('href', '../impressum-' + lang + '.html');
+  }
+
+  /* ---------- Neu Lokalisieren bei Sprachwechsel ----------
+     Aktualisiert alle sichtbaren Texte SOFORT, auch mitten im Spiel:
+     Karten-Aria-Labels, HUD (inkl. Bestwert-Text), letzte Ansage und ein
+     offenes Spielende-Overlay. */
+  function relocalize() {
+    document.documentElement.lang = lang;
+    applyTexts();
+    refreshLangBar();
+    refreshThemeBar();
+    setFooterLinks();
+    refreshAllAria();
+    updateHud();
+    if (lastAnnounceKind) announce(statusText(lastAnnounceKind));
+    if (phase === 'over') renderOverlayTexts();
   }
 
   /* ---------- Service Worker: nur https oder localhost, nie ueber file:// ---------- */
@@ -524,7 +709,9 @@
      machen (startLevel). Kein sichtbarer Aufbau greift auf ein noch
      nicht existierendes Brett zu. */
   function init() {
+    document.documentElement.lang = lang;
     setFooterLinks();
+    buildLangBar();
     buildThemeBar();
     applyTheme();
     applyTexts();

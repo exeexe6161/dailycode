@@ -9,7 +9,8 @@
   var POSITIONS = 4;
   var SYMBOL_COUNT = 6;
   var MAX_TRIES = 6;
-  var STORAGE_KEY = 'dailycode:v1';
+  var STORAGE_KEY = 'dailycode:ciphera:v1';
+  var LEGACY_STORAGE_KEY = 'dailycode:v1';
   var LANG_KEY = 'dailycode:lang';
   var THEME_KEY = 'dailycode:theme';
   var THEMES = ['auto', 'light', 'dark'];
@@ -947,7 +948,7 @@
 
   // Kompaktes Emoji Raster, eine Zeile pro Versuch, sprachneutral, kein Code Spoiler.
   function buildShareText(won, tries) {
-    var header = 'dailycode ' + todayKey + '  ' + (won ? String(tries) : 'X') + '/' + MAX_TRIES;
+    var header = 'Ciphera ' + todayKey + '  ' + (won ? String(tries) : 'X') + '/' + MAX_TRIES;
     var lines = [header, ''];
     for (var r = 0; r < playedGuesses.length; r++) {
       var result = evaluate(playedGuesses[r], code);

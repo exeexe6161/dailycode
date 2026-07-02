@@ -6,8 +6,8 @@
    Ressourcen, keine data-URI. Strikte CSP konform: keine Inline-
    Styles im Markup, dynamische Werte nur ueber CSSOM und Canvas.
    Theme und Sprache teilen die bestehenden Keys (dailycode:theme,
-   dailycode:lang). i18n der Spieltexte folgt als eigener Schritt,
-   die Texte liegen bereits hinter einem t() Muster.
+   dailycode:lang). Sprache DE/EN/TR ueber I18N Tabelle und t()
+   Muster, identisch zu code/game.js (Ciphera).
    ============================================================ */
 (function () {
   'use strict';
@@ -23,44 +23,114 @@
   var START_LEN = 3;             // Anfangslaenge der Kette
   var SWIPE_MIN = 24;            // Mindestweg fuer eine Wischgeste in px
 
-  /* ---------- Sprache: minimaler t() Tisch (Deutsch) ----------
-     Bewusst eine Sprache in diesem Schritt. Migration spaeter:
-     Tisch je Sprache erweitern, Aufruf bleibt t(key). */
-  var STR = {
-    subtitle: 'Lenke die wachsende Kette ueber das Feld.',
-    score: 'Punkte',
-    lbl_best: 'Bestwert',
-    best_none: 'noch keine',
-    pause: 'Pause',
-    resume: 'Weiter',
-    restart: 'Neu',
-    over_title: 'Spiel vorbei',
-    won_title: 'Feld voll, stark gespielt',
-    over_restart: 'Neu starten',
-    theme_group: 'Darstellung',
-    theme_auto: 'Auto',
-    theme_light: 'Hell',
-    theme_dark: 'Dunkel',
-    dir_up: 'Hoch',
-    dir_down: 'Runter',
-    dir_left: 'Links',
-    dir_right: 'Rechts',
-    aria_field: 'Spielfeld. Kette mit Pfeiltasten oder WASD steuern, P pausiert.',
-    aria_pause: 'Pausieren',
-    aria_resume: 'Fortsetzen',
-    aria_restart: 'Neu starten',
-    help_summary: 'Hilfe',
-    help_1: 'Pfeiltasten oder WASD steuern die Kette, Wischen geht auch.',
-    help_2: 'Sammle die leuchtenden Punkte, die Kette waechst und wird schneller.',
-    help_3: 'Die Raender sind offen, nur der Lauf in den eigenen Koerper beendet das Spiel.',
-    nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum',
-    back: 'Zurueck',
-    back_aria: 'Zurueck zur Startseite'
+  /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ----------
+     Struktur und Fallback-Muster identisch zu code/game.js (Ciphera). */
+  var I18N = {
+    de: {
+      subtitle: 'Lenke die wachsende Kette ueber das Feld.',
+      score: 'Punkte',
+      lbl_best: 'Bestwert',
+      best_none: 'noch keine',
+      pause: 'Pause',
+      resume: 'Weiter',
+      restart: 'Neu',
+      over_title: 'Spiel vorbei',
+      won_title: 'Feld voll, stark gespielt',
+      over_restart: 'Neu starten',
+      theme_group: 'Darstellung',
+      theme_auto: 'Auto',
+      theme_light: 'Hell',
+      theme_dark: 'Dunkel',
+      dir_up: 'Hoch',
+      dir_down: 'Runter',
+      dir_left: 'Links',
+      dir_right: 'Rechts',
+      aria_field: 'Spielfeld. Kette mit Pfeiltasten oder WASD steuern, P pausiert.',
+      aria_pause: 'Pausieren',
+      aria_resume: 'Fortsetzen',
+      aria_restart: 'Neu starten',
+      help_summary: 'Hilfe',
+      help_1: 'Pfeiltasten oder WASD steuern die Kette, Wischen geht auch.',
+      help_2: 'Sammle die leuchtenden Punkte, die Kette waechst und wird schneller.',
+      help_3: 'Die Raender sind offen, nur der Lauf in den eigenen Koerper beendet das Spiel.',
+      nav_privacy: 'Datenschutz',
+      nav_imprint: 'Impressum',
+      back: 'Zurueck',
+      back_aria: 'Zurueck zur Startseite',
+      aria_lang_group: 'Sprache'
+    },
+    en: {
+      subtitle: 'Steer the growing chain across the field.',
+      score: 'Points',
+      lbl_best: 'Best',
+      best_none: 'none yet',
+      pause: 'Pause',
+      resume: 'Resume',
+      restart: 'New',
+      over_title: 'Game over',
+      won_title: 'Field full, well played',
+      over_restart: 'Restart',
+      theme_group: 'Appearance',
+      theme_auto: 'Auto',
+      theme_light: 'Light',
+      theme_dark: 'Dark',
+      dir_up: 'Up',
+      dir_down: 'Down',
+      dir_left: 'Left',
+      dir_right: 'Right',
+      aria_field: 'Game field. Steer the chain with arrow keys or WASD, P pauses.',
+      aria_pause: 'Pause',
+      aria_resume: 'Resume',
+      aria_restart: 'Restart',
+      help_summary: 'How it works',
+      help_1: 'Arrow keys or WASD steer the chain, swiping works too.',
+      help_2: 'Collect the glowing points, the chain grows and speeds up.',
+      help_3: 'The edges are open, only running into your own body ends the game.',
+      nav_privacy: 'Privacy',
+      nav_imprint: 'Imprint',
+      back: 'Back',
+      back_aria: 'Back to start',
+      aria_lang_group: 'Language'
+    },
+    tr: {
+      subtitle: 'Büyüyen zinciri alan boyunca yönlendir.',
+      score: 'Puan',
+      lbl_best: 'En iyi',
+      best_none: 'henüz yok',
+      pause: 'Duraklat',
+      resume: 'Devam',
+      restart: 'Yeni',
+      over_title: 'Oyun bitti',
+      won_title: 'Alan doldu, harika oynadın',
+      over_restart: 'Yeniden başlat',
+      theme_group: 'Görünüm',
+      theme_auto: 'Otomatik',
+      theme_light: 'Açık',
+      theme_dark: 'Koyu',
+      dir_up: 'Yukarı',
+      dir_down: 'Aşağı',
+      dir_left: 'Sol',
+      dir_right: 'Sağ',
+      aria_field: 'Oyun alanı. Zinciri ok tuşları veya WASD ile yönlendir, P duraklatır.',
+      aria_pause: 'Duraklat',
+      aria_resume: 'Devam et',
+      aria_restart: 'Yeniden başlat',
+      help_summary: 'Nasıl çalışır',
+      help_1: 'Ok tuşları veya WASD zinciri yönlendirir, kaydırma da işe yarar.',
+      help_2: 'Parlayan puanları topla, zincir büyür ve hızlanır.',
+      help_3: 'Kenarlar açıktır, oyunu yalnızca kendi gövdene çarpmak bitirir.',
+      nav_privacy: 'Gizlilik',
+      nav_imprint: 'Künye',
+      back: 'Geri',
+      back_aria: 'Geri, ana sayfaya',
+      aria_lang_group: 'Dil'
+    }
   };
   function t(key) {
-    var v = STR[key];
-    return v === undefined ? key : v;
+    var table = I18N[lang] || I18N.en;
+    var entry = table[key];
+    if (entry === undefined) entry = I18N.en[key]; // Fallback en
+    return entry === undefined ? key : entry;
   }
 
   /* ---------- Lucide Bedien-Icons (ISC), Pfade verbatim ----------
@@ -71,11 +141,20 @@
   var ICON = {
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
-    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>')
+    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
   };
   var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
 
+  /* ---------- Sprachen: Anzeigename je Kuerzel (Sprachumschalter) ---------- */
+  var LANGS = [
+    { code: 'de', label: 'DE', name: 'Deutsch' },
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'tr', label: 'TR', name: 'Türkçe' }
+  ];
+
   /* ---------- DOM ---------- */
+  var langbarEl     = document.getElementById('langbar');
   var themebarEl    = document.getElementById('themebar');
   var themeColorEl  = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
@@ -101,10 +180,12 @@
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
   var theme = loadTheme();
+  var lang = loadLang();
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
   var reduceMotion = reduceMQ.matches;
   var themeToggleBtn = null;
+  var langToggleBtn = null;
   var fbTimer = 0;
 
   function storageOK() {
@@ -136,6 +217,18 @@
       } catch (e) { /* kein Storage */ }
     }
     return 'de';
+  }
+  function saveLang(l) {
+    if (!hasStorage) return;
+    try { window.localStorage.setItem(LANG_KEY, l); } catch (e) { /* nur Sitzung */ }
+  }
+  function setLang(l) {
+    if (l !== 'de' && l !== 'en' && l !== 'tr') return;
+    lang = l;
+    saveLang(l);
+    document.documentElement.lang = lang;
+    applyTexts();
+    setFooterLinks();
   }
   function effectiveDark() {
     return theme === 'dark' || (theme === 'auto' && systemDarkMQ.matches);
@@ -184,6 +277,33 @@
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
+  }
+
+  /* ---------- Sprachumschalter ----------
+     Weltkugel plus aktuelles Kuerzel, zyklisch DE -> EN -> TR -> DE. */
+  function buildLangBar() {
+    if (!langbarEl) return;
+    langbarEl.innerHTML = '';
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(lang);
+    setLang(order[(i + 1) % order.length]);
+  }
+  function refreshLangBar() {
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
+  }
+  function langName(c) {
+    for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) return LANGS[i].name; }
+    return c;
   }
 
   /* ---------- Canvas Farben aus Tokens lesen (Theme Parität) ---------- */
@@ -265,8 +385,16 @@
   }
 
   function updateScore() {
-    if (scoreEl) scoreEl.textContent = t('score') + ' ' + score;
+    refreshScoreText();
     updateBest();
+  }
+  // Im Spielende Zustand traegt die Punkteanzeige zusaetzlich Sieg/Niederlage,
+  // damit Screenreader Nutzer (aria-live) den Ausgang direkt mitbekommen.
+  function refreshScoreText() {
+    if (!scoreEl) return;
+    scoreEl.textContent = over
+      ? (won ? t('won_title') : t('over_title')) + ', ' + t('score') + ' ' + score
+      : t('score') + ' ' + score;
   }
 
   /* ---------- Bestwert (einheitliches null-Muster, Vorbild grid9) ----------
@@ -444,17 +572,36 @@
     pauseBtn.setAttribute('aria-label', paused ? t('aria_resume') : t('aria_pause'));
   }
 
-  function showOverlay(title, scoreText, btnText) {
+  function setOverlayTexts(title, scoreText, btnText) {
     if (overlayTitleEl) overlayTitleEl.textContent = title;
     if (overlayScoreEl) {
       overlayScoreEl.textContent = scoreText || '';
       overlayScoreEl.hidden = !scoreText;
     }
     if (overlayBtn) overlayBtn.textContent = btnText;
+  }
+  function showOverlay(title, scoreText, btnText) {
+    setOverlayTexts(title, scoreText, btnText);
     if (overlayEl) overlayEl.hidden = false;
+    // Fokus auf den Overlay Knopf, damit Tastatur/Screenreader Nutzer beim
+    // Erscheinen (Pause oder Spielende) nicht am Hintergrund haengen bleiben.
+    if (overlayBtn) overlayBtn.focus();
   }
   function hideOverlay() {
     if (overlayEl) overlayEl.hidden = true;
+  }
+  // Nur die sichtbaren Overlay Texte neu setzen (z.B. bei Sprachwechsel
+  // waehrend Pause/Spielende offen ist), ohne den Fokus zu verschieben.
+  function refreshOverlayTexts() {
+    if (!overlayEl || overlayEl.hidden) return;
+    if (over) {
+      var best = loadBestVal();
+      setOverlayTexts(won ? t('won_title') : t('over_title'),
+        t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
+        t('over_restart'));
+    } else if (paused) {
+      setOverlayTexts(t('pause'), '', t('resume'));
+    }
   }
 
   function pauseGame() {
@@ -485,11 +632,10 @@
     var prev = loadBestVal();
     if (prev == null || score > prev) saveBest(score);
     var best = loadBestVal();
-    updateBest();
+    updateScore(); // aktualisiert Punkte- und Bestwertanzeige (over ist bereits true)
     showOverlay(won ? t('won_title') : t('over_title'),
       t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
       t('over_restart'));
-    if (scoreEl) scoreEl.textContent = (won ? t('won_title') : t('over_title')) + ', ' + t('score') + ' ' + score;
   }
 
   function restartGame() {
@@ -536,12 +682,21 @@
     for (var i = 0; i < btns.length; i++) {
       (function (btn) {
         var name = btn.getAttribute('data-dir');
-        btn.setAttribute('aria-label', t('dir_' + name));
         btn.addEventListener('click', function () {
           var d = DIRS[name];
           if (d) enqueueDir(d.x, d.y);
         });
       })(btns[i]);
+    }
+    applyDpadLabels();
+  }
+  // Getrennt von bindDpad(), damit ein Sprachwechsel die aria-labels
+  // ohne erneute Event-Bindung auffrischen kann.
+  function applyDpadLabels() {
+    if (!dpadEl) return;
+    var btns = dpadEl.querySelectorAll('[data-dir]');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute('aria-label', t('dir_' + btns[i].getAttribute('data-dir')));
     }
   }
 
@@ -607,6 +762,11 @@
     if (restartBtn) restartBtn.setAttribute('aria-label', t('aria_restart'));
     if (canvas) canvas.setAttribute('aria-label', t('aria_field'));
     setPauseLabels();
+    applyDpadLabels();
+    refreshThemeBar();
+    refreshLangBar();
+    updateScore();
+    refreshOverlayTexts();
   }
   function setText(id, val) {
     var el = document.getElementById(id);
@@ -638,6 +798,8 @@
   /* ---------- Start ---------- */
   function init() {
     buildThemeBar();
+    buildLangBar();
+    document.documentElement.lang = lang;
     applyTheme();         // setzt data-theme, Farben, erstes Render kommt nach reset
     applyTexts();
     setFooterLinks();

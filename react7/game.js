@@ -31,53 +31,189 @@
 (function () {
   'use strict';
 
-  /* ---------- Sprache: minimaler t() Tisch (Deutsch) ---------- */
-  var STR = {
-    subtitle: 'Waehle blitzschnell die passende Form und Farbe.',
-    lbl_score: 'Punkte',
-    lbl_lives: 'Leben',
-    lbl_round: 'Runde',
-    lbl_best: 'Bestwert',
-    best_none: 'noch keine',
-    target_lead: 'Finde:',
-    in_color: ' in ',
-    timebar_aria: 'Verbleibende Zeit der Runde',
-    opt_group: 'Optionen, waehle die passende Form und Farbe',
-    aria_opt: 'Option {n}: {desc}',
-    btn_pause: 'Pause',
-    btn_resume: 'Fortsetzen',
-    btn_restart: 'Neu starten',
-    aria_pause: 'Spiel pausieren',
-    aria_resume: 'Spiel fortsetzen',
-    aria_restart: 'Lauf neu starten',
-    msg_go: 'Los',
-    msg_correct: 'Richtig',
-    msg_wrong: 'Daneben',
-    msg_timeout: 'Zeit abgelaufen',
-    msg_lives_left: 'Noch {n} Leben',
-    msg_paused: 'Pausiert',
-    msg_resumed: 'Weiter',
-    over_title: 'Vorbei',
-    over_score: 'Punkte {s}, Runde {r}',
-    over_restart: 'Neu starten',
-    theme_group: 'Darstellung',
-    theme_auto: 'Auto',
-    theme_light: 'Hell',
-    theme_dark: 'Dunkel',
-    help_summary: 'Hilfe',
-    help_1: 'Oben siehst du ein Ziel aus Form und Farbe. Tippe unten die Option mit genau dieser Form an. Nur eine passt.',
-    help_2: 'Mit der Tastatur: Ziffer eins bis sechs waehlt direkt, Pfeiltasten wandern, Enter oder Leertaste bestaetigt.',
-    help_3: 'Die Zeitleiste wird mit den Runden kuerzer. Eine falsche Wahl oder abgelaufene Zeit kostet ein Leben. Bei null Leben ist der Lauf vorbei.',
-    nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum',
-    back: 'Zurueck',
-    back_aria: 'Zurueck zur Startseite'
+  /* ---------- Sprache: DE/EN/TR Tabellen, t() liest ueber lang ---------- */
+  var I18N = {
+    de: {
+      subtitle: 'Waehle blitzschnell die passende Form und Farbe.',
+      lbl_score: 'Punkte',
+      lbl_lives: 'Leben',
+      lbl_round: 'Runde',
+      lbl_best: 'Bestwert',
+      best_none: 'noch keine',
+      target_lead: 'Finde:',
+      in_color: ' in ',
+      timebar_aria: 'Verbleibende Zeit der Runde',
+      opt_group: 'Optionen, waehle die passende Form und Farbe',
+      aria_opt: 'Option {n}: {desc}',
+      btn_pause: 'Pause',
+      btn_resume: 'Fortsetzen',
+      btn_restart: 'Neu starten',
+      aria_pause: 'Spiel pausieren',
+      aria_resume: 'Spiel fortsetzen',
+      aria_restart: 'Lauf neu starten',
+      msg_go: 'Los',
+      msg_correct: 'Richtig',
+      msg_wrong: 'Daneben',
+      msg_timeout: 'Zeit abgelaufen',
+      msg_lives_left: 'Noch {n} Leben',
+      msg_paused: 'Pausiert',
+      msg_resumed: 'Weiter',
+      over_title: 'Vorbei',
+      over_score: 'Punkte {s}, Runde {r}',
+      over_restart: 'Neu starten',
+      theme_group: 'Darstellung',
+      theme_auto: 'Auto',
+      theme_light: 'Hell',
+      theme_dark: 'Dunkel',
+      help_summary: 'Hilfe',
+      help_1: 'Oben siehst du ein Ziel aus Form und Farbe. Tippe unten die Option mit genau dieser Form an. Nur eine passt.',
+      help_2: 'Mit der Tastatur: Ziffer eins bis sechs waehlt direkt, Pfeiltasten wandern, Enter oder Leertaste bestaetigt.',
+      help_3: 'Die Zeitleiste wird mit den Runden kuerzer. Eine falsche Wahl oder abgelaufene Zeit kostet ein Leben. Bei null Leben ist der Lauf vorbei.',
+      nav_privacy: 'Datenschutz',
+      nav_imprint: 'Impressum',
+      back: 'Zurueck',
+      back_aria: 'Zurueck zur Startseite',
+      aria_lang_group: 'Sprache',
+      shape_dreieck: 'Dreieck',
+      shape_kreis: 'Kreis',
+      shape_quadrat: 'Quadrat',
+      shape_raute: 'Raute',
+      shape_stern: 'Stern',
+      shape_sechseck: 'Sechseck',
+      color_blau: 'Blau',
+      color_bernstein: 'Bernstein',
+      color_tuerkis: 'Tuerkis',
+      color_violett: 'Violett',
+      color_magenta: 'Magenta',
+      color_schiefer: 'Schiefer'
+    },
+    en: {
+      subtitle: 'Pick the matching shape and color, fast.',
+      lbl_score: 'Points',
+      lbl_lives: 'Lives',
+      lbl_round: 'Round',
+      lbl_best: 'Best',
+      best_none: 'none yet',
+      target_lead: 'Find:',
+      in_color: ' in ',
+      timebar_aria: 'Remaining time of the round',
+      opt_group: 'Options, choose the matching shape and color',
+      aria_opt: 'Option {n}: {desc}',
+      btn_pause: 'Pause',
+      btn_resume: 'Resume',
+      btn_restart: 'Restart',
+      aria_pause: 'Pause the game',
+      aria_resume: 'Resume the game',
+      aria_restart: 'Restart the run',
+      msg_go: 'Go',
+      msg_correct: 'Correct',
+      msg_wrong: 'Wrong',
+      msg_timeout: 'Time is up',
+      msg_lives_left: '{n} lives left',
+      msg_paused: 'Paused',
+      msg_resumed: 'Resumed',
+      over_title: 'Game over',
+      over_score: 'Points {s}, round {r}',
+      over_restart: 'Restart',
+      theme_group: 'Appearance',
+      theme_auto: 'Auto',
+      theme_light: 'Light',
+      theme_dark: 'Dark',
+      help_summary: 'Help',
+      help_1: 'Above you see a target made of shape and color. Tap the option below with exactly this shape. Only one matches.',
+      help_2: 'With the keyboard: digits one to six choose directly, arrow keys move, Enter or Space confirms.',
+      help_3: 'The time bar gets shorter with each round. A wrong choice or running out of time costs one life. At zero lives the run is over.',
+      nav_privacy: 'Privacy',
+      nav_imprint: 'Imprint',
+      back: 'Back',
+      back_aria: 'Back to start',
+      aria_lang_group: 'Language',
+      shape_dreieck: 'Triangle',
+      shape_kreis: 'Circle',
+      shape_quadrat: 'Square',
+      shape_raute: 'Diamond',
+      shape_stern: 'Star',
+      shape_sechseck: 'Hexagon',
+      color_blau: 'Blue',
+      color_bernstein: 'Amber',
+      color_tuerkis: 'Teal',
+      color_violett: 'Violet',
+      color_magenta: 'Magenta',
+      color_schiefer: 'Slate'
+    },
+    tr: {
+      subtitle: 'Uygun şekli ve rengi hızlıca seç.',
+      lbl_score: 'Puan',
+      lbl_lives: 'Can',
+      lbl_round: 'Tur',
+      lbl_best: 'En iyi',
+      best_none: 'henüz yok',
+      target_lead: 'Bul:',
+      in_color: ' renginde ',
+      timebar_aria: 'Turun kalan süresi',
+      opt_group: 'Seçenekler, uygun şekli ve rengi seç',
+      aria_opt: 'Seçenek {n}: {desc}',
+      btn_pause: 'Duraklat',
+      btn_resume: 'Devam et',
+      btn_restart: 'Yeniden başlat',
+      aria_pause: 'Oyunu duraklat',
+      aria_resume: 'Oyuna devam et',
+      aria_restart: 'Turu yeniden başlat',
+      msg_go: 'Başla',
+      msg_correct: 'Doğru',
+      msg_wrong: 'Yanlış',
+      msg_timeout: 'Süre doldu',
+      msg_lives_left: '{n} can kaldı',
+      msg_paused: 'Duraklatıldı',
+      msg_resumed: 'Devam ediyor',
+      over_title: 'Oyun bitti',
+      over_score: 'Puan {s}, tur {r}',
+      over_restart: 'Yeniden başlat',
+      theme_group: 'Görünüm',
+      theme_auto: 'Otomatik',
+      theme_light: 'Açık',
+      theme_dark: 'Koyu',
+      help_summary: 'Yardım',
+      help_1: 'Yukarıda şekil ve renkten oluşan bir hedef görürsün. Aşağıda tam olarak bu şekle sahip seçeneğe dokun. Yalnızca biri uyar.',
+      help_2: 'Klavyeyle: bir ile altı arası rakamlar doğrudan seçer, ok tuşları gezdirir, Enter veya boşluk onaylar.',
+      help_3: 'Zaman çubuğu turlarla birlikte kısalır. Yanlış seçim veya sürenin dolması bir can kaybettirir. Can sıfır olunca tur biter.',
+      nav_privacy: 'Gizlilik',
+      nav_imprint: 'Künye',
+      back: 'Geri',
+      back_aria: 'Geri, ana sayfaya',
+      aria_lang_group: 'Dil',
+      shape_dreieck: 'Üçgen',
+      shape_kreis: 'Daire',
+      shape_quadrat: 'Kare',
+      shape_raute: 'Karo',
+      shape_stern: 'Yıldız',
+      shape_sechseck: 'Altıgen',
+      color_blau: 'Mavi',
+      color_bernstein: 'Kehribar',
+      color_tuerkis: 'Turkuaz',
+      color_violett: 'Mor',
+      color_magenta: 'Macenta',
+      color_schiefer: 'Arduvaz'
+    }
   };
-  function t(key) { var v = STR[key]; return v === undefined ? key : v; }
+  function t(key) {
+    var table = I18N[lang] || I18N.en;
+    var v = table[key];
+    if (v === undefined) v = I18N.en[key]; // Fallback Englisch
+    return v === undefined ? key : v;
+  }
   function fmt(key, map) {
     var s = t(key);
     for (var k in map) { if (map.hasOwnProperty(k)) { s = s.replace('{' + k + '}', String(map[k])); } }
     return s;
+  }
+  function shapeName(k) { return t('shape_' + k); }
+  function colorName(k) { return t('color_' + k); }
+  // Wortstellung sprachabhaengig: DE/EN Form zuerst ("Dreieck in Blau"),
+  // TR Farbe vor Form ("Mavi Üçgen"), grammatisch natuerliche Reihenfolge.
+  function composeShapeColor(shapeText, colorText) {
+    if (lang === 'tr') return colorText + ' ' + shapeText;
+    return shapeText + t('in_color') + colorText;
   }
 
   /* ---------- Formen: je eine eigene, klar verschiedene Silhouette ----------
@@ -87,22 +223,22 @@
     return '<svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true" focusable="false">' + inner + '</svg>';
   }
   var SHAPES = [
-    { key: 'dreieck',  name: 'Dreieck',  svg: shapeSvg('<path d="M50 14 L88 82 H12 Z"/>') },
-    { key: 'kreis',    name: 'Kreis',    svg: shapeSvg('<circle cx="50" cy="50" r="38"/>') },
-    { key: 'quadrat',  name: 'Quadrat',  svg: shapeSvg('<rect x="16" y="16" width="68" height="68" rx="8"/>') },
-    { key: 'raute',    name: 'Raute',    svg: shapeSvg('<path d="M50 10 L86 50 L50 90 L14 50 Z"/>') },
-    { key: 'stern',    name: 'Stern',    svg: shapeSvg('<path d="M50 10 L59.4 37.1 L88 37.6 L65.2 54.9 L73.5 82.4 L50 66 L26.5 82.4 L34.8 54.9 L12 37.6 L40.6 37.1 Z"/>') },
-    { key: 'sechseck', name: 'Sechseck', svg: shapeSvg('<path d="M50 12 L86 32 V68 L50 88 L14 68 V32 Z"/>') }
+    { key: 'dreieck',  svg: shapeSvg('<path d="M50 14 L88 82 H12 Z"/>') },
+    { key: 'kreis',    svg: shapeSvg('<circle cx="50" cy="50" r="38"/>') },
+    { key: 'quadrat',  svg: shapeSvg('<rect x="16" y="16" width="68" height="68" rx="8"/>') },
+    { key: 'raute',    svg: shapeSvg('<path d="M50 10 L86 50 L50 90 L14 50 Z"/>') },
+    { key: 'stern',    svg: shapeSvg('<path d="M50 10 L59.4 37.1 L88 37.6 L65.2 54.9 L73.5 82.4 L50 66 L26.5 82.4 L34.8 54.9 L12 37.6 L40.6 37.1 Z"/>') },
+    { key: 'sechseck', svg: shapeSvg('<path d="M50 12 L86 32 V68 L50 88 L14 68 V32 Z"/>') }
   ];
 
   /* ---------- Farben: Okabe-Ito-nah, gut unterscheidbar ---------- */
   var COLORS = [
-    { key: 'blau',      name: 'Blau' },
-    { key: 'bernstein', name: 'Bernstein' },
-    { key: 'tuerkis',   name: 'Tuerkis' },
-    { key: 'violett',   name: 'Violett' },
-    { key: 'magenta',   name: 'Magenta' },
-    { key: 'schiefer',  name: 'Schiefer' }
+    { key: 'blau' },
+    { key: 'bernstein' },
+    { key: 'tuerkis' },
+    { key: 'violett' },
+    { key: 'magenta' },
+    { key: 'schiefer' }
   ];
 
   /* ---------- Lucide Bedien-Icons (ISC) ---------- */
@@ -112,11 +248,18 @@
   var ICON = {
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
-    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>')
+    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
   };
   var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
+  var LANGS = [
+    { code: 'de', name: 'Deutsch' },
+    { code: 'en', name: 'English' },
+    { code: 'tr', name: 'Türkçe' }
+  ];
 
   /* ---------- DOM ---------- */
+  var langbarEl     = document.getElementById('langbar');
   var themebarEl    = document.getElementById('themebar');
   var themeColorEl  = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
@@ -147,8 +290,10 @@
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
   var theme = loadTheme();
+  var lang = loadLang();
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var themeToggleBtn = null;
+  var langToggleBtn = null;
   var fbTimer = 0;
 
   function storageOK() {
@@ -196,6 +341,73 @@
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
   }
 
+  /* ---------- Sprachumschalter ----------
+     Weltkugel plus aktuelles Kuerzel, zyklisch DE -> EN -> TR -> DE. */
+  function saveLang(l) { if (!hasStorage) return; try { window.localStorage.setItem(LANG_KEY, l); } catch (e) {} }
+  function setLang(l) {
+    if (l !== 'de' && l !== 'en' && l !== 'tr') return;
+    lang = l;
+    saveLang(l);
+    relocalize();
+  }
+  function langName(c) {
+    for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) return LANGS[i].name; }
+    return c;
+  }
+  function buildLangBar() {
+    if (!langbarEl) return;
+    langbarEl.innerHTML = '';
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(lang);
+    setLang(order[(i + 1) % order.length]);
+  }
+  function refreshLangBar() {
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
+  }
+
+  /* ---------- Neu Lokalisieren bei Sprachwechsel mitten im Spiel ----------
+     Ziel und Optionen tragen selbst keinen Sprachtext, daher reicht ein
+     Neusetzen der Labels/Texte. Das aktuelle Ziel entspricht immer exakt
+     der Option an correctIndex, daher aus dieser rekonstruierbar. */
+  function relocalize() {
+    document.documentElement.lang = lang;
+    applyTexts();
+    refreshLangBar();
+    refreshThemeBar();
+    setFooterLinks();
+    if (phase !== 'init' && correctIndex >= 0 && options[correctIndex]) {
+      renderTarget(options[correctIndex]);
+      relabelOptions();
+    }
+    if (phase === 'over') {
+      var best = loadBestVal();
+      var scoreText = fmt('over_score', { s: score, r: round }) +
+        (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : '');
+      if (overlayTitleEl) overlayTitleEl.textContent = t('over_title');
+      if (overlayScoreEl) { overlayScoreEl.textContent = scoreText; overlayScoreEl.hidden = !scoreText; }
+      if (overlayBtn) overlayBtn.textContent = t('over_restart');
+    }
+    updateBest();
+  }
+  // Aktualisiert nur die aria-labels der bestehenden Options-Knoepfe, ohne
+  // das DOM neu aufzubauen, damit Reveal-Klassen (is-correct/is-wrong) und
+  // Fokus waehrend eines Sprachwechsels mitten in der Runde erhalten bleiben.
+  function relabelOptions() {
+    for (var i = 0; i < optEls.length && i < options.length; i++) {
+      optEls[i].setAttribute('aria-label', fmt('aria_opt', { n: i + 1, desc: describe(options[i]) }));
+    }
+  }
+
   /* ---------- Spielzustand ----------
      phase: 'init' | 'play' | 'paused' | 'reveal' | 'over'
        play   Runde laeuft, Zeitleiste schrumpft, Eingabe aktiv
@@ -239,7 +451,7 @@
   function shapeByKey(k) { for (var i = 0; i < SHAPES.length; i++) { if (SHAPES[i].key === k) return SHAPES[i]; } return SHAPES[0]; }
   function colorByKey(k) { for (var i = 0; i < COLORS.length; i++) { if (COLORS[i].key === k) return COLORS[i]; } return COLORS[0]; }
   function describe(opt) {
-    return shapeByKey(opt.shape).name + t('in_color') + colorByKey(opt.color).name;
+    return composeShapeColor(shapeName(opt.shape), colorName(opt.color));
   }
   function announce(msg, kind) {
     if (!statusEl) return;
@@ -291,17 +503,22 @@
   /* ---------- Render (defensiv gegen leeren Zustand) ---------- */
   function renderTarget(target) {
     if (!target) return;
-    var sh = shapeByKey(target.shape), co = colorByKey(target.color);
+    var sh = shapeByKey(target.shape);
     if (targetLeadEl) targetLeadEl.textContent = t('target_lead');
     if (targetChipEl) {
       targetChipEl.className = 'target-chip col-' + target.color;
       targetChipEl.innerHTML = sh.svg;
     }
-    if (targetNameEl) targetNameEl.textContent = sh.name + t('in_color') + co.name;
+    if (targetNameEl) targetNameEl.textContent = composeShapeColor(shapeName(target.shape), colorName(target.color));
   }
 
   function buildOptionsDOM() {
     if (!optionsEl) return;
+    // Fokus vor dem Neuaufbau merken: nur wiederherstellen, wenn er auf einer
+    // Options-Schaltflaeche lag (Tastatur/Screenreader-Nutzer), nicht wenn
+    // z. B. Pause/Neustart fokussiert war, damit kein Fokus gestohlen wird.
+    var hadOptFocus = !!(document.activeElement && document.activeElement.classList &&
+      document.activeElement.classList.contains('opt'));
     optionsEl.innerHTML = '';
     optEls = [];
     for (var i = 0; i < options.length; i++) {
@@ -332,6 +549,7 @@
         optEls.push(btn);
       })(i);
     }
+    if (hadOptFocus && optEls[0]) optEls[0].focus();
   }
   function setRoving(idx) {
     for (var i = 0; i < optEls.length; i++) { optEls[i].tabIndex = (i === idx) ? 0 : -1; }
@@ -391,7 +609,7 @@
     // unsichtbar weiter und kostete bei Rueckkehr ein Leben. onVisibility
     // setzt sie beim Wiedererscheinen automatisch fort (manualPause bleibt false).
     if (document.hidden) doPause();
-    announce(t('msg_go') + ': ' + shapeByKey(data.target.shape).name + t('in_color') + colorByKey(data.target.color).name);
+    announce(t('msg_go') + ': ' + composeShapeColor(shapeName(data.target.shape), colorName(data.target.color)));
   }
 
   function choose(idx) {
@@ -472,10 +690,10 @@
   }
 
   /* ---------- Ende und Neustart ----------
-     Highscore ist bewusst noch nicht persistent. Der Lauf-Score wird in
-     einer Variablen gefuehrt und am Ende angezeigt; eine spaetere Bestwert
-     Persistenz haengt sich hier (gameOver) und beim Start an, analog der
-     loadBest/saveBest Logik der anderen Spiele. */
+     Highscore ist persistent (siehe loadBestVal/saveBest oben). Der
+     Lauf-Score wird in einer Variablen gefuehrt, am Ende mit dem
+     gespeicherten Bestwert verglichen und bei Bedarf hier (gameOver)
+     ueberschrieben, analog der Bestwert Logik der anderen Spiele. */
   function gameOver() {
     phase = 'over';
     stopTick();
@@ -604,7 +822,6 @@
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
   function setFooterLinks() {
-    var lang = loadLang();
     if (linkPrivacyEl) linkPrivacyEl.setAttribute('href', '../datenschutz-' + lang + '.html');
     if (linkImprintEl) linkImprintEl.setAttribute('href', '../impressum-' + lang + '.html');
   }
@@ -628,7 +845,9 @@
      Bedienleisten zuerst, dann Listener, DANN die erste Runde erzeugen.
      Kein Render greift vorher auf noch nicht existierende Optionen zu. */
   function init() {
+    document.documentElement.lang = lang;
     setFooterLinks();
+    buildLangBar();
     buildThemeBar();
     applyTheme();
     applyTexts();

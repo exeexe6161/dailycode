@@ -1,7 +1,7 @@
 {
   "id": "dailycode-ciphera",
-  "name": "dailycode",
-  "short_name": "dailycode",
+  "name": "Ciphera",
+  "short_name": "Ciphera",
   "description": "Solve Ciphera's secret code of the day, made of six symbols.",
   "lang": "en",
   "dir": "ltr",

@@ -45,48 +45,140 @@
   }
   var MIN_SEG = 3; // Mindestlaenge je Segment, damit Endpunkte distinkt sind
 
-  /* ---------- Sprache: minimaler t() Tisch (Deutsch) ---------- */
-  var STR = {
-    subtitle: 'Verbinde die gleichen Punkte und fuelle das ganze Gitter.',
-    lbl_level: 'Stufe',
-    lbl_fill: 'Felder',
-    lbl_best: 'Bestwert',
-    best_none: 'noch keine',
-    btn_clear: 'Alles loeschen',
-    btn_new: 'Neues Raetsel',
-    btn_restart: 'Neu starten',
-    btn_continue: 'Weiter',
-    aria_clear: 'Alle Wege loeschen',
-    aria_new: 'Neues Raetsel der gleichen Stufe',
-    aria_restart: 'Lauf bei Stufe eins neu starten',
-    aria_board: 'Wege-Gitter. Ziehe von einem Punkt zum gleichfarbigen Punkt. Mit der Tastatur: Ziffer waehlt ein Paar, Pfeiltasten ziehen den Weg, Entf loescht.',
-    loading: 'Erzeuge Raetsel',
-    msg_go: 'Verbinde die Paare und fuelle das Gitter',
-    msg_pair: 'Paar {n} verbunden',
-    msg_pair_open: 'Paar {n} wieder offen',
-    msg_full: 'Gitter voll',
-    msg_cleared: 'Weg geloescht',
-    msg_color: 'Farbe {n} gewaehlt',
-    solved_title: 'Stufe geloest',
-    solved_score: 'Stufe {n} geschafft',
-    theme_group: 'Darstellung',
-    theme_auto: 'Auto',
-    theme_light: 'Hell',
-    theme_dark: 'Dunkel',
-    help_summary: 'Hilfe',
-    help_1: 'Ziehe mit dem Finger oder der Maus von einem Punkt entlang der Felder zum gleichfarbigen Punkt. Jeder Punkt traegt zusaetzlich eine Ziffer.',
-    help_2: 'Ein Weg darf einen anderen ueberschreiben, der fremde Weg wird dort abgeschnitten. Tippe einen Punkt oder Weg kurz an, um ihn zu loeschen.',
-    help_3: 'Geloest ist die Stufe, wenn alle Paare verbunden sind und jedes Feld belegt ist. Dann waechst das Gitter.',
-    nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum',
-    back: 'Zurueck',
-    back_aria: 'Zurueck zur Startseite'
+  /* ---------- Sprache: DE/EN/TR, Werte mit {platzhalter} ---------- */
+  var LANGS = [
+    { code: 'de', label: 'DE', name: 'Deutsch' },
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'tr', label: 'TR', name: 'Türkçe' }
+  ];
+  var I18N = {
+    de: {
+      subtitle: 'Verbinde die gleichen Punkte und fuelle das ganze Gitter.',
+      lbl_level: 'Stufe',
+      lbl_fill: 'Felder',
+      lbl_best: 'Bestwert',
+      best_none: 'noch keine',
+      btn_clear: 'Alles loeschen',
+      btn_new: 'Neues Raetsel',
+      btn_restart: 'Neu starten',
+      btn_continue: 'Weiter',
+      aria_clear: 'Alle Wege loeschen',
+      aria_new: 'Neues Raetsel der gleichen Stufe',
+      aria_restart: 'Lauf bei Stufe eins neu starten',
+      aria_board: 'Wege-Gitter. Ziehe von einem Punkt zum gleichfarbigen Punkt. Mit der Tastatur: Ziffer waehlt ein Paar, Pfeiltasten ziehen den Weg, Entf loescht.',
+      loading: 'Erzeuge Raetsel',
+      msg_go: 'Verbinde die Paare und fuelle das Gitter',
+      msg_pair: 'Paar {n} verbunden',
+      msg_pair_open: 'Paar {n} wieder offen',
+      msg_full: 'Gitter voll',
+      msg_cleared: 'Weg geloescht',
+      msg_color: 'Farbe {n} gewaehlt',
+      solved_title: 'Stufe geloest',
+      solved_score: 'Stufe {n} geschafft',
+      solved_announce: 'Stufe geloest, Stufe {n} geschafft',
+      theme_group: 'Darstellung',
+      theme_auto: 'Auto',
+      theme_light: 'Hell',
+      theme_dark: 'Dunkel',
+      help_summary: 'Hilfe',
+      help_1: 'Ziehe mit dem Finger oder der Maus von einem Punkt entlang der Felder zum gleichfarbigen Punkt. Jeder Punkt traegt zusaetzlich eine Ziffer.',
+      help_2: 'Ein Weg darf einen anderen ueberschreiben, der fremde Weg wird dort abgeschnitten. Tippe einen Punkt oder Weg kurz an, um ihn zu loeschen.',
+      help_3: 'Geloest ist die Stufe, wenn alle Paare verbunden sind und jedes Feld belegt ist. Dann waechst das Gitter.',
+      nav_privacy: 'Datenschutz',
+      nav_imprint: 'Impressum',
+      back: 'Zurueck',
+      back_aria: 'Zurueck zur Startseite',
+      aria_lang_group: 'Sprache'
+    },
+    en: {
+      subtitle: 'Connect matching points and fill the whole grid.',
+      lbl_level: 'Level',
+      lbl_fill: 'Fields',
+      lbl_best: 'Best',
+      best_none: 'none yet',
+      btn_clear: 'Clear all',
+      btn_new: 'New puzzle',
+      btn_restart: 'Restart',
+      btn_continue: 'Continue',
+      aria_clear: 'Clear all paths',
+      aria_new: 'New puzzle of the same level',
+      aria_restart: 'Restart the run at level one',
+      aria_board: 'Path grid. Drag from one point to the matching point of the same color. With the keyboard: a digit selects a pair, arrow keys draw the path, Delete clears it.',
+      loading: 'Generating puzzle',
+      msg_go: 'Connect the pairs and fill the grid',
+      msg_pair: 'Pair {n} connected',
+      msg_pair_open: 'Pair {n} open again',
+      msg_full: 'Grid full',
+      msg_cleared: 'Path cleared',
+      msg_color: 'Color {n} selected',
+      solved_title: 'Level solved',
+      solved_score: 'Level {n} completed',
+      solved_announce: 'Level solved, level {n} completed',
+      theme_group: 'Appearance',
+      theme_auto: 'Auto',
+      theme_light: 'Light',
+      theme_dark: 'Dark',
+      help_summary: 'Help',
+      help_1: 'Drag with your finger or mouse from one point along the fields to the matching point of the same color. Each point also carries a digit.',
+      help_2: 'A path may overwrite another one, the other path is cut off there. Tap a point or path briefly to clear it.',
+      help_3: 'The level is solved once all pairs are connected and every field is filled. Then the grid grows.',
+      nav_privacy: 'Privacy',
+      nav_imprint: 'Imprint',
+      back: 'Back',
+      back_aria: 'Back to start',
+      aria_lang_group: 'Language'
+    },
+    tr: {
+      subtitle: 'Aynı noktaları birleştir ve tüm gridi doldur.',
+      lbl_level: 'Seviye',
+      lbl_fill: 'Alanlar',
+      lbl_best: 'En iyi',
+      best_none: 'henüz yok',
+      btn_clear: 'Tümünü sil',
+      btn_new: 'Yeni bulmaca',
+      btn_restart: 'Yeniden başlat',
+      btn_continue: 'Devam et',
+      aria_clear: 'Tüm yolları sil',
+      aria_new: 'Aynı seviyede yeni bulmaca',
+      aria_restart: 'Turu birinci seviyeden yeniden başlat',
+      aria_board: 'Yol gridi. Bir noktadan aynı renkteki eşleşen noktaya sürükle. Klavyeyle: bir rakam çifti seçer, ok tuşları yolu çizer, Delete tuşu siler.',
+      loading: 'Bulmaca oluşturuluyor',
+      msg_go: 'Çiftleri birleştir ve gridi doldur',
+      msg_pair: '{n}. çift birleşti',
+      msg_pair_open: '{n}. çift tekrar açıldı',
+      msg_full: 'Grid dolu',
+      msg_cleared: 'Yol silindi',
+      msg_color: '{n}. renk seçildi',
+      solved_title: 'Seviye çözüldü',
+      solved_score: '{n}. seviye tamamlandı',
+      solved_announce: 'Seviye çözüldü, {n}. seviye tamamlandı',
+      theme_group: 'Görünüm',
+      theme_auto: 'Otomatik',
+      theme_light: 'Açık',
+      theme_dark: 'Koyu',
+      help_summary: 'Yardım',
+      help_1: 'Parmağınla veya fareyle bir noktadan, alanlar boyunca aynı renkteki eşleşen noktaya sürükle. Her nokta ayrıca bir rakam taşır.',
+      help_2: 'Bir yol başka bir yolun üzerine yazabilir, diğer yol o noktada kesilir. Bir noktaya veya yola kısaca dokunarak silebilirsin.',
+      help_3: 'Tüm çiftler birleştiğinde ve her alan dolduğunda seviye çözülmüş olur. Ardından grid büyür.',
+      nav_privacy: 'Gizlilik',
+      nav_imprint: 'Künye',
+      back: 'Geri',
+      back_aria: 'Geri, ana sayfaya',
+      aria_lang_group: 'Dil'
+    }
   };
-  function t(key) { var v = STR[key]; return v === undefined ? key : v; }
-  function fmt(key, map) {
-    var s = t(key);
-    for (var k in map) { if (map.hasOwnProperty(k)) { s = s.replace('{' + k + '}', String(map[k])); } }
-    return s;
+  function fill(str, params) {
+    if (!params) return str;
+    return str.replace(/\{(\w+)\}/g, function (m, k) {
+      return (params[k] !== undefined) ? String(params[k]) : m;
+    });
+  }
+  function t(key, params) {
+    var table = I18N[lang] || I18N.en;
+    var entry = table[key];
+    if (entry === undefined) entry = I18N.en[key]; // Fallback en
+    if (entry === undefined) return key;
+    return fill(entry, params);
   }
 
   /* ---------- Lucide Bedien-Icons (ISC) ---------- */
@@ -96,11 +188,13 @@
   var ICON = {
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
-    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>')
+    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
   };
   var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
 
   /* ---------- DOM ---------- */
+  var langbarEl     = document.getElementById('langbar');
   var themebarEl    = document.getElementById('themebar');
   var themeColorEl  = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
@@ -140,10 +234,6 @@
     return 'auto';
   }
   function saveTheme(v) { if (!hasStorage) return; try { window.localStorage.setItem(THEME_KEY, v); } catch (e) {} }
-  function loadLang() {
-    if (hasStorage) { try { var v = window.localStorage.getItem(LANG_KEY); if (v === 'de' || v === 'en' || v === 'tr') return v; } catch (e) {} }
-    return 'de';
-  }
   function effectiveDark() { return theme === 'dark' || (theme === 'auto' && systemDarkMQ.matches); }
   function updateThemeColor() { if (themeColorEl) themeColorEl.setAttribute('content', effectiveDark() ? '#0a0c11' : '#f4f5f7'); }
   function applyTheme() {
@@ -176,6 +266,67 @@
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
+  }
+
+  /* ---------- Sprache: Zustand laden, speichern, setzen (Muster: code/game.js) ---------- */
+  var lang = loadLang();
+  var langToggleBtn = null;
+
+  function loadLang() {
+    var stored = null;
+    if (hasStorage) {
+      try { stored = window.localStorage.getItem(LANG_KEY); } catch (e) { stored = null; }
+    }
+    if (stored && I18N[stored]) return stored;
+    var navs = [];
+    if (navigator.languages && navigator.languages.length) navs = navigator.languages;
+    else if (navigator.language) navs = [navigator.language];
+    for (var i = 0; i < navs.length; i++) {
+      var two = String(navs[i]).slice(0, 2).toLowerCase();
+      if (two === 'de' || two === 'en' || two === 'tr') return two;
+    }
+    return 'en';
+  }
+  function saveLang(l) {
+    if (!hasStorage) return;
+    try { window.localStorage.setItem(LANG_KEY, l); } catch (e) { /* nur Sitzung */ }
+  }
+  function setLang(l) {
+    if (!I18N[l]) return;
+    lang = l;
+    saveLang(l);
+    document.documentElement.lang = lang;
+    applyTexts();
+    refreshLangBar();
+    refreshThemeBar();
+    setFooterLinks();
+    updateBest();
+    if (lastStatus) announce(lastStatus.key, lastStatus.params, lastStatus.kind);
+    if (phase === 'solved') showOverlay(t('solved_title'), t('solved_score', { n: level }), t('btn_continue'));
+  }
+  function langName(c) {
+    for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) return LANGS[i].name; }
+    return c;
+  }
+  function buildLangBar() {
+    if (!langbarEl) return;
+    langbarEl.innerHTML = '';
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(lang);
+    setLang(order[(i + 1) % order.length]);
+  }
+  function refreshLangBar() {
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
   }
 
   /* ---------- Farben aus CSS Variablen (CSP konform) ---------- */
@@ -217,8 +368,38 @@
   var engaged = false;
   var moved = false;
 
+  // Tagesdeterministischer Generator: eine rng Instanz je makeLevel() Durchlauf
+  var rng = null;
+  var newPuzzleSalt = 0; // erhoeht sich nur bei "Neues Raetsel", damit der Klick abweicht
+
+  /* ---------- Tagesdeterministischer Seed (1:1 aus code/game.js uebernommen) ---------- */
+  function dateKeyUTC(d) {
+    d = d || new Date();
+    var y = d.getUTCFullYear();
+    var m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    var day = String(d.getUTCDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+  function fnv1a(str) {
+    var h = 0x811c9dc5;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    return h >>> 0;
+  }
+  function mulberry32(a) {
+    return function () {
+      a |= 0;
+      a = (a + 0x6D2B79F5) | 0;
+      var t2 = Math.imul(a ^ (a >>> 15), 1 | a);
+      t2 = (t2 + Math.imul(t2 ^ (t2 >>> 7), 61 | t2)) ^ t2;
+      return ((t2 ^ (t2 >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   /* ---------- Helfer ---------- */
-  function randInt(n) { return Math.floor(Math.random() * n); }
+  function randInt(n) { return Math.floor(rng() * n); }
   function rc(cell) { return [Math.floor(cell / N), cell % N]; }
   function adjacent(a, b) {
     var ar = Math.floor(a / N), ac = a % N, br = Math.floor(b / N), bc = b % N;
@@ -265,7 +446,7 @@
       var list = [];
       var ns = nbrs(cell);
       for (var i = 0; i < ns.length; i++) if (!visited[ns[i]]) list.push(ns[i]);
-      list.sort(function (a, b) { return (freeDeg(a) - freeDeg(b)) || (Math.random() < 0.5 ? -1 : 1); });
+      list.sort(function (a, b) { return (freeDeg(a) - freeDeg(b)) || (rng() < 0.5 ? -1 : 1); });
       for (var j = 0; j < list.length; j++) { if (dfs(list[j])) return true; }
       visited[cell] = 0; path.pop();
       return false;
@@ -290,11 +471,16 @@
     return lens;
   }
 
-  /* ---------- Stufe aufbauen (volles, loesbares Gitter garantiert) ---------- */
+  /* ---------- Stufe aufbauen (volles, loesbares Gitter garantiert) ----------
+     Seed: Tag (UTC) + Stufe, damit dasselbe Tagesraetsel je Stufe reproduzierbar
+     ist. newPuzzleSalt weicht NUR bei explizitem "Neues Raetsel" Klick ab. */
   function makeLevel() {
     var cfg = levelConfig(level);
     N = cfg.N; K = cfg.K;
     var total = N * N;
+
+    var seed = 'flow8:' + dateKeyUTC() + ':' + level + (newPuzzleSalt ? ':' + newPuzzleSalt : '');
+    rng = mulberry32(fnv1a(seed));
 
     var path = null, tries = 0;
     while (!path && tries < 8) { path = makeHamiltonian(N); tries++; }
@@ -377,7 +563,11 @@
     return true;
   }
 
-  // Ziel-Feld T: entlang gemeinsamer Zeile/Spalte schrittweise erweitern.
+  // Ziel-Feld T: entlang gemeinsamer Zeile/Spalte schrittweise erweitern. Liegt
+  // T weder in der aktuellen Zeile noch Spalte des Kopfes (schneller Drag ueber
+  // schmale Zellen), wird die Bewegung zerlegt: erst horizontal auf die
+  // Zielspalte zu, danach vertikal auf die Zielzeile, Schritt fuer Schritt
+  // ueber tryExtend(), statt komplett abzubrechen.
   function dragTo(T) {
     if (active < 0 || !engaged) return false;
     var changed = false, guard = 0;
@@ -388,7 +578,8 @@
       var next;
       if (hr === tr && hc !== tc) next = head + (tc > hc ? 1 : -1);
       else if (hc === tc && hr !== tr) next = head + (tr > hr ? N : -N);
-      else break; // nicht ausgerichtet: auf naechstes Move warten
+      else if (hc !== tc) next = head + (tc > hc ? 1 : -1);   // erst horizontal auf Zielspalte zu
+      else next = head + (tr > hr ? N : -N);                   // dann vertikal auf Zielzeile zu
       if (!tryExtend(next)) break;
       changed = true;
     }
@@ -438,7 +629,7 @@
     if (active < 0) return;
     if (!moved) {
       clearColor(active, (pendingStart === 'endpoint') ? downCell : endpoints[active].a);
-      announce(t('msg_cleared'));
+      announce('msg_cleared', null);
     }
     try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
     active = -1; engaged = false; pendingStart = null; downCell = -1;
@@ -459,7 +650,7 @@
         e.preventDefault();
         active = idx; pendingStart = 'endpoint'; downCell = endpoints[idx].a;
         engaged = false; engage(); moved = true;
-        announce(fmt('msg_color', { n: idx + 1 }));
+        announce('msg_color', { n: idx + 1 });
         afterChange(); requestDraw();
       }
       return;
@@ -473,7 +664,7 @@
     else if (k === 'ArrowRight') { if (hc < N - 1) next = head + 1; }
     else if (k === 'Backspace' || k === 'Delete') {
       e.preventDefault(); clearColor(active, endpoints[active].a);
-      announce(t('msg_cleared')); afterChange(); requestDraw(); return;
+      announce('msg_cleared', null); afterChange(); requestDraw(); return;
     } else { return; }
     if (next >= 0) { e.preventDefault(); if (tryExtend(next)) { afterChange(); checkWin(); requestDraw(); } }
   }
@@ -492,7 +683,7 @@
   function afterChange() {
     recomputeConnected();
     for (var k = 0; k < K; k++) {
-      if (connected[k] && !prevConnected[k]) announce(fmt('msg_pair', { n: k + 1 }));
+      if (connected[k] && !prevConnected[k]) announce('msg_pair', { n: k + 1 });
       prevConnected[k] = connected[k];
     }
     updateHud();
@@ -508,8 +699,8 @@
     var prev = loadBestVal();
     if (prev == null || level > prev) saveBest(level);
     updateBest();
-    showOverlay(t('solved_title'), fmt('solved_score', { n: level }), t('btn_continue'));
-    announce(t('solved_title') + ', ' + fmt('solved_score', { n: level }), 'good');
+    showOverlay(t('solved_title'), t('solved_score', { n: level }), t('btn_continue'));
+    announce('solved_announce', { n: level }, 'good');
   }
 
   /* ---------- Bestwert (einheitliches null-Muster, Vorbild grid9) ----------
@@ -534,9 +725,11 @@
     if (hudFillEl) hudFillEl.textContent = coveredCount() + '/' + (N * N);
     updateBest();
   }
-  function announce(msg, kind) {
+  var lastStatus = null; // { key, params, kind } fuer Neu-Lokalisieren bei Sprachwechsel
+  function announce(key, params, kind) {
+    lastStatus = { key: key, params: params || null, kind: kind };
     if (!statusEl) return;
-    statusEl.textContent = msg;
+    statusEl.textContent = t(key, params);
     statusEl.classList.toggle('is-good', kind === 'good');
   }
 
@@ -629,7 +822,7 @@
   function generate() {
     phase = 'loading';
     hideOverlay();
-    announce(t('loading'));
+    announce('loading', null);
     if (canvas) canvas.setAttribute('aria-busy', 'true');
     // Ladezustand zuerst zeigen, Erzeugung auf den naechsten Tick legen.
     window.setTimeout(function () {
@@ -640,12 +833,12 @@
       updateHud();
       if (canvas) canvas.removeAttribute('aria-busy');
       requestDraw();
-      announce(t('msg_go'));
+      announce('msg_go', null);
     }, 0);
   }
-  function newPuzzle() { generate(); }
-  function restartRun() { level = 1; generate(); }
-  function nextLevel() { level += 1; generate(); }
+  function newPuzzle() { newPuzzleSalt += 1; generate(); }
+  function restartRun() { level = 1; newPuzzleSalt = 0; generate(); }
+  function nextLevel() { level += 1; newPuzzleSalt = 0; generate(); }
 
   /* ---------- Statische Texte und Rechtslinks ---------- */
   function applyTexts() {
@@ -669,7 +862,6 @@
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
   function setFooterLinks() {
-    var lang = loadLang();
     if (linkPrivacyEl) linkPrivacyEl.setAttribute('href', '../datenschutz-' + lang + '.html');
     if (linkImprintEl) linkImprintEl.setAttribute('href', '../impressum-' + lang + '.html');
   }
@@ -695,7 +887,9 @@
      Render greift vorher auf einen leeren Zustand zu (render() prueft
      owner.length). */
   function init() {
+    document.documentElement.lang = lang;
     setFooterLinks();
+    buildLangBar();
     buildThemeBar();
     readColors();
     applyTheme();

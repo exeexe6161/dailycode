@@ -10,8 +10,8 @@
    data-URI. Strikte CSP konform: keine Inline-Styles im Markup,
    dynamische Werte nur ueber CSSOM und Canvas. Theme und Sprache
    teilen die bestehenden Keys (dailycode:theme, dailycode:lang).
-   i18n der Spieltexte folgt als eigener Schritt, die Texte liegen
-   bereits hinter einem t() Muster.
+   i18n vollstaendig DE/EN/TR ueber I18N Tabelle und t() Muster,
+   Sprachumschalter nach Vorbild Ciphera (code/game.js).
    ============================================================ */
 (function () {
   'use strict';
@@ -33,39 +33,106 @@
   var SWIPE_MIN = 24;           // Mindestweg fuer eine Wischgeste in px
   var FLASH_MS = 260;           // Dauer der dezenten Aufloese-Blende (nur Zier)
 
-  /* ---------- Sprache: minimaler t() Tisch (Deutsch) ---------- */
-  var STR = {
-    subtitle: 'Staple Formen, verbinde drei gleiche und mehr.',
-    score: 'Punkte',
-    lbl_best: 'Bestwert',
-    best_none: 'noch keine',
-    pause: 'Pause',
-    resume: 'Weiter',
-    restart: 'Neu',
-    over_title: 'Spiel vorbei',
-    over_restart: 'Neu starten',
-    theme_group: 'Darstellung',
-    theme_auto: 'Auto',
-    theme_light: 'Hell',
-    theme_dark: 'Dunkel',
-    act_left: 'Nach links',
-    act_right: 'Nach rechts',
-    act_drop: 'Schneller fallen',
-    aria_field: 'Spielfeld. Symbol mit Pfeiltasten oder WASD bewegen, runter faellt schneller, P pausiert.',
-    aria_pause: 'Pausieren',
-    aria_resume: 'Fortsetzen',
-    aria_restart: 'Neu starten',
-    help_summary: 'Hilfe',
-    help_1: 'Pfeiltasten oder WASD bewegen, runter laesst schneller fallen, Wischen und Tippen geht auch.',
-    help_2: 'Drei oder mehr gleiche Formen, die sich beruehren, loesen sich auf und geben Punkte.',
-    help_3: 'Ketten geben Bonus. Vorbei ist es, wenn oben kein Platz mehr bleibt.',
-    nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum',
-    back: 'Zurueck',
-    back_aria: 'Zurueck zur Startseite'
+  /* ---------- Sprache: I18N Tisch DE/EN/TR ---------- */
+  var I18N = {
+    de: {
+      subtitle: 'Staple Formen, verbinde drei gleiche und mehr.',
+      score: 'Punkte',
+      lbl_best: 'Bestwert',
+      best_none: 'noch keine',
+      pause: 'Pause',
+      resume: 'Weiter',
+      restart: 'Neu',
+      over_title: 'Spiel vorbei',
+      over_restart: 'Neu starten',
+      theme_group: 'Darstellung',
+      theme_auto: 'Auto',
+      theme_light: 'Hell',
+      theme_dark: 'Dunkel',
+      act_left: 'Nach links',
+      act_right: 'Nach rechts',
+      act_drop: 'Schneller fallen',
+      aria_field: 'Spielfeld. Symbol mit Pfeiltasten oder WASD bewegen, runter faellt schneller, P pausiert.',
+      aria_pause: 'Pausieren',
+      aria_resume: 'Fortsetzen',
+      aria_restart: 'Neu starten',
+      help_summary: 'Hilfe',
+      help_1: 'Pfeiltasten oder WASD bewegen, runter laesst schneller fallen, Wischen und Tippen geht auch.',
+      help_2: 'Drei oder mehr gleiche Formen, die sich beruehren, loesen sich auf und geben Punkte.',
+      help_3: 'Ketten geben Bonus. Vorbei ist es, wenn oben kein Platz mehr bleibt.',
+      nav_privacy: 'Datenschutz',
+      nav_imprint: 'Impressum',
+      back: 'Zurueck',
+      back_aria: 'Zurueck zur Startseite',
+      aria_lang_group: 'Sprache'
+    },
+    en: {
+      subtitle: 'Stack shapes, connect three or more alike.',
+      score: 'Points',
+      lbl_best: 'Best',
+      best_none: 'none yet',
+      pause: 'Pause',
+      resume: 'Resume',
+      restart: 'New',
+      over_title: 'Game over',
+      over_restart: 'Restart',
+      theme_group: 'Appearance',
+      theme_auto: 'Auto',
+      theme_light: 'Light',
+      theme_dark: 'Dark',
+      act_left: 'Move left',
+      act_right: 'Move right',
+      act_drop: 'Drop faster',
+      aria_field: 'Game field. Move the symbol with arrow keys or WASD, down falls faster, P pauses.',
+      aria_pause: 'Pause',
+      aria_resume: 'Resume',
+      aria_restart: 'Restart',
+      help_summary: 'Help',
+      help_1: 'Move with arrow keys or WASD, down makes it fall faster, swiping and tapping also work.',
+      help_2: 'Three or more matching shapes touching each other dissolve and score points.',
+      help_3: 'Chains give a bonus. It is over once there is no room left at the top.',
+      nav_privacy: 'Privacy',
+      nav_imprint: 'Imprint',
+      back: 'Back',
+      back_aria: 'Back to start',
+      aria_lang_group: 'Language'
+    },
+    tr: {
+      subtitle: 'Şekilleri istifle, üç veya daha fazla aynı şekli birleştir.',
+      score: 'Puan',
+      lbl_best: 'En iyi',
+      best_none: 'henüz yok',
+      pause: 'Duraklat',
+      resume: 'Devam',
+      restart: 'Yeni',
+      over_title: 'Oyun bitti',
+      over_restart: 'Yeniden başlat',
+      theme_group: 'Görünüm',
+      theme_auto: 'Otomatik',
+      theme_light: 'Açık',
+      theme_dark: 'Koyu',
+      act_left: 'Sola git',
+      act_right: 'Sağa git',
+      act_drop: 'Hızlı düşür',
+      aria_field: 'Oyun alanı. Simgeyi ok tuşları veya WASD ile hareket ettir, aşağı tuşu daha hızlı düşürür, P duraklatır.',
+      aria_pause: 'Duraklat',
+      aria_resume: 'Devam et',
+      aria_restart: 'Yeniden başlat',
+      help_summary: 'Yardım',
+      help_1: 'Ok tuşları veya WASD ile hareket ettir, aşağı tuşu daha hızlı düşürür, kaydırma ve dokunma da çalışır.',
+      help_2: 'Birbirine değen üç veya daha fazla aynı şekil çözülür ve puan kazandırır.',
+      help_3: 'Zincirler bonus verir. Üstte yer kalmayınca oyun biter.',
+      nav_privacy: 'Gizlilik',
+      nav_imprint: 'Künye',
+      back: 'Geri',
+      back_aria: 'Geri, ana sayfaya',
+      aria_lang_group: 'Dil'
+    }
   };
   function t(key) {
-    var v = STR[key];
+    var table = I18N[lang] || I18N.en;
+    var v = table[key];
+    if (v === undefined) v = I18N.en[key];
     return v === undefined ? key : v;
   }
 
@@ -76,11 +143,20 @@
   var ICON = {
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
-    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>')
+    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
   };
   var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
 
+  /* ---------- Sprachen: Reihenfolge und Anzeigenamen ---------- */
+  var LANGS = [
+    { code: 'de', label: 'DE', name: 'Deutsch' },
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'tr', label: 'TR', name: 'Türkçe' }
+  ];
+
   /* ---------- DOM ---------- */
+  var langbarEl     = document.getElementById('langbar');
   var themebarEl    = document.getElementById('themebar');
   var themeColorEl  = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
@@ -105,11 +181,13 @@
   var LANG_KEY = 'dailycode:lang';
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
+  var lang = loadLang();
   var theme = loadTheme();
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
   var reduceMotion = reduceMQ.matches;
   var themeToggleBtn = null;
+  var langToggleBtn = null;
   var fbTimer = 0;
 
   function storageOK() {
@@ -141,6 +219,45 @@
       } catch (e) { /* kein Storage */ }
     }
     return 'de';
+  }
+  function saveLang(l) {
+    if (!hasStorage) return;
+    try { window.localStorage.setItem(LANG_KEY, l); } catch (e) { /* nur Sitzung */ }
+  }
+  function setLang(l) {
+    if (!I18N[l]) return;
+    lang = l;
+    saveLang(l);
+    document.documentElement.lang = lang;
+    applyTexts();
+    refreshLangBar();
+    refreshThemeBar();
+    setFooterLinks();
+    refreshDynamicTexts();
+  }
+  function buildLangBar() {
+    if (!langbarEl) return;
+    langbarEl.innerHTML = '';
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(lang);
+    setLang(order[(i + 1) % order.length]);
+  }
+  function refreshLangBar() {
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
+  }
+  function langName(c) {
+    for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) return LANGS[i].name; }
+    return c;
   }
   function effectiveDark() {
     return theme === 'dark' || (theme === 'auto' && systemDarkMQ.matches);
@@ -650,13 +767,20 @@
   }
 
   /* ---------- Touch Knoepfe (links, schneller, rechts) ---------- */
+  function updateCtrlpadLabels() {
+    if (!ctrlpadEl) return;
+    var btns = ctrlpadEl.querySelectorAll('[data-act]');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute('aria-label', t('act_' + btns[i].getAttribute('data-act')));
+    }
+  }
   function bindCtrlpad() {
     if (!ctrlpadEl) return;
+    updateCtrlpadLabels();
     var btns = ctrlpadEl.querySelectorAll('[data-act]');
     for (var i = 0; i < btns.length; i++) {
       (function (btn) {
         var act = btn.getAttribute('data-act');
-        btn.setAttribute('aria-label', t('act_' + act));
         if (act === 'left') btn.addEventListener('click', moveLeft);
         else if (act === 'right') btn.addEventListener('click', moveRight);
         else if (act === 'drop') {
@@ -710,6 +834,44 @@
     }, { passive: true });
   }
 
+  /* ---------- Maus auf dem Feld: Klicken und Ziehen (Desktop Pendant zu Touch) ---------- */
+  var mStartX = 0, mStartY = 0, mActive = false, mMoved = false;
+  function bindFieldMouse() {
+    if (!canvas) return;
+    canvas.addEventListener('mousedown', function (e) {
+      mActive = true; mMoved = false;
+      mStartX = e.clientX;
+      mStartY = e.clientY;
+    });
+    canvas.addEventListener('mousemove', function (e) {
+      if (!mActive) return;
+      var dx = e.clientX - mStartX;
+      var dy = e.clientY - mStartY;
+      if (Math.abs(dx) >= SWIPE_MIN && Math.abs(dx) > Math.abs(dy)) {
+        // je Zieh-Schwelle ein Schritt, Startpunkt nachziehen (entprellt Mehrfachschritte)
+        if (dx > 0) moveRight(); else moveLeft();
+        mStartX = e.clientX;
+        mMoved = true;
+      } else if (dy >= SWIPE_MIN && Math.abs(dy) > Math.abs(dx)) {
+        setSoftDrop(true);
+        mMoved = true;
+      }
+    });
+    canvas.addEventListener('mouseup', function (e) {
+      setSoftDrop(false);
+      if (mActive && !mMoved) {
+        // Klick ohne Ziehen: ein Schritt zur angeklickten Seite (kein Durchklippen).
+        var rect = canvas.getBoundingClientRect();
+        var rel = e.clientX - rect.left;
+        if (rel < rect.width / 2) moveLeft(); else moveRight();
+      }
+      mActive = false;
+    });
+    canvas.addEventListener('mouseleave', function () {
+      if (mActive) { setSoftDrop(false); mActive = false; }
+    });
+  }
+
   /* ---------- Sichtbarkeit: Logik und Canvas bei verstecktem Tab anhalten ---------- */
   function onVisibility() {
     if (document.hidden) { softDrop = false; stopLoop(); }
@@ -733,12 +895,26 @@
     if (restartBtn) restartBtn.setAttribute('aria-label', t('aria_restart'));
     if (canvas) canvas.setAttribute('aria-label', t('aria_field'));
     setPauseLabels();
+    updateCtrlpadLabels();
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
   function setFooterLinks() {
-    var lang = loadLang();
     if (linkPrivacyEl) linkPrivacyEl.setAttribute('href', '../datenschutz-' + lang + '.html');
     if (linkImprintEl) linkImprintEl.setAttribute('href', '../impressum-' + lang + '.html');
+  }
+
+  /* ---------- Dynamische Texte bei Sprachwechsel MITTEN im Spiel ---------- */
+  function refreshDynamicTexts() {
+    updateScore();   // aktualisiert Punktestand und Bestwert
+    if (over) {
+      var best = loadBestVal();
+      if (scoreEl) scoreEl.textContent = t('over_title') + ', ' + t('score') + ' ' + score;
+      showOverlay(t('over_title'),
+        t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
+        t('over_restart'));
+    } else if (paused) {
+      showOverlay(t('pause'), '', t('resume'));
+    }
   }
 
   /* ---------- Service Worker: nur https oder localhost, nie ueber file:// ---------- */
@@ -767,12 +943,15 @@
     sizeCanvas();
     readColors();
 
+    document.documentElement.lang = lang;
+    buildLangBar();
     buildThemeBar();
     applyTheme();
     applyTexts();
     setFooterLinks();
     bindCtrlpad();
     bindFieldTouch();
+    bindFieldMouse();
 
     updateScore();
     spawn();

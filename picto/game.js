@@ -20,29 +20,95 @@
 (function () {
   'use strict';
 
-  /* ---------- Sprache: minimaler t() Tisch (Deutsch) ---------- */
-  var STR = {
-    subtitle: 'Fuelle das Gitter und decke das Bild auf.',
-    level: function (n) { return 'Stufe ' + n; },
-    solved: 'Geloest',
-    unsolved: 'noch nicht geloest',
-    btn_clear: 'Alles loeschen',
-    btn_next: 'Naechste Stufe',
-    aria_clear: 'Alle Markierungen loeschen',
-    aria_next: 'Naechste Stufe waehlen',
-    aria_cell: function (r, c) { return 'Zelle ' + r + ',' + c; },
-    aria_board: 'Bilderraetsel Gitter. Zeilen- und Spaltenzahlen geben an, wie viele zusammenhaengende Felder gefuellt werden. Tippen fuellt ein Feld, rechte Maustaste oder Umschalttaste markiert es als leer.',
-    win: 'Bild vollstaendig',
-    theme_group: 'Darstellung',
-    theme_auto: 'Auto',
-    theme_light: 'Hell',
-    theme_dark: 'Dunkel',
-    nav_privacy: 'Datenschutz',
-    nav_imprint: 'Impressum',
-    back: 'Zurueck',
-    back_aria: 'Zurueck zur Startseite'
+  /* ---------- Sprachen: DE/EN/TR, alle sichtbaren Strings und aria-labels ---------- */
+  var LANGS = [
+    { code: 'de', label: 'DE', name: 'Deutsch' },
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'tr', label: 'TR', name: 'Türkçe' }
+  ];
+  var I18N = {
+    de: {
+      subtitle: 'Fuelle das Gitter und decke das Bild auf.',
+      level: function (n) { return 'Stufe ' + n; },
+      solved: 'Geloest',
+      unsolved: 'noch nicht geloest',
+      btn_clear: 'Alles loeschen',
+      btn_next: 'Naechste Stufe',
+      aria_clear: 'Alle Markierungen loeschen',
+      aria_next: 'Naechste Stufe waehlen',
+      cell_filled: 'gefuellt',
+      cell_marked: 'markiert',
+      cell_empty: 'leer',
+      aria_cell: function (r, c, state) { return 'Zelle ' + r + ', ' + c + ', ' + state; },
+      aria_board: 'Bilderraetsel Gitter. Zeilen- und Spaltenzahlen geben an, wie viele zusammenhaengende Felder gefuellt werden. Tippen fuellt ein Feld, rechte Maustaste oder Umschalttaste markiert es als leer. Pfeiltasten bewegen den Fokus, Eingabetaste oder Leertaste fuellt ein Feld, X oder Ruecktaste markiert es.',
+      win: 'Bild vollstaendig',
+      theme_group: 'Darstellung',
+      theme_auto: 'Auto',
+      theme_light: 'Hell',
+      theme_dark: 'Dunkel',
+      aria_lang_group: 'Sprache',
+      nav_privacy: 'Datenschutz',
+      nav_imprint: 'Impressum',
+      back: 'Zurueck',
+      back_aria: 'Zurueck zur Startseite'
+    },
+    en: {
+      subtitle: 'Fill the grid and reveal the picture.',
+      level: function (n) { return 'Level ' + n; },
+      solved: 'Solved',
+      unsolved: 'not solved yet',
+      btn_clear: 'Clear all',
+      btn_next: 'Next level',
+      aria_clear: 'Clear all marks',
+      aria_next: 'Choose next level',
+      cell_filled: 'filled',
+      cell_marked: 'marked',
+      cell_empty: 'empty',
+      aria_cell: function (r, c, state) { return 'Cell ' + r + ', ' + c + ', ' + state; },
+      aria_board: 'Picture puzzle grid. Row and column numbers show how many connected cells to fill. Tap fills a cell, right click or Shift marks it as empty. Arrow keys move focus, Enter or Space fills a cell, X or Backspace marks it.',
+      win: 'Picture complete',
+      theme_group: 'Appearance',
+      theme_auto: 'Auto',
+      theme_light: 'Light',
+      theme_dark: 'Dark',
+      aria_lang_group: 'Language',
+      nav_privacy: 'Privacy',
+      nav_imprint: 'Imprint',
+      back: 'Back',
+      back_aria: 'Back to start'
+    },
+    tr: {
+      subtitle: 'Bulmaca ızgarasını doldur ve resmi ortaya çıkar.',
+      level: function (n) { return 'Seviye ' + n; },
+      solved: 'Çözüldü',
+      unsolved: 'henüz çözülmedi',
+      btn_clear: 'Tümünü temizle',
+      btn_next: 'Sonraki seviye',
+      aria_clear: 'Tüm işaretleri temizle',
+      aria_next: 'Sonraki seviyeyi seç',
+      cell_filled: 'dolu',
+      cell_marked: 'işaretli',
+      cell_empty: 'boş',
+      aria_cell: function (r, c, state) { return 'Hücre ' + r + ', ' + c + ', ' + state; },
+      aria_board: 'Resim bulmacası ızgarası. Satır ve sütun sayıları kaç bitişik hücrenin doldurulacağını gösterir. Dokunma bir hücreyi doldurur, sağ tık veya Shift tuşu onu boş olarak işaretler. Ok tuşları odağı taşır, Enter veya boşluk tuşu bir hücreyi doldurur, X veya Geri tuşu onu işaretler.',
+      win: 'Resim tamamlandı',
+      theme_group: 'Görünüm',
+      theme_auto: 'Otomatik',
+      theme_light: 'Açık',
+      theme_dark: 'Koyu',
+      aria_lang_group: 'Dil',
+      nav_privacy: 'Gizlilik',
+      nav_imprint: 'Künye',
+      back: 'Geri',
+      back_aria: 'Geri, ana sayfaya'
+    }
   };
-  function t(key) { var v = STR[key]; return v === undefined ? key : v; }
+  function t(key) {
+    var table = I18N[lang] || I18N.en;
+    var v = table[key];
+    if (v === undefined) v = I18N.en[key];
+    return v === undefined ? key : v;
+  }
 
   /* ---------- Lucide Bedien-Icons (ISC), wie in den anderen Spielen ---------- */
   function svg(inner) {
@@ -51,11 +117,13 @@
   var ICON = {
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
-    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>')
+    monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
   };
   var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
 
   /* ---------- DOM ---------- */
+  var langbarEl      = document.getElementById('langbar');
   var themebarEl     = document.getElementById('themebar');
   var themeColorEl   = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
@@ -71,9 +139,12 @@
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
   var theme = loadTheme();
+  var lang = loadLang();
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var themeToggleBtn = null;
+  var langToggleBtn = null;
   var fbTimer = 0;
+  var currentRelocalize = null; // vom aktiven mountPicto() gesetzt, fuer Sprachwechsel mitten im Spiel
 
   function storageOK() {
     try { var k = '__dc_test__'; window.localStorage.setItem(k, '1'); window.localStorage.removeItem(k); return true; }
@@ -87,6 +158,42 @@
   function loadLang() {
     if (hasStorage) { try { var v = window.localStorage.getItem(LANG_KEY); if (v === 'de' || v === 'en' || v === 'tr') return v; } catch (e) {} }
     return 'de';
+  }
+  function saveLang(l) { if (!hasStorage) return; try { window.localStorage.setItem(LANG_KEY, l); } catch (e) {} }
+  function setLang(l) {
+    if (l !== 'de' && l !== 'en' && l !== 'tr') return;
+    lang = l;
+    saveLang(l);
+    document.documentElement.lang = lang;
+    applyTexts();
+    refreshLangBar();
+    refreshThemeBar();
+    setFooterLinks();
+    if (currentRelocalize) currentRelocalize();
+  }
+  function langName(c) {
+    for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) return LANGS[i].name; }
+    return c;
+  }
+  function buildLangBar() {
+    if (!langbarEl) return;
+    langbarEl.innerHTML = '';
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(lang);
+    setLang(order[(i + 1) % order.length]);
+  }
+  function refreshLangBar() {
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
   }
   function effectiveDark() { return theme === 'dark' || (theme === 'auto' && systemDarkMQ.matches); }
   function updateThemeColor() { if (themeColorEl) themeColorEl.setAttribute('content', effectiveDark() ? '#0a0c11' : '#f4f5f7'); }
@@ -120,7 +227,6 @@
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
   }
   function setFooterLinks() {
-    var lang = loadLang();
     if (linkPrivacyEl) linkPrivacyEl.setAttribute('href', '../datenschutz-' + lang + '.html');
     if (linkImprintEl) linkImprintEl.setAttribute('href', '../impressum-' + lang + '.html');
   }
@@ -373,6 +479,9 @@
     var player = makeEmptyPlayer(puzzle);
     var won = false;
     var pointerMode = null;
+    var curR = 0; // Roving Tabindex: aktuell per Tastatur/Zeiger fokussierte Zelle
+    var curC = 0;
+    var focusAfterRender = false;
 
     container.replaceChildren();
     container.classList.add('picto-root');
@@ -386,10 +495,12 @@
       b.textContent = t('level')(lvl);
       b.setAttribute('aria-pressed', String(lvl === difficulty));
       b.addEventListener('click', function () {
+        if (lvl === difficulty) return; // Bugfix: Klick auf bereits aktive Stufe loescht keinen Fortschritt
         difficulty = lvl;
         puzzle = generatePicto(dateStr, difficulty);
         player = makeEmptyPlayer(puzzle);
         won = false;
+        curR = 0; curC = 0;
         render();
       });
       levelRow.append(b);
@@ -397,6 +508,8 @@
 
     var statusLine = document.createElement('div');
     statusLine.className = 'picto-status';
+    statusLine.setAttribute('role', 'status');
+    statusLine.setAttribute('aria-live', 'polite');
 
     var boardWrap = document.createElement('div');
     boardWrap.className = 'picto-board-wrap';
@@ -413,6 +526,7 @@
       puzzle = generatePicto(dateStr, difficulty);
       player = makeEmptyPlayer(puzzle);
       won = false;
+      curR = 0; curC = 0;
       render();
     });
     actions.append(clearBtn, nextBtn);
@@ -421,6 +535,8 @@
     winBanner.className = 'picto-win';
     winBanner.textContent = t('win');
     winBanner.hidden = true;
+    winBanner.setAttribute('role', 'status');
+    winBanner.setAttribute('aria-live', 'polite');
 
     container.append(levelRow, statusLine, boardWrap, actions, winBanner);
 
@@ -494,22 +610,37 @@
               cell.className = 'picto-cell';
               cell.style.gridRow = String(r + 2);
               cell.style.gridColumn = String(c2 + 2);
+              cell.dataset.r = String(r);
+              cell.dataset.c = String(c2);
               var state = player[r][c2];
               if (state === 1) cell.classList.add('is-filled');
               if (state === 2) cell.classList.add('is-marked');
-              cell.setAttribute('aria-label', t('aria_cell')(r + 1, c2 + 1));
+              var stateKey = state === 1 ? 'cell_filled' : (state === 2 ? 'cell_marked' : 'cell_empty');
+              cell.setAttribute('aria-label', t('aria_cell')(r + 1, c2 + 1, t(stateKey)));
+              // Roving Tabindex: nur die aktuelle Zelle ist per Tab erreichbar
+              cell.tabIndex = (r === curR && c2 === curC) ? 0 : -1;
 
               cell.addEventListener('pointerdown', function (ev) {
                 ev.preventDefault();
                 var cur = player[r][c2];
                 var next = (ev.button === 2 || ev.shiftKey) ? (cur === 2 ? 0 : 2) : (cur === 1 ? 0 : 1);
                 pointerMode = next;
+                curR = r; curC = c2;
                 setCell(r, c2, next);
               });
               cell.addEventListener('pointerenter', function () {
                 if (pointerMode !== null) setCell(r, c2, pointerMode);
               });
               cell.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
+              cell.addEventListener('keydown', function (ev) {
+                var k = ev.key;
+                if (k === 'ArrowUp') { ev.preventDefault(); moveCursor(-1, 0); }
+                else if (k === 'ArrowDown') { ev.preventDefault(); moveCursor(1, 0); }
+                else if (k === 'ArrowLeft') { ev.preventDefault(); moveCursor(0, -1); }
+                else if (k === 'ArrowRight') { ev.preventDefault(); moveCursor(0, 1); }
+                else if (k === 'Enter' || k === ' ' || k === 'Spacebar') { ev.preventDefault(); toggleFill(r, c2); }
+                else if (k === 'x' || k === 'X' || k === 'Backspace' || k === 'Delete') { ev.preventDefault(); toggleMark(r, c2); }
+              });
               table.append(cell);
             })(c2);
           }
@@ -520,14 +651,57 @@
 
     window.addEventListener('pointerup', function () { pointerMode = null; });
 
+    // Bewegt den Tastaturfokus im Gitter, Grenzen des Gitters begrenzen die Bewegung.
+    function moveCursor(dr, dc) {
+      var nr = Math.max(0, Math.min(puzzle.height - 1, curR + dr));
+      var nc = Math.max(0, Math.min(puzzle.width - 1, curC + dc));
+      if (nr === curR && nc === curC) return;
+      curR = nr; curC = nc;
+      focusAfterRender = true;
+      render();
+    }
+    // Entspricht Linksklick/Tippen: fuellt die Zelle oder leert sie wieder.
+    function toggleFill(r, c) {
+      curR = r; curC = c;
+      focusAfterRender = true;
+      var cur = player[r][c];
+      setCell(r, c, cur === 1 ? 0 : 1);
+    }
+    // Entspricht Rechtsklick/Umschalttaste plus Klick: markiert die Zelle als leer (X) oder hebt die Markierung auf.
+    function toggleMark(r, c) {
+      curR = r; curC = c;
+      focusAfterRender = true;
+      var cur = player[r][c];
+      setCell(r, c, cur === 2 ? 0 : 2);
+    }
+
     function render() {
-      boardWrap.replaceChildren(buildBoard());
+      var board = buildBoard();
+      boardWrap.replaceChildren(board);
       statusLine.textContent = t('level')(difficulty) + ' · ' + puzzle.width + 'x' + puzzle.height + ' · ' + (won ? t('solved') : t('unsolved'));
       winBanner.hidden = !won;
       levelRow.querySelectorAll('.picto-level-btn').forEach(function (b, i) {
         b.setAttribute('aria-pressed', String(i + 1 === difficulty));
       });
+      if (focusAfterRender) {
+        focusAfterRender = false;
+        var sel = board.querySelector('.picto-cell[data-r="' + curR + '"][data-c="' + curC + '"]');
+        if (sel) sel.focus();
+      }
     }
+
+    function relocalizeGame() {
+      levelRow.querySelectorAll('.picto-level-btn').forEach(function (b, i) {
+        b.textContent = t('level')(i + 1);
+      });
+      clearBtn.textContent = t('btn_clear');
+      clearBtn.setAttribute('aria-label', t('aria_clear'));
+      nextBtn.textContent = t('btn_next');
+      nextBtn.setAttribute('aria-label', t('aria_next'));
+      winBanner.textContent = t('win');
+      render();
+    }
+    currentRelocalize = relocalizeGame;
 
     render();
   }
@@ -544,7 +718,9 @@
 
   /* ---------- Start ---------- */
   function init() {
+    document.documentElement.lang = lang;
     setFooterLinks();
+    buildLangBar();
     buildThemeBar();
     applyTheme();
     applyTexts();

@@ -12,7 +12,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-portal-v14';
+var CACHE = 'dailycode-portal-v15';
 var PREFIX = 'dailycode-portal-';
 var LEGACY = ['dailycode-cache-v2'];
 
@@ -87,7 +87,7 @@ self.addEventListener('fetch', function (event) {
   if (req.method !== 'GET') { return; }
 
   // Spiel Scopes nicht anfassen: /code/, /drift/, /cluster/, /echo/,
-  // /glyph/, /grid9/, /react7/ und /flow8/ bedienen die jeweiligen Spiel Worker
+  // /glyph/, /grid9/, /react7/, /flow8/ und /picto/ bedienen die jeweiligen Spiel Worker
   // allein, damit der Portal Cache keine fremden Spielassets aufnimmt (Cache Storage ist origin weit).
   var path;
   try { path = new URL(req.url).pathname; } catch (e) { path = ''; }
@@ -99,6 +99,7 @@ self.addEventListener('fetch', function (event) {
   if (path === '/grid9' || path.indexOf('/grid9/') === 0) { return; }
   if (path === '/react7' || path.indexOf('/react7/') === 0) { return; }
   if (path === '/flow8' || path.indexOf('/flow8/') === 0) { return; }
+  if (path === '/picto' || path.indexOf('/picto/') === 0) { return; }
 
   event.respondWith(
     caches.match(req).then(function (cached) {

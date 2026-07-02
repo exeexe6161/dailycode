@@ -168,6 +168,9 @@ body {
 }
 .subtitle { margin: 0; color: var(--text-muted); font-size: .95rem; }
 
+/* Sprachumschalter */
+.langbar { display: flex; justify-content: center; gap: 6px; margin: 0 0 14px; }
+
 /* Darstellungsumschalter */
 .themebar {
   display: flex;
@@ -203,6 +206,7 @@ body {
 }
 .icon-btn:hover { border-color: var(--accent); color: var(--text); }
 .icon-btn .lucide { width: 22px; height: 22px; display: block; }
+.lang-toggle .lang-code { font-size: .9rem; letter-spacing: .5px; }
 
 /* Transiente Textrueckmeldung des neuen Theme-Modus (per Klasse) */
 .toggle-feedback {
