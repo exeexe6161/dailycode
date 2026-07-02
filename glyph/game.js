@@ -62,27 +62,27 @@
   /* ---------- Sprache: minimaler t() Tisch (DE und EN) ---------- */
   var STR = {
     de: {
-      subtitle: 'Bilde Woerter aus den Buchstaben, so viele wie moeglich.',
+      subtitle: 'Bilde so viele Wörter wie möglich aus den Buchstaben.',
       lbl_score: 'Punkte', lbl_best: 'Bestwert', best_none: 'noch keine', lbl_time: 'Zeit',
-      btn_undo: 'Zurueck', btn_clear: 'Leeren', btn_submit: 'Pruefen',
+      btn_undo: 'Zurück', btn_clear: 'Leeren', btn_submit: 'Prüfen',
       btn_pause: 'Pause', btn_resume: 'Weiter', btn_restart: 'Neu',
-      loading: 'Lade Woerterbuch',
+      loading: 'Lade Wörterbuch',
       load_err: 'Wortliste konnte nicht geladen werden',
-      choose_lang: 'Sprache waehlen',
-      go: 'Los, bilde Woerter',
+      choose_lang: 'Sprache wählen',
+      go: 'Los, bilde Wörter',
       too_short: 'Zu kurz',
-      invalid: 'Kein gueltiges Wort',
+      invalid: 'Kein gültiges Wort',
       over_title: 'Zeit abgelaufen',
       over_restart: 'Neu starten',
       time_warn: 'Noch {n} Sekunden',
       tr_notice: 'Türkçe oyun dili yakında. Lütfen oyun için Almanca veya İngilizce seç.',
-      aria_rack: 'Buchstabenfeld. Buchstaben tippen oder anklicken, Enter prueft das Wort.',
+      aria_rack: 'Buchstabenfeld. Buchstaben tippen oder anklicken; Enter prüft das Wort.',
       help_summary: 'Hilfe',
-      help_1: 'Buchstaben antippen oder ueber die Tastatur tippen, dann mit Enter pruefen.',
-      help_2: 'Jeder Buchstabe ist einmal nutzbar; nach einem Wort ruecken neue nach.',
-      help_3: 'Laengere Woerter geben mehr Punkte und mehr Zeit. Leertaste pausiert.',
+      help_1: 'Buchstaben antippen oder über die Tastatur eingeben, dann mit Enter prüfen.',
+      help_2: 'Jeder Buchstabe ist einmal nutzbar; nach einem Wort rücken neue nach.',
+      help_3: 'Längere Wörter geben mehr Punkte und mehr Zeit. Die Leertaste pausiert.',
       nav_privacy: 'Datenschutz', nav_imprint: 'Impressum',
-      back: 'Zurueck', back_aria: 'Zurueck zur Startseite'
+      back: 'Zurück', back_aria: 'Zurück zur Startseite'
     },
     en: {
       subtitle: 'Build as many words from the letters as you can.',

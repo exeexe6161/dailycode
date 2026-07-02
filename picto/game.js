@@ -28,20 +28,20 @@
   ];
   var I18N = {
     de: {
-      subtitle: 'Fuelle das Gitter und decke das Bild auf.',
+      subtitle: 'Fülle das Gitter und decke das Bild auf.',
       level: function (n) { return 'Stufe ' + n; },
-      solved: 'Geloest',
-      unsolved: 'noch nicht geloest',
-      btn_clear: 'Alles loeschen',
-      btn_next: 'Naechste Stufe',
-      aria_clear: 'Alle Markierungen loeschen',
-      aria_next: 'Naechste Stufe waehlen',
-      cell_filled: 'gefuellt',
+      solved: 'Gelöst',
+      unsolved: 'noch nicht gelöst',
+      btn_clear: 'Alles löschen',
+      btn_next: 'Nächste Stufe',
+      aria_clear: 'Alle Markierungen löschen',
+      aria_next: 'Nächste Stufe wählen',
+      cell_filled: 'gefüllt',
       cell_marked: 'markiert',
       cell_empty: 'leer',
       aria_cell: function (r, c, state) { return 'Zelle ' + r + ', ' + c + ', ' + state; },
-      aria_board: 'Bilderraetsel Gitter. Zeilen- und Spaltenzahlen geben an, wie viele zusammenhaengende Felder gefuellt werden. Tippen fuellt ein Feld, rechte Maustaste oder Umschalttaste markiert es als leer. Pfeiltasten bewegen den Fokus, Eingabetaste oder Leertaste fuellt ein Feld, X oder Ruecktaste markiert es.',
-      win: 'Bild vollstaendig',
+      aria_board: 'Bilderrätsel-Gitter. Zeilen- und Spaltenzahlen geben an, wie viele zusammenhängende Felder gefüllt werden. Tippen füllt ein Feld; die rechte Maustaste oder Umschalttaste markiert es als leer. Pfeiltasten bewegen den Fokus, Eingabe oder Leertaste füllt ein Feld, X oder Rücktaste markiert es.',
+      win: 'Bild vollständig',
       theme_group: 'Darstellung',
       theme_auto: 'Auto',
       theme_light: 'Hell',
@@ -49,8 +49,8 @@
       aria_lang_group: 'Sprache',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurueck',
-      back_aria: 'Zurueck zur Startseite'
+      back: 'Zurück',
+      back_aria: 'Zurück zur Startseite'
     },
     en: {
       subtitle: 'Fill the grid and reveal the picture.',
@@ -100,7 +100,7 @@
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
       back: 'Geri',
-      back_aria: 'Geri, ana sayfaya'
+      back_aria: 'Ana sayfaya dön'
     }
   };
   function t(key) {

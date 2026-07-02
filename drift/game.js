@@ -27,7 +27,7 @@
      Struktur und Fallback-Muster identisch zu code/game.js (Ciphera). */
   var I18N = {
     de: {
-      subtitle: 'Lenke die wachsende Kette ueber das Feld.',
+      subtitle: 'Lenke die wachsende Kette über das Feld.',
       score: 'Punkte',
       lbl_best: 'Bestwert',
       best_none: 'noch keine',
@@ -51,12 +51,12 @@
       aria_restart: 'Neu starten',
       help_summary: 'Hilfe',
       help_1: 'Pfeiltasten oder WASD steuern die Kette, Wischen geht auch.',
-      help_2: 'Sammle die leuchtenden Punkte, die Kette waechst und wird schneller.',
-      help_3: 'Die Raender sind offen, nur der Lauf in den eigenen Koerper beendet das Spiel.',
+      help_2: 'Sammle die leuchtenden Punkte. Die Kette wächst und wird schneller.',
+      help_3: 'Die Ränder sind offen; nur eine Kollision mit dem eigenen Körper beendet das Spiel.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurueck',
-      back_aria: 'Zurueck zur Startseite',
+      back: 'Zurück',
+      back_aria: 'Zurück zur Startseite',
       aria_lang_group: 'Sprache'
     },
     en: {
@@ -122,7 +122,7 @@
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
       back: 'Geri',
-      back_aria: 'Geri, ana sayfaya',
+      back_aria: 'Ana sayfaya dön',
       aria_lang_group: 'Dil'
     }
   };
