@@ -159,9 +159,13 @@ body {
 
 /* ============================================================
    Picto Spielbereich: Stufenwahl, Status, Gitter mit Zeilen- und
-   Spaltenhinweisen, Aktionen, Gewinnbanner. Zellgroesse fest (28px),
-   bei groesseren Stufen scrollt picto-board-wrap horizontal statt
-   die Zellen unter Mindestgroesse (BFSG Touchziel) zu schrumpfen.
+   Spaltenhinweisen, Aktionen, Gewinnbanner. --picto-cell-size wird von
+   game.js nach dem Rendern anhand der real gemessenen Breite von
+   picto-board-wrap und der real gemessenen Breite der Zeilenhinweis
+   Spalte gesetzt (kein CSS Schaetzwert), damit es nie zu einem Ratefehler
+   kommt. Der Wert hier ist nur ein Fallback fuer den allerersten Frame.
+   Scroll tritt nur ein, wenn selbst die feste Untergrenze nicht mehr
+   passt, in der Praxis nur bei 20x20 auf schmalen Bildschirmen.
    ============================================================ */
 .picto-root { margin: 0 0 16px; }
 
@@ -182,6 +186,12 @@ body {
 .picto-level-btn:hover { border-color: var(--accent); color: var(--text); }
 .picto-level-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
+.picto-modes { display: flex; justify-content: center; gap: 8px; margin: 0 0 10px; }
+
+.picto-unlimited-nav { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0 0 12px; }
+.picto-unlimited-nav[hidden] { display: none; }
+.picto-puzzle-number { min-width: 9em; text-align: center; font-weight: 700; color: var(--text-muted); }
+
 .picto-status {
   text-align: center;
   margin: 0 0 12px;
@@ -193,7 +203,9 @@ body {
 .picto-board-wrap {
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   margin: 0 auto 16px;
   padding: 14px;
   border: 1px solid var(--border);
@@ -202,9 +214,9 @@ body {
   box-shadow: 0 10px 28px rgba(20, 30, 60, .08);
 }
 .picto-table {
-  --picto-cell-size: clamp(15px, calc((100vw - 96px) / var(--picto-cols)), 28px);
+  --picto-cell-size: 22px;
   display: grid;
-  gap: clamp(1px, .35vw, 2px);
+  gap: 2px;
   width: max-content;
   max-width: 100%;
   margin-inline: auto;
@@ -236,8 +248,8 @@ body {
 }
 .picto-row-clue.is-satisfied { color: var(--border); }
 .picto-cell {
-  width: var(--picto-cell-size);
-  height: var(--picto-cell-size);
+  width: 100%;
+  height: 100%;
   background: var(--field-cell);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -259,8 +271,45 @@ body {
 .picto-cell.is-marked::before { transform: rotate(45deg); }
 .picto-cell.is-marked::after { transform: rotate(-45deg); }
 
+.picto-hud {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  margin: 0 0 12px;
+}
+.picto-timer {
+  min-width: 3.4em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.picto-hint-count, .picto-error-count { font-size: .85rem; color: var(--text-muted); }
+.picto-error-count[hidden] { display: none; }
+
 .picto-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--gap); margin: 0 0 16px; }
-.picto-win { text-align: center; margin: 0 0 8px; font-size: .95rem; font-weight: 700; color: var(--good); }
+.picto-win { text-align: center; margin: 0 0 8px; }
+.picto-win-text { margin: 0 0 6px; font-size: .95rem; font-weight: 700; color: var(--good); }
+
+.picto-stars { display: flex; justify-content: center; gap: 6px; margin: 0 0 8px; }
+.picto-star { display: inline-flex; color: var(--border); }
+.picto-star .lucide { width: 22px; height: 22px; }
+.picto-star.is-lit { color: var(--accent); }
+.picto-star.is-lit .lucide { fill: currentColor; }
+
+.picto-stats { margin-top: 8px; }
+.picto-stats-title { font-size: .95rem; margin: 0 0 8px; text-align: center; }
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+.stat-cell { padding: 8px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
+.stat-num { font-size: 1.2rem; font-weight: 700; }
+.stat-cap { font-size: .72rem; color: var(--text-muted); }
+.stats-hint { color: var(--text-muted); font-size: .9rem; text-align: center; }
 
 .btn {
   min-height: 44px;
@@ -275,6 +324,8 @@ body {
   transition: border-color var(--ease), background var(--ease), color var(--ease);
 }
 .btn:hover { border-color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn:disabled:hover { border-color: var(--border); }
 .btn-ghost { color: var(--text-muted); }
 .btn-ghost:hover { color: var(--text); }
 
@@ -337,9 +388,8 @@ body {
 @media (max-width: 420px) {
   body { padding-inline: 8px; }
   .picto-board-wrap { padding: 8px 5px; }
-  .picto-levels { gap: 5px; }
+  .picto-levels, .picto-modes { gap: 5px; }
   .picto-level-btn { padding-inline: 10px; }
-  .picto-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .picto-actions .btn { min-width: 0; padding-inline: 8px; }
 }
 

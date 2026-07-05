@@ -1,21 +1,19 @@
 /* ============================================================
-   dailycode  Pixela  Nonogram Tagesraetsel
-   Deterministisches Tagesraetsel je Datum und Schwierigkeit, Eindeutigkeit
-   der Loesung per Constraint-Solver garantiert (kein Raten noetig). Drei
-   Stufen (8x8, 12x12, 15x15). Eingabe per Pointer Events, rechte Maustaste
-   oder Shift markiert ein Feld als leer (X) statt zu fuellen.
+   dailycode  Pixela  Nonogram Raetsel, v2
+   Deterministisches Tagesraetsel je Datum und Stufe sowie ein
+   unbegrenzter Modus mit stabiler Raetselnummer. Eindeutigkeit der
+   Loesung per Constraint-Solver garantiert (kein Raten noetig). Vier
+   Stufen (5x5, 10x10, 15x15, 20x20). Eingabe per Pointer Events,
+   rechte Maustaste oder Shift markiert ein Feld als leer (X) statt
+   es zu fuellen. Hinweis Button, optionaler Fehlerzaehler, Timer mit
+   Pause im Hintergrund, Sternewertung nach dem Loesen, Spielstand,
+   Tagesstatistik und Streak in localStorage.
 
-   Herkunft: Logik und UI urspruenglich als zwei ES Module mit TypeScript
-   Typen geliefert (picto-logic.ts, picto-ui.ts). Dieses Projekt hat keinen
-   Build Schritt, alle Spiele sind ein einzelnes game.js als IIFE ohne
-   Modul System (gleiche Konvention wie flow8, cluster, echo). Typen
-   entfernt, Logik inhaltlich unveraendert uebernommen, UI an die
-   bestehende Kopf/Fuss/Theme Bedienleiste angeglichen (ein deutscher
-   Untertitel statt drei gestapelter Sprachzeilen, da auch die anderen
-   Spiele nur Deutsch im Spielbereich zeigen).
-
-   Vanilla JS, keine Libraries, keine externen Ressourcen, keine data-URI.
-   Strikte CSP konform: keine Inline-Styles, Theme ueber data-Attribut.
+   Dieses Projekt hat keinen Build Schritt, alle Spiele sind ein
+   einzelnes game.js als IIFE ohne Modul System (gleiche Konvention
+   wie flow8, cluster, echo). Vanilla JS, keine Libraries, keine
+   externen Ressourcen, keine data-URI. Strikte CSP konform: keine
+   Inline-Styles, Theme ueber data-Attribut.
    ============================================================ */
 (function () {
   'use strict';
@@ -33,14 +31,12 @@
       solved: 'Gelöst',
       unsolved: 'noch nicht gelöst',
       btn_clear: 'Alles löschen',
-      btn_next: 'Nächste Stufe',
       aria_clear: 'Alle Markierungen löschen',
-      aria_next: 'Nächste Stufe wählen',
       cell_filled: 'gefüllt',
       cell_marked: 'markiert',
       cell_empty: 'leer',
       aria_cell: function (r, c, state) { return 'Zelle ' + r + ', ' + c + ', ' + state; },
-      aria_board: 'Bilderrätsel-Gitter. Zeilen- und Spaltenzahlen geben an, wie viele zusammenhängende Felder gefüllt werden. Tippen füllt ein Feld; die rechte Maustaste oder Umschalttaste markiert es als leer. Pfeiltasten bewegen den Fokus, Eingabe oder Leertaste füllt ein Feld, X oder Rücktaste markiert es.',
+      aria_board: 'Bilderrätselgitter. Zeilenzahlen und Spaltenzahlen geben an, wie viele zusammenhängende Felder gefüllt werden. Tippen füllt ein Feld; die rechte Maustaste oder Umschalttaste markiert es als leer. Pfeiltasten bewegen den Fokus, Eingabe oder Leertaste füllt ein Feld, X oder Rücktaste markiert es.',
       win: 'Bild vollständig',
       theme_group: 'Darstellung',
       theme_auto: 'Auto',
@@ -50,7 +46,26 @@
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
       back: 'Zurück',
-      back_aria: 'Zurück zur Startseite'
+      back_aria: 'Zurück zur Startseite',
+      mode_daily: 'Tagesrätsel',
+      mode_unlimited: 'Unbegrenzt',
+      aria_mode_daily: 'Tagesrätsel wählen',
+      aria_mode_unlimited: 'Unbegrenzten Modus wählen',
+      puzzle_number: function (n) { return 'Rätsel Nr. ' + n; },
+      aria_prev_puzzle: 'Voriges Rätsel anzeigen',
+      aria_next_puzzle: 'Nächstes Rätsel anzeigen',
+      aria_random_puzzle: 'Zufälliges Rätsel anzeigen',
+      btn_hint: 'Hinweis',
+      aria_hint: 'Ein Hinweisfeld aufdecken',
+      hint_count: function (n) { return 'Hinweise ' + n; },
+      aria_toggle_errors: 'Fehleranzeige umschalten',
+      error_count: function (n) { return 'Fehler ' + n; },
+      stars_result: function (n) { return n + ' von 3 Sternen'; },
+      stats_title: 'Statistik',
+      stat_solved_cap: 'Gelöst',
+      stat_current_cap: 'Serie',
+      stat_best_cap: 'Beste Serie',
+      stats_hint: 'Statistik nicht verfügbar, lokaler Speicher ist aus.'
     },
     en: {
       subtitle: 'Fill the grid and reveal the picture.',
@@ -58,9 +73,7 @@
       solved: 'Solved',
       unsolved: 'not solved yet',
       btn_clear: 'Clear all',
-      btn_next: 'Next level',
       aria_clear: 'Clear all marks',
-      aria_next: 'Choose next level',
       cell_filled: 'filled',
       cell_marked: 'marked',
       cell_empty: 'empty',
@@ -75,7 +88,26 @@
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
       back: 'Back',
-      back_aria: 'Back to start'
+      back_aria: 'Back to start',
+      mode_daily: 'Daily puzzle',
+      mode_unlimited: 'Unlimited',
+      aria_mode_daily: 'Choose daily puzzle',
+      aria_mode_unlimited: 'Choose unlimited mode',
+      puzzle_number: function (n) { return 'Puzzle number ' + n; },
+      aria_prev_puzzle: 'Show previous puzzle',
+      aria_next_puzzle: 'Show next puzzle',
+      aria_random_puzzle: 'Show a random puzzle',
+      btn_hint: 'Hint',
+      aria_hint: 'Reveal one hint cell',
+      hint_count: function (n) { return 'Hints ' + n; },
+      aria_toggle_errors: 'Toggle error display',
+      error_count: function (n) { return 'Errors ' + n; },
+      stars_result: function (n) { return n + ' out of 3 stars'; },
+      stats_title: 'Statistics',
+      stat_solved_cap: 'Solved',
+      stat_current_cap: 'Streak',
+      stat_best_cap: 'Best streak',
+      stats_hint: 'Statistics unavailable, local storage is off.'
     },
     tr: {
       subtitle: 'Bulmaca ızgarasını doldur ve resmi ortaya çıkar.',
@@ -83,9 +115,7 @@
       solved: 'Çözüldü',
       unsolved: 'henüz çözülmedi',
       btn_clear: 'Tümünü temizle',
-      btn_next: 'Sonraki seviye',
       aria_clear: 'Tüm işaretleri temizle',
-      aria_next: 'Sonraki seviyeyi seç',
       cell_filled: 'dolu',
       cell_marked: 'işaretli',
       cell_empty: 'boş',
@@ -100,7 +130,26 @@
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
       back: 'Geri',
-      back_aria: 'Ana sayfaya dön'
+      back_aria: 'Ana sayfaya dön',
+      mode_daily: 'Günlük bulmaca',
+      mode_unlimited: 'Sınırsız',
+      aria_mode_daily: 'Günlük bulmacayı seç',
+      aria_mode_unlimited: 'Sınırsız modu seç',
+      puzzle_number: function (n) { return 'Bulmaca numarası ' + n; },
+      aria_prev_puzzle: 'Önceki bulmacayı göster',
+      aria_next_puzzle: 'Sonraki bulmacayı göster',
+      aria_random_puzzle: 'Rastgele bir bulmaca göster',
+      btn_hint: 'İpucu',
+      aria_hint: 'Bir ipucu hücresini ortaya çıkar',
+      hint_count: function (n) { return 'İpucu sayısı ' + n; },
+      aria_toggle_errors: 'Hata görünümünü aç veya kapat',
+      error_count: function (n) { return 'Hata sayısı ' + n; },
+      stars_result: function (n) { return '3 üzerinden ' + n + ' yıldız'; },
+      stats_title: 'İstatistik',
+      stat_solved_cap: 'Çözülen',
+      stat_current_cap: 'Seri',
+      stat_best_cap: 'En iyi seri',
+      stats_hint: 'İstatistik kullanılamıyor, yerel depolama kapalı.'
     }
   };
   function t(key) {
@@ -110,7 +159,9 @@
     return v === undefined ? key : v;
   }
 
-  /* ---------- Lucide Bedien-Icons (ISC), wie in den anderen Spielen ---------- */
+  /* ---------- Lucide Bedien-Icons (ISC), wie in den anderen Spielen ----------
+     Quelle: https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/<name>.svg
+     Zur Buildzeit geholt und unveraendert eingebettet, kein Laufzeitnachladen. */
   function svg(inner) {
     return '<svg viewBox="0 0 24 24" class="lucide" aria-hidden="true" focusable="false">' + inner + '</svg>';
   }
@@ -118,7 +169,13 @@
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
     monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
-    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>')
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>'),
+    chevronLeft: svg('<path d="m15 18-6-6 6-6"/>'),
+    chevronRight: svg('<path d="m9 18 6-6-6-6"/>'),
+    shuffle: svg('<path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/>'),
+    star: svg('<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>'),
+    eye: svg('<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>'),
+    eyeOff: svg('<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/>')
   };
   var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
 
@@ -246,14 +303,15 @@
   }
 
   /* ============================================================
-     Picto Logik (vormals picto-logic.ts). 0/1 Zellen, Zeilen- und
-     Spaltenhinweise, deterministischer Tagesseed, Solver fuer eindeutige
-     Loesung. Inhaltlich unveraendert, nur ohne TypeScript Typen.
+     Picto Logik v2. 0/1 Zellen, Zeilen- und Spaltenhinweise,
+     deterministischer Seed fuer Tages- und Unbegrenzt-Modus, Solver
+     fuer eindeutige Loesung. Vier Stufen: 5x5, 10x10, 15x15, 20x20.
      ============================================================ */
   var SIZE_BY_DIFFICULTY = {
-    1: { size: 8, fillRatio: 0.45 },
-    2: { size: 12, fillRatio: 0.43 },
-    3: { size: 15, fillRatio: 0.42 }
+    1: { size: 5, fillRatio: 0.50 },
+    2: { size: 10, fillRatio: 0.45 },
+    3: { size: 15, fillRatio: 0.42 },
+    4: { size: 20, fillRatio: 0.38 }
   };
 
   function mulberry32(seed) {
@@ -273,9 +331,6 @@
       h = Math.imul(h, 16777619);
     }
     return h >>> 0;
-  }
-  function dailySeed(dateStr, size, salt) {
-    return hashStringToSeed('picto:' + dateStr + ':' + size + ':' + (salt || ''));
   }
   function rowClue(row) {
     var out = [];
@@ -426,13 +481,10 @@
     }
     return grid;
   }
-  /* Erzeugt das Tagesraetsel fuer ein Datum (YYYY-MM-DD) und eine Schwierigkeit.
-     Loesung ist eindeutig durch Constraint-Loesung garantiert (kein Raten noetig). */
-  function generatePicto(dateStr, difficulty, maxAttempts) {
+  /* Gemeinsamer Kern fuer Tages- und Unbegrenzt-Modus: erzeugt Kandidaten aus
+     einem Basis-Seed, bis eine eindeutige Loesung gefunden ist. */
+  function buildPuzzle(baseSeed, size, fillRatio, maxAttempts) {
     maxAttempts = maxAttempts || 80;
-    var cfg = SIZE_BY_DIFFICULTY[difficulty];
-    var size = cfg.size, fillRatio = cfg.fillRatio;
-    var baseSeed = dailySeed(dateStr, size + 'x' + size, 'd' + difficulty);
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       var rng = mulberry32(baseSeed + attempt * 7919);
       var grid = randomConnectedPattern(rng, size, size, fillRatio);
@@ -442,11 +494,27 @@
         return { height: size, width: size, solution: grid, rowClues: clues.rows, colClues: clues.cols };
       }
     }
-    // Fallback (in 240 Testtagen nie ausgeloest): kleinste Stufe mit niedrigerer Fuellquote erzwingen
+    // Fallback (in ausgiebigen Tests nie ausgeloest): niedrigere Fuellquote erzwingen
     var rngF = mulberry32(baseSeed + 999983);
-    var gridF = randomConnectedPattern(rngF, size, size, 0.3);
+    var gridF = randomConnectedPattern(rngF, size, size, Math.max(0.28, fillRatio - 0.12));
     var cluesF = computeClues(gridF);
     return { height: size, width: size, solution: gridF, rowClues: cluesF.rows, colClues: cluesF.cols };
+  }
+  /* Tagesraetsel: deterministisch je Datum (YYYY-MM-DD) und Stufe. */
+  function generateDailyPuzzle(dateStr, difficulty) {
+    var cfg = SIZE_BY_DIFFICULTY[difficulty];
+    var baseSeed = hashStringToSeed('picto:daily:' + dateStr + ':' + cfg.size + 'x' + cfg.size + ':d' + difficulty);
+    return buildPuzzle(baseSeed, cfg.size, cfg.fillRatio);
+  }
+  /* Unbegrenzter Modus: deterministisch je Raetselnummer und Stufe, unabhaengig vom Datum. */
+  function generateUnlimitedPuzzle(index, difficulty) {
+    var cfg = SIZE_BY_DIFFICULTY[difficulty];
+    var idx = Math.max(0, Math.floor(index) || 0);
+    var baseSeed = hashStringToSeed('picto:unlimited:' + idx + ':' + cfg.size + 'x' + cfg.size + ':d' + difficulty);
+    return buildPuzzle(baseSeed, cfg.size, cfg.fillRatio);
+  }
+  function randomUnlimitedIndex() {
+    return Math.floor(Math.random() * 1000000);
   }
   /* Prueft, ob ein Spielerstand (0=leer,1=voll,2=markiert-x) die Loesung erfuellt. Markierungen sind irrelevant. */
   function isSolved(playerGrid, solution) {
@@ -463,48 +531,213 @@
     var filled = playerLine.map(function (v) { return v === 1 ? 1 : 0; });
     return JSON.stringify(rowClue(filled)) === JSON.stringify(clue);
   }
-
-  /* ============================================================
-     Picto UI (vormals picto-ui.ts), an die Container Signatur aus der
-     Aufgabe gebunden: mountPicto(container, anfangsSchwierigkeit).
-     ============================================================ */
-  function todayUTC() {
-    return new Date().toISOString().slice(0, 10);
+  /* Live Fehleranzahl: falsch gefuellte Zellen. Markierungen (X) zaehlen nie als Fehler. */
+  function countErrors(player, solution) {
+    var n = 0;
+    for (var r = 0; r < solution.length; r++) {
+      for (var c = 0; c < solution[0].length; c++) {
+        if (player[r][c] === 1 && solution[r][c] !== 1) n++;
+      }
+    }
+    return n;
+  }
+  /* Findet eine noch offene Zelle und liefert deren korrekten Zielwert (1 fuellen oder 2 markieren). */
+  function getHint(player, solution) {
+    var open = [];
+    for (var r = 0; r < solution.length; r++) {
+      for (var c = 0; c < solution[0].length; c++) {
+        var shouldFill = solution[r][c] === 1;
+        var isFilled = player[r][c] === 1;
+        if (shouldFill !== isFilled) open.push({ r: r, c: c, value: shouldFill ? 1 : 2 });
+      }
+    }
+    if (!open.length) return null;
+    return open[Math.floor(Math.random() * open.length)];
+  }
+  /* 1 bis 3 Sterne aus Groesse, Zeit, Hinweisen und kumulierten Fehltritten. Nie 0 Sterne. */
+  function starRating(size, elapsedSeconds, hintsUsed, mistakes) {
+    var cells = size * size;
+    var par = Math.round(cells * 1.1);
+    var penalty = hintsUsed + mistakes;
+    if (penalty === 0 && elapsedSeconds <= par) return 3;
+    if (penalty <= 3 && elapsedSeconds <= par * 1.8) return 2;
+    return 1;
   }
 
-  function mountPicto(container, initialDifficulty) {
-    var difficulty = initialDifficulty || 2;
-    var dateStr = todayUTC();
-    var puzzle = generatePicto(dateStr, difficulty);
-    var player = makeEmptyPlayer(puzzle);
+  /* ---------- Datum: YYYY-MM-DD in UTC, damit weltweit am selben Kalendertag dasselbe Raetsel gilt ---------- */
+  function dateKeyUTC(d) {
+    d = d || new Date();
+    var y = d.getUTCFullYear();
+    var m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    var day = String(d.getUTCDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+  function prevDayKey(key) {
+    var p = key.split('-');
+    var dt = new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])));
+    dt.setUTCDate(dt.getUTCDate() - 1);
+    return dateKeyUTC(dt);
+  }
+  function isDateKey(v) { return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
+  function intOr(v, d) {
+    if (typeof v !== 'number' || !isFinite(v)) return d;
+    v = Math.floor(v);
+    return v < 0 ? d : v;
+  }
+
+  /* ============================================================
+     Persistenz: Spielstand je Raetsel, Sitzungszustand, Tagesstatistik
+     und Streak je Stufe. Alles defensiv gegen kaputte/fehlende Daten.
+     ============================================================ */
+  var PROGRESS_PREFIX = 'picto:progress:';
+  var STATE_KEY = 'dailycode:pixela:state:v1';
+  var STATS_KEY = 'dailycode:pixela:stats:v1';
+
+  function puzzleId(mode, difficulty, dateOrIndex) {
+    return mode === 'daily' ? ('daily:' + dateOrIndex + ':d' + difficulty) : ('unlimited:' + dateOrIndex + ':d' + difficulty);
+  }
+  function loadProgress(id) {
+    if (!hasStorage) return null;
+    try {
+      var raw = window.localStorage.getItem(PROGRESS_PREFIX + id);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || !Array.isArray(o.player)) return null;
+      return o;
+    } catch (e) { return null; }
+  }
+  function saveProgressEntry(id, data) {
+    if (!hasStorage) return;
+    try { window.localStorage.setItem(PROGRESS_PREFIX + id, JSON.stringify(data)); } catch (e) {}
+  }
+
+  function defaultState() {
+    return { mode: 'daily', difficulty: 2, unlimitedIndexByDifficulty: { 1: 0, 2: 0, 3: 0, 4: 0 }, showErrors: false };
+  }
+  function loadState() {
+    if (!hasStorage) return defaultState();
+    try {
+      var raw = window.localStorage.getItem(STATE_KEY);
+      if (!raw) return defaultState();
+      var o = JSON.parse(raw);
+      var d = defaultState();
+      if (o.mode === 'daily' || o.mode === 'unlimited') d.mode = o.mode;
+      if ([1, 2, 3, 4].indexOf(o.difficulty) !== -1) d.difficulty = o.difficulty;
+      if (o.unlimitedIndexByDifficulty && typeof o.unlimitedIndexByDifficulty === 'object') {
+        for (var k = 1; k <= 4; k++) d.unlimitedIndexByDifficulty[k] = intOr(o.unlimitedIndexByDifficulty[k], 0);
+      }
+      d.showErrors = !!o.showErrors;
+      return d;
+    } catch (e) { return defaultState(); }
+  }
+  function saveState(s) { if (!hasStorage) return; try { window.localStorage.setItem(STATE_KEY, JSON.stringify(s)); } catch (e) {} }
+
+  function defaultDifficultyStats() { return { currentStreak: 0, maxStreak: 0, lastWinDate: null, totalSolved: 0 }; }
+  function defaultStats() {
+    return { byDifficulty: { 1: defaultDifficultyStats(), 2: defaultDifficultyStats(), 3: defaultDifficultyStats(), 4: defaultDifficultyStats() } };
+  }
+  function normalizeDifficultyStats(o) {
+    var d = defaultDifficultyStats();
+    if (!o || typeof o !== 'object') return d;
+    d.currentStreak = intOr(o.currentStreak, 0);
+    d.maxStreak = intOr(o.maxStreak, 0);
+    d.lastWinDate = isDateKey(o.lastWinDate) ? o.lastWinDate : null;
+    d.totalSolved = intOr(o.totalSolved, 0);
+    if (d.currentStreak > d.maxStreak) d.maxStreak = d.currentStreak;
+    return d;
+  }
+  function loadStats() {
+    if (!hasStorage) return defaultStats();
+    try {
+      var raw = window.localStorage.getItem(STATS_KEY);
+      if (!raw) return defaultStats();
+      var o = JSON.parse(raw);
+      var d = defaultStats();
+      if (o && o.byDifficulty) { for (var k = 1; k <= 4; k++) d.byDifficulty[k] = normalizeDifficultyStats(o.byDifficulty[k]); }
+      return d;
+    } catch (e) { return defaultStats(); }
+  }
+  function saveStats(s) { if (!hasStorage) return; try { window.localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch (e) {} }
+  function recordDailyWin(stats, difficulty, dateStr) {
+    var ds = stats.byDifficulty[difficulty];
+    if (ds.lastWinDate === dateStr) return stats; // bereits gezaehlt, Idempotenz
+    ds.totalSolved += 1;
+    ds.currentStreak = (ds.lastWinDate === prevDayKey(dateStr)) ? ds.currentStreak + 1 : 1;
+    ds.lastWinDate = dateStr;
+    if (ds.currentStreak > ds.maxStreak) ds.maxStreak = ds.currentStreak;
+    saveStats(stats);
+    return stats;
+  }
+
+  /* ============================================================
+     Picto UI v2, gebunden an die Container Signatur mountPicto(container).
+     ============================================================ */
+  function mountPicto(container) {
+    var state = loadState();
+    var mode = state.mode;
+    var difficulty = state.difficulty;
+    var showErrors = state.showErrors;
+    var dateStr = dateKeyUTC();
+    var unlimitedIndex = state.unlimitedIndexByDifficulty[difficulty] || 0;
+    var statsData = loadStats();
+
+    var puzzle = null;
+    var player = null;
     var won = false;
+    var hintsUsed = 0;
+    var mistakes = 0;
+    var baseElapsed = 0;
+    var segStart = 0;
+    var timerStarted = false;
+    var timerId = 0;
+    var startedAt = null;
+    var stars = 0;
+
     var pointerMode = null;
     var curR = 0; // Roving Tabindex: aktuell per Tastatur/Zeiger fokussierte Zelle
     var curC = 0;
     var focusAfterRender = false;
+    var currentBoardEl = null;
+    var resizeTimer = 0;
 
     container.replaceChildren();
     container.classList.add('picto-root');
 
+    var modeRow = document.createElement('div');
+    modeRow.className = 'picto-modes';
+    var modeDailyBtn = modeButton('daily');
+    var modeUnlimitedBtn = modeButton('unlimited');
+    modeRow.append(modeDailyBtn, modeUnlimitedBtn);
+
     var levelRow = document.createElement('div');
     levelRow.className = 'picto-levels';
-    [1, 2, 3].forEach(function (lvl) {
+    [1, 2, 3, 4].forEach(function (lvl) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'picto-level-btn';
       b.textContent = t('level')(lvl);
       b.setAttribute('aria-pressed', String(lvl === difficulty));
       b.addEventListener('click', function () {
-        if (lvl === difficulty) return; // Bugfix: Klick auf bereits aktive Stufe loescht keinen Fortschritt
+        if (lvl === difficulty) return; // Klick auf bereits aktive Stufe loescht keinen Fortschritt
+        persistCurrentProgress();
         difficulty = lvl;
-        puzzle = generatePicto(dateStr, difficulty);
-        player = makeEmptyPlayer(puzzle);
-        won = false;
-        curR = 0; curC = 0;
+        state.difficulty = difficulty;
+        unlimitedIndex = state.unlimitedIndexByDifficulty[difficulty] || 0;
+        saveState(state);
+        loadPuzzleForState();
         render();
       });
       levelRow.append(b);
     });
+
+    var unlimitedNav = document.createElement('div');
+    unlimitedNav.className = 'picto-unlimited-nav';
+    var prevBtn = iconNavButton('chevronLeft', function () { goToIndex(Math.max(0, unlimitedIndex - 1)); }, 'aria_prev_puzzle');
+    var numberEl = document.createElement('span');
+    numberEl.className = 'picto-puzzle-number';
+    var nextBtn = iconNavButton('chevronRight', function () { goToIndex(unlimitedIndex + 1); }, 'aria_next_puzzle');
+    var randomBtn = iconNavButton('shuffle', function () { goToIndex(randomUnlimitedIndex()); }, 'aria_random_puzzle');
+    unlimitedNav.append(prevBtn, numberEl, nextBtn, randomBtn);
 
     var statusLine = document.createElement('div');
     statusLine.className = 'picto-status';
@@ -514,38 +747,96 @@
     var boardWrap = document.createElement('div');
     boardWrap.className = 'picto-board-wrap';
 
+    var hudRow = document.createElement('div');
+    hudRow.className = 'picto-hud';
+    var timerEl = document.createElement('span');
+    timerEl.className = 'picto-timer';
+    timerEl.setAttribute('aria-hidden', 'true');
+    var hintBtn = button(t('btn_hint'), 'btn btn-ghost picto-hint-btn', t('aria_hint'), function () {
+      if (won || !puzzle) return;
+      var hint = getHint(player, puzzle.solution);
+      if (!hint) return;
+      startTimerIfNeeded();
+      player[hint.r][hint.c] = hint.value;
+      hintsUsed += 1;
+      checkWinAndPersist();
+      render();
+    });
+    var hintCountEl = document.createElement('span');
+    hintCountEl.className = 'picto-hint-count';
+    var errorsToggleBtn = document.createElement('button');
+    errorsToggleBtn.type = 'button';
+    errorsToggleBtn.className = 'icon-btn picto-errors-toggle';
+    errorsToggleBtn.addEventListener('click', function () {
+      showErrors = !showErrors;
+      state.showErrors = showErrors;
+      saveState(state);
+      render();
+    });
+    var errorCountEl = document.createElement('span');
+    errorCountEl.className = 'picto-error-count';
+    hudRow.append(timerEl, hintBtn, hintCountEl, errorsToggleBtn, errorCountEl);
+
     var actions = document.createElement('div');
     actions.className = 'picto-actions';
     var clearBtn = button(t('btn_clear'), 'btn btn-ghost', t('aria_clear'), function () {
       player = makeEmptyPlayer(puzzle);
       won = false;
+      hintsUsed = 0;
+      mistakes = 0;
+      baseElapsed = 0;
+      segStart = 0;
+      timerStarted = false;
+      startedAt = null;
+      stars = 0;
+      persistCurrentProgress();
       render();
     });
-    var nextBtn = button(t('btn_next'), 'btn btn-ghost', t('aria_next'), function () {
-      difficulty = (difficulty % 3) + 1;
-      puzzle = generatePicto(dateStr, difficulty);
-      player = makeEmptyPlayer(puzzle);
-      won = false;
-      curR = 0; curC = 0;
-      render();
-    });
-    actions.append(clearBtn, nextBtn);
+    actions.append(clearBtn);
 
     var winBanner = document.createElement('div');
     winBanner.className = 'picto-win';
-    winBanner.textContent = t('win');
     winBanner.hidden = true;
     winBanner.setAttribute('role', 'status');
     winBanner.setAttribute('aria-live', 'polite');
+    var winTextEl = document.createElement('p');
+    winTextEl.className = 'picto-win-text';
+    var starsEl = document.createElement('div');
+    starsEl.className = 'picto-stars';
+    winBanner.append(winTextEl, starsEl);
 
-    container.append(levelRow, statusLine, boardWrap, actions, winBanner);
+    var statsPanel = document.createElement('div');
+    statsPanel.className = 'picto-stats';
 
-    function makeEmptyPlayer(p) {
-      var rows = [];
-      for (var r = 0; r < p.height; r++) rows.push(new Array(p.width).fill(0));
-      return rows;
+    container.append(modeRow, levelRow, unlimitedNav, statusLine, boardWrap, hudRow, actions, winBanner, statsPanel);
+
+    function modeButton(m) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'picto-level-btn';
+      b.textContent = t(m === 'daily' ? 'mode_daily' : 'mode_unlimited');
+      b.setAttribute('aria-pressed', String(mode === m));
+      b.setAttribute('aria-label', t(m === 'daily' ? 'aria_mode_daily' : 'aria_mode_unlimited'));
+      b.addEventListener('click', function () {
+        if (mode === m) return;
+        persistCurrentProgress();
+        mode = m;
+        state.mode = mode;
+        saveState(state);
+        loadPuzzleForState();
+        render();
+      });
+      return b;
     }
-
+    function iconNavButton(iconKey, onClick, ariaKey) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'icon-btn picto-nav-btn';
+      b.innerHTML = ICON[iconKey];
+      b.setAttribute('aria-label', t(ariaKey));
+      b.addEventListener('click', onClick);
+      return b;
+    }
     function button(label, cls, ariaLabel, onClick) {
       var b = document.createElement('button');
       b.type = 'button';
@@ -555,12 +846,143 @@
       b.addEventListener('click', onClick);
       return b;
     }
+    function makeEmptyPlayer(p) {
+      var rows = [];
+      for (var r = 0; r < p.height; r++) rows.push(new Array(p.width).fill(0));
+      return rows;
+    }
+    function goToIndex(idx) {
+      persistCurrentProgress();
+      unlimitedIndex = Math.max(0, idx);
+      state.unlimitedIndexByDifficulty[difficulty] = unlimitedIndex;
+      saveState(state);
+      loadPuzzleForState();
+      render();
+    }
+    function currentPuzzleId() {
+      return mode === 'daily' ? puzzleId('daily', difficulty, dateStr) : puzzleId('unlimited', difficulty, unlimitedIndex);
+    }
+
+    function loadPuzzleForState() {
+      puzzle = mode === 'daily' ? generateDailyPuzzle(dateStr, difficulty) : generateUnlimitedPuzzle(unlimitedIndex, difficulty);
+      var saved = loadProgress(currentPuzzleId());
+      if (saved && Array.isArray(saved.player) && saved.player.length === puzzle.height && saved.player[0] && saved.player[0].length === puzzle.width) {
+        player = saved.player;
+        hintsUsed = intOr(saved.hintsUsed, 0);
+        mistakes = intOr(saved.mistakes, 0);
+        baseElapsed = intOr(saved.elapsedSeconds, 0);
+        startedAt = saved.startedAt || null;
+        won = !!saved.completed;
+        timerStarted = baseElapsed > 0 || won;
+      } else {
+        player = makeEmptyPlayer(puzzle);
+        hintsUsed = 0;
+        mistakes = 0;
+        baseElapsed = 0;
+        startedAt = null;
+        won = false;
+        timerStarted = false;
+      }
+      segStart = 0;
+      curR = 0; curC = 0;
+      stars = won ? starRating(puzzle.width, baseElapsed, hintsUsed, mistakes) : 0;
+      stopTicker();
+      if (!won && timerStarted && !document.hidden) { segStart = nowMs(); startTicker(); }
+    }
+
+    function persistCurrentProgress() {
+      if (!puzzle) return;
+      saveProgressEntry(currentPuzzleId(), {
+        puzzleId: currentPuzzleId(),
+        mode: mode,
+        date: mode === 'daily' ? dateStr : null,
+        puzzleNumber: mode === 'unlimited' ? unlimitedIndex : null,
+        difficulty: difficulty,
+        player: player,
+        hintsUsed: hintsUsed,
+        mistakes: mistakes,
+        elapsedSeconds: Math.floor(currentElapsed()),
+        startedAt: startedAt,
+        completed: won
+      });
+    }
+
+    /* ---------- Timer: startet erst bei echter Interaktion, pausiert im Hintergrund ---------- */
+    function nowMs() { return window.performance && performance.now ? performance.now() : new Date().getTime(); }
+    function currentElapsed() { return baseElapsed + (segStart ? (nowMs() - segStart) / 1000 : 0); }
+    function startTimerIfNeeded() {
+      if (!timerStarted) { timerStarted = true; startedAt = new Date().toISOString(); }
+      if (!segStart) { segStart = nowMs(); startTicker(); }
+    }
+    function startTicker() {
+      if (timerId) return;
+      timerId = window.setInterval(function () { if (!won) updateTimerDisplay(); }, 500);
+    }
+    function stopTicker() { if (timerId) { window.clearInterval(timerId); timerId = 0; } }
+    function stopTimer() {
+      if (segStart) { baseElapsed = currentElapsed(); segStart = 0; }
+      stopTicker();
+    }
+    function updateTimerDisplay() { if (timerEl) timerEl.textContent = fmtTime(Math.floor(currentElapsed())); }
+    function fmtTime(sec) {
+      sec = Math.max(0, sec);
+      var m = Math.floor(sec / 60), s = sec % 60;
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+    function onVisibility() {
+      if (document.hidden) {
+        if (segStart) { baseElapsed = currentElapsed(); segStart = 0; }
+      } else if (timerStarted && !won && !segStart) {
+        segStart = nowMs();
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility);
+
+    window.addEventListener('pointerup', function () { pointerMode = null; });
+    // Fenstergroesse oder Ausrichtung aendert sich: Zellgroesse neu messen, ohne den Spielstand anzufassen.
+    window.addEventListener('resize', function () {
+      if (resizeTimer) window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(function () { if (currentBoardEl) sizeBoard(currentBoardEl); }, 150);
+    });
 
     function setCell(r, c, val) {
       if (won) return;
+      var prev = player[r][c];
+      if (prev === val) return;
+      startTimerIfNeeded();
+      if (val === 1 && puzzle.solution[r][c] !== 1) mistakes += 1;
       player[r][c] = val;
-      if (isSolved(player, puzzle.solution)) won = true;
+      checkWinAndPersist();
       render();
+    }
+    function checkWinAndPersist() {
+      if (!won && isSolved(player, puzzle.solution)) {
+        won = true;
+        stopTimer();
+        stars = starRating(puzzle.width, Math.floor(currentElapsed()), hintsUsed, mistakes);
+        if (mode === 'daily') recordDailyWin(statsData, difficulty, dateStr);
+      }
+      persistCurrentProgress();
+    }
+
+    /* Misst nach dem Anhaengen ans DOM die tatsaechlich verfuegbare Breite und die reale
+       Breite der Zeilenhinweis Spalte (kein Schaetzwert), damit die Zellgroesse in jeder
+       Stufe exakt in picto-board-wrap passt und nur bei 20x20 auf schmalen Screens ueberhaupt
+       an die feste Untergrenze stoesst und Scroll ausloest. */
+    function sizeBoard(table) {
+      if (!table || !puzzle) return;
+      var cols = puzzle.width;
+      var floorPx = 15;
+      var maxPx = Math.min(48, Math.max(18, Math.round(300 / cols)));
+      var gapPx = parseFloat(window.getComputedStyle(table).columnGap) || 2;
+      var clueW = 0;
+      table.querySelectorAll('.picto-row-clue').forEach(function (el) {
+        var w = el.getBoundingClientRect().width;
+        if (w > clueW) clueW = w;
+      });
+      var available = boardWrap.clientWidth - clueW - gapPx * cols - 2; // 2px Sicherheitsabstand gegen Rundung
+      var cellPx = Math.max(floorPx, Math.min(maxPx, Math.floor(available / cols)));
+      table.style.setProperty('--picto-cell-size', cellPx + 'px');
     }
 
     function buildBoard() {
@@ -612,10 +1034,10 @@
               cell.style.gridColumn = String(c2 + 2);
               cell.dataset.r = String(r);
               cell.dataset.c = String(c2);
-              var state = player[r][c2];
-              if (state === 1) cell.classList.add('is-filled');
-              if (state === 2) cell.classList.add('is-marked');
-              var stateKey = state === 1 ? 'cell_filled' : (state === 2 ? 'cell_marked' : 'cell_empty');
+              var st = player[r][c2];
+              if (st === 1) cell.classList.add('is-filled');
+              if (st === 2) cell.classList.add('is-marked');
+              var stateKey = st === 1 ? 'cell_filled' : (st === 2 ? 'cell_marked' : 'cell_empty');
               cell.setAttribute('aria-label', t('aria_cell')(r + 1, c2 + 1, t(stateKey)));
               // Roving Tabindex: nur die aktuelle Zelle ist per Tab erreichbar
               cell.tabIndex = (r === curR && c2 === curC) ? 0 : -1;
@@ -649,8 +1071,6 @@
       return table;
     }
 
-    window.addEventListener('pointerup', function () { pointerMode = null; });
-
     // Bewegt den Tastaturfokus im Gitter, Grenzen des Gitters begrenzen die Bewegung.
     function moveCursor(dr, dc) {
       var nr = Math.max(0, Math.min(puzzle.height - 1, curR + dr));
@@ -675,14 +1095,69 @@
       setCell(r, c, cur === 2 ? 0 : 2);
     }
 
+    function statCellHtml(num, cap) {
+      return '<div class="stat-cell"><div class="stat-num">' + num + '</div><div class="stat-cap">' + cap + '</div></div>';
+    }
+    function renderStatsPanel() {
+      if (!hasStorage) {
+        statsPanel.innerHTML = '<p class="stats-hint">' + t('stats_hint') + '</p>';
+        return;
+      }
+      var ds = statsData.byDifficulty[difficulty];
+      var html = '<h2 class="picto-stats-title">' + t('stats_title') + '</h2>';
+      html += '<div class="stat-grid">';
+      html += statCellHtml(ds.totalSolved, t('stat_solved_cap'));
+      html += statCellHtml(ds.currentStreak, t('stat_current_cap'));
+      html += statCellHtml(ds.maxStreak, t('stat_best_cap'));
+      html += '</div>';
+      statsPanel.innerHTML = html;
+    }
+
+    function renderStars() {
+      starsEl.innerHTML = '';
+      starsEl.setAttribute('role', 'img');
+      starsEl.setAttribute('aria-label', t('stars_result')(stars));
+      for (var i = 1; i <= 3; i++) {
+        var s = document.createElement('span');
+        s.className = 'picto-star' + (i <= stars ? ' is-lit' : '');
+        s.innerHTML = ICON.star;
+        s.setAttribute('aria-hidden', 'true');
+        starsEl.append(s);
+      }
+    }
+
     function render() {
-      var board = buildBoard();
-      boardWrap.replaceChildren(board);
-      statusLine.textContent = t('level')(difficulty) + ' · ' + puzzle.width + 'x' + puzzle.height + ' · ' + (won ? t('solved') : t('unsolved'));
-      winBanner.hidden = !won;
+      modeDailyBtn.setAttribute('aria-pressed', String(mode === 'daily'));
+      modeUnlimitedBtn.setAttribute('aria-pressed', String(mode === 'unlimited'));
+      unlimitedNav.hidden = mode !== 'unlimited';
+      if (mode === 'unlimited') numberEl.textContent = t('puzzle_number')(unlimitedIndex + 1);
+
       levelRow.querySelectorAll('.picto-level-btn').forEach(function (b, i) {
         b.setAttribute('aria-pressed', String(i + 1 === difficulty));
       });
+
+      var board = buildBoard();
+      boardWrap.replaceChildren(board);
+      currentBoardEl = board;
+      sizeBoard(board);
+
+      var modeLabel = mode === 'daily' ? (t('mode_daily') + ' ' + dateStr) : (t('mode_unlimited') + ' · ' + t('puzzle_number')(unlimitedIndex + 1));
+      statusLine.textContent = modeLabel + ' · ' + t('level')(difficulty) + ' · ' + puzzle.width + 'x' + puzzle.height + ' · ' + (won ? t('solved') : t('unsolved'));
+
+      updateTimerDisplay();
+      hintBtn.disabled = won;
+      hintCountEl.textContent = t('hint_count')(hintsUsed);
+      errorsToggleBtn.innerHTML = ICON[showErrors ? 'eye' : 'eyeOff'];
+      errorsToggleBtn.setAttribute('aria-pressed', String(showErrors));
+      errorsToggleBtn.setAttribute('aria-label', t('aria_toggle_errors'));
+      errorCountEl.hidden = !showErrors;
+      if (showErrors) errorCountEl.textContent = t('error_count')(countErrors(player, puzzle.solution));
+
+      winBanner.hidden = !won;
+      if (won) { winTextEl.textContent = t('win'); renderStars(); }
+
+      renderStatsPanel();
+
       if (focusAfterRender) {
         focusAfterRender = false;
         var sel = board.querySelector('.picto-cell[data-r="' + curR + '"][data-c="' + curC + '"]');
@@ -691,18 +1166,23 @@
     }
 
     function relocalizeGame() {
-      levelRow.querySelectorAll('.picto-level-btn').forEach(function (b, i) {
-        b.textContent = t('level')(i + 1);
-      });
+      modeDailyBtn.textContent = t('mode_daily');
+      modeDailyBtn.setAttribute('aria-label', t('aria_mode_daily'));
+      modeUnlimitedBtn.textContent = t('mode_unlimited');
+      modeUnlimitedBtn.setAttribute('aria-label', t('aria_mode_unlimited'));
+      prevBtn.setAttribute('aria-label', t('aria_prev_puzzle'));
+      nextBtn.setAttribute('aria-label', t('aria_next_puzzle'));
+      randomBtn.setAttribute('aria-label', t('aria_random_puzzle'));
+      levelRow.querySelectorAll('.picto-level-btn').forEach(function (b, i) { b.textContent = t('level')(i + 1); });
+      hintBtn.textContent = t('btn_hint');
+      hintBtn.setAttribute('aria-label', t('aria_hint'));
       clearBtn.textContent = t('btn_clear');
       clearBtn.setAttribute('aria-label', t('aria_clear'));
-      nextBtn.textContent = t('btn_next');
-      nextBtn.setAttribute('aria-label', t('aria_next'));
-      winBanner.textContent = t('win');
       render();
     }
     currentRelocalize = relocalizeGame;
 
+    loadPuzzleForState();
     render();
   }
 
@@ -730,7 +1210,7 @@
 
     registerServiceWorker();
 
-    if (stageEl) mountPicto(stageEl, 2);
+    if (stageEl) mountPicto(stageEl);
   }
 
   init();
