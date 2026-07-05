@@ -65,7 +65,7 @@
       aria_clear: 'Alle Wege löschen',
       aria_new: 'Neues Rätsel der gleichen Stufe',
       aria_restart: 'Lauf bei Stufe eins neu starten',
-      aria_board: 'Wege-Gitter. Ziehe von einem Punkt zum gleichfarbigen Punkt. Mit der Tastatur: Eine Ziffer wählt ein Paar, die Pfeiltasten ziehen den Weg, Entf löscht ihn.',
+      aria_board: 'Wegegitter. Ziehe von einem Punkt zum gleichfarbigen Punkt. Mit der Tastatur: Eine Ziffer wählt ein Paar, die Pfeiltasten ziehen den Weg, Entf löscht ihn.',
       loading: 'Erzeuge Rätsel',
       msg_go: 'Verbinde die Paare und fülle das Gitter',
       msg_pair: 'Paar {n} verbunden',
