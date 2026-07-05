@@ -296,7 +296,17 @@ button { touch-action: manipulation; }
 .head { position: relative; }
 .head-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
 .head-top .head-logo { margin: 0; }
-.head-controls { display: flex; align-items: center; gap: 6px; }
+.head-controls {
+  display: flex;
+  align-items: stretch;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+.head-controls > * + * { border-left: 1px solid var(--border); }
+.head-controls .icon-btn { border: none; border-radius: 0; background: transparent; }
+.head-controls .icon-btn:hover { background: var(--surface-2); }
 .head-controls .langbar, .head-controls .themebar { margin: 0; }
 
 .home-link {

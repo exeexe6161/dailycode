@@ -123,7 +123,17 @@ button { touch-action: manipulation; }
 :root[data-theme="dark"] .logo-light { display: none; }
 :root[data-theme="dark"] .logo-dark { display: block; }
 
-.head-controls { display: flex; align-items: center; gap: 6px; }
+.head-controls {
+  display: flex;
+  align-items: stretch;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+.head-controls > * + * { border-left: 1px solid var(--border); }
+.head-controls .icon-btn { border: none; border-radius: 0; background: transparent; }
+.head-controls .icon-btn:hover { background: var(--surface-2); }
 .langbar, .themebar { display: flex; align-items: center; gap: 6px; margin: 0; }
 
 .title {
