@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-memora-v2';
+var CACHE = 'dailycode-memora-v3';
 var LEGACY = ['dailycode-echo-v4'];
 var PREFIX = 'dailycode-memora-';
 

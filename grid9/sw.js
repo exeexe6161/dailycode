@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-numora-v2';
+var CACHE = 'dailycode-numora-v3';
 var LEGACY = ['dailycode-grid9-v1'];
 var PREFIX = 'dailycode-numora-';
 
