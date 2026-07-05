@@ -49,7 +49,7 @@
       aria_pause: 'Pausieren',
       aria_resume: 'Fortsetzen',
       aria_restart: 'Neu starten',
-      help_summary: 'Hilfe',
+      help_summary: 'So funktioniert es',
       help_1: 'Pfeiltasten oder WASD steuern die Kette, Wischen geht auch.',
       help_2: 'Sammle die leuchtenden Punkte. Die Kette wächst und wird schneller.',
       help_3: 'Die Ränder sind offen; nur eine Kollision mit dem eigenen Körper beendet das Spiel.',

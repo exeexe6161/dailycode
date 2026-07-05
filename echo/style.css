@@ -396,14 +396,18 @@ button { touch-action: manipulation; }
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  gap: 7px;
+  width: fit-content;
+  min-height: 44px;
+  padding: 6px 16px;
   margin: 0 auto;
   border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text-muted);
   text-decoration: none;
+  font-weight: 700;
+  font-size: .95rem;
   transition: border-color var(--ease), color var(--ease), background var(--ease);
 }
 .home-link:hover { border-color: var(--accent); color: var(--text); }
