@@ -55,7 +55,7 @@
   // Werte sind Vorlagen mit {platzhalter} oder Funktionen (params) fuer Grammatik.
   var I18N = {
     de: {
-      subtitle: 'Knacke den geheimen Code von Ciphera.',
+      subtitle: 'Errate die geheime Farbfolge. Jeder Versuch zeigt dir, was schon stimmt.',
       aria_board: 'Spielfeld',
       aria_palette: 'Symbolauswahl',
       btn_clear: 'Letztes entfernen',
@@ -120,7 +120,7 @@
       theme_dark: 'Dunkel'
     },
     en: {
-      subtitle: 'Crack the secret code of Ciphera.',
+      subtitle: 'Guess the secret color sequence. Each try shows you what already matches.',
       aria_board: 'Game board',
       aria_palette: 'Symbol picker',
       btn_clear: 'Remove last',
@@ -185,7 +185,7 @@
       theme_dark: 'Dark'
     },
     tr: {
-      subtitle: 'Ciphera\'nın gizli kodunu çöz.',
+      subtitle: 'Gizli renk dizisini tahmin et. Her deneme sana neyin doğru olduğunu gösterir.',
       aria_board: 'Oyun alanı',
       aria_palette: 'Simge seçimi',
       btn_clear: 'Sonuncuyu sil',

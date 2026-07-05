@@ -62,7 +62,7 @@
   /* ---------- Sprache: minimaler t() Tisch (DE und EN) ---------- */
   var STR = {
     de: {
-      subtitle: 'Bilde so viele Wörter wie möglich aus den Buchstaben.',
+      subtitle: 'Bilde aus den Buchstaben so viele gültige Wörter wie möglich.',
       lbl_score: 'Punkte', lbl_best: 'Bestwert', best_none: 'noch keine', lbl_time: 'Zeit',
       btn_undo: 'Zurück', btn_clear: 'Leeren', btn_submit: 'Prüfen',
       btn_pause: 'Pause', btn_resume: 'Weiter', btn_restart: 'Neu',
@@ -85,7 +85,7 @@
       back: 'Zurück', back_aria: 'Zurück zur Startseite'
     },
     en: {
-      subtitle: 'Build as many words from the letters as you can.',
+      subtitle: 'Build as many valid words as you can from the letters.',
       lbl_score: 'Score', lbl_best: 'Best', best_none: 'none yet', lbl_time: 'Time',
       btn_undo: 'Undo', btn_clear: 'Clear', btn_submit: 'Check',
       btn_pause: 'Pause', btn_resume: 'Resume', btn_restart: 'New',

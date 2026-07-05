@@ -26,7 +26,7 @@
   ];
   var I18N = {
     de: {
-      subtitle: 'Fülle das Gitter und decke das Bild auf.',
+      subtitle: 'Fülle das Gitter nach den Zahlenhinweisen an Zeilen und Spalten und decke das Bild auf.',
       level: function (n) { return 'Stufe ' + n; },
       solved: 'Gelöst',
       unsolved: 'noch nicht gelöst',
@@ -68,7 +68,7 @@
       stats_hint: 'Statistik nicht verfügbar, lokaler Speicher ist aus.'
     },
     en: {
-      subtitle: 'Fill the grid and reveal the picture.',
+      subtitle: 'Fill the grid using the row and column number clues to reveal the picture.',
       level: function (n) { return 'Level ' + n; },
       solved: 'Solved',
       unsolved: 'not solved yet',
@@ -110,7 +110,7 @@
       stats_hint: 'Statistics unavailable, local storage is off.'
     },
     tr: {
-      subtitle: 'Bulmaca ızgarasını doldur ve resmi ortaya çıkar.',
+      subtitle: 'Satır ve sütunlardaki sayı ipuçlarına göre ızgarayı doldur ve resmi ortaya çıkar.',
       level: function (n) { return 'Seviye ' + n; },
       solved: 'Çözüldü',
       unsolved: 'henüz çözülmedi',

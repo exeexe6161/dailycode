@@ -34,7 +34,7 @@
   /* ---------- Sprache: DE/EN/TR Tabellen, t() liest ueber lang ---------- */
   var I18N = {
     de: {
-      subtitle: 'Wähle blitzschnell die passende Form und Farbe.',
+      subtitle: 'Wähle blitzschnell die passende Form und Farbe, bevor die Zeit abläuft.',
       lbl_score: 'Punkte',
       lbl_lives: 'Leben',
       lbl_round: 'Runde',
@@ -88,7 +88,7 @@
       color_schiefer: 'Schiefer'
     },
     en: {
-      subtitle: 'Pick the matching shape and color, fast.',
+      subtitle: 'Pick the matching shape and color before time runs out.',
       lbl_score: 'Points',
       lbl_lives: 'Lives',
       lbl_round: 'Round',
@@ -142,7 +142,7 @@
       color_schiefer: 'Slate'
     },
     tr: {
-      subtitle: 'Uygun şekli ve rengi hızlıca seç.',
+      subtitle: 'Süre bitmeden uygun şekli ve rengi hızlıca seç.',
       lbl_score: 'Puan',
       lbl_lives: 'Can',
       lbl_round: 'Tur',

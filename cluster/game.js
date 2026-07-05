@@ -36,7 +36,7 @@
   /* ---------- Sprache: I18N Tisch DE/EN/TR ---------- */
   var I18N = {
     de: {
-      subtitle: 'Staple Formen, verbinde drei gleiche und mehr.',
+      subtitle: 'Staple fallende Formen und verbinde drei oder mehr gleiche, bevor der Stapel den oberen Rand erreicht.',
       score: 'Punkte',
       lbl_best: 'Bestwert',
       best_none: 'noch keine',
@@ -67,7 +67,7 @@
       aria_lang_group: 'Sprache'
     },
     en: {
-      subtitle: 'Stack shapes, connect three or more alike.',
+      subtitle: 'Stack falling shapes and connect three or more alike before the stack reaches the top.',
       score: 'Points',
       lbl_best: 'Best',
       best_none: 'none yet',
@@ -98,7 +98,7 @@
       aria_lang_group: 'Language'
     },
     tr: {
-      subtitle: 'Şekilleri istifle, üç veya daha fazla aynı şekli birleştir.',
+      subtitle: 'Düşen şekilleri istifle ve yığın üste ulaşmadan üç veya daha fazla aynı şekli birleştir.',
       score: 'Puan',
       lbl_best: 'En iyi',
       best_none: 'henüz yok',

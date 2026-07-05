@@ -44,7 +44,7 @@
 
   var I18N = {
     de: {
-      subtitle: 'Präge dir die Paare ein und finde sie wieder.',
+      subtitle: 'Decke zwei Karten auf, merke dir die Paare und finde am Ende alle wieder.',
       lbl_level: 'Stufe',
       lbl_lives: 'Fehler übrig',
       lbl_score: 'Punkte',
@@ -85,7 +85,7 @@
       sym_outline: 'Umriss'
     },
     en: {
-      subtitle: 'Memorize the pairs and find them again.',
+      subtitle: 'Reveal two cards, remember the pairs and find them all in the end.',
       lbl_level: 'Level',
       lbl_lives: 'Mistakes left',
       lbl_score: 'Points',
@@ -126,7 +126,7 @@
       sym_outline: 'outline'
     },
     tr: {
-      subtitle: 'Çiftleri aklında tut ve tekrar bul.',
+      subtitle: 'İki kart aç, çiftleri aklında tut ve sonunda hepsini bul.',
       lbl_level: 'Seviye',
       lbl_lives: 'Kalan hata',
       lbl_score: 'Puan',

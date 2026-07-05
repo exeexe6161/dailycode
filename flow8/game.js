@@ -53,7 +53,7 @@
   ];
   var I18N = {
     de: {
-      subtitle: 'Verbinde die gleichen Punkte und fülle das ganze Gitter.',
+      subtitle: 'Verbinde jeweils zwei gleichfarbige Punkte, bis das ganze Gitter gefüllt ist.',
       lbl_level: 'Stufe',
       lbl_fill: 'Felder',
       lbl_best: 'Bestwert',
@@ -91,7 +91,7 @@
       aria_lang_group: 'Sprache'
     },
     en: {
-      subtitle: 'Connect matching points and fill the whole grid.',
+      subtitle: 'Connect each pair of matching colored points until the whole grid is filled.',
       lbl_level: 'Level',
       lbl_fill: 'Fields',
       lbl_best: 'Best',
@@ -129,7 +129,7 @@
       aria_lang_group: 'Language'
     },
     tr: {
-      subtitle: 'Aynı noktaları birleştir ve tüm ızgarayı doldur.',
+      subtitle: 'Aynı renkteki iki noktayı birleştir, tüm ızgara dolana kadar devam et.',
       lbl_level: 'Seviye',
       lbl_fill: 'Alanlar',
       lbl_best: 'En iyi',

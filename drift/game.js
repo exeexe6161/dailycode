@@ -27,7 +27,7 @@
      Struktur und Fallback-Muster identisch zu code/game.js (Ciphera). */
   var I18N = {
     de: {
-      subtitle: 'Lenke die wachsende Kette über das Feld.',
+      subtitle: 'Lenke die wachsende Kette über das Feld und weiche dir selbst aus.',
       score: 'Punkte',
       lbl_best: 'Bestwert',
       best_none: 'noch keine',
@@ -60,7 +60,7 @@
       aria_lang_group: 'Sprache'
     },
     en: {
-      subtitle: 'Steer the growing chain across the field.',
+      subtitle: 'Steer the growing chain across the field and avoid yourself.',
       score: 'Points',
       lbl_best: 'Best',
       best_none: 'none yet',
@@ -93,7 +93,7 @@
       aria_lang_group: 'Language'
     },
     tr: {
-      subtitle: 'Büyüyen zinciri alan boyunca yönlendir.',
+      subtitle: 'Büyüyen zinciri alan boyunca yönlendir ve kendine çarpma.',
       score: 'Puan',
       lbl_best: 'En iyi',
       best_none: 'henüz yok',

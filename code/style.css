@@ -701,8 +701,10 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   grid-row: 2;
   margin-top: 6px;
 }
-@media (max-width: 390px) {
-  .head { column-gap: 6px; }
-  .head .back-link { width: 44px; padding-inline: 10px; justify-content: center; }
-  .head .back-link span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-}
+/* Zurueck Button immer kompakt (Icon, Text nur fuer Screenreader): die App Karte ist
+   nie breiter als --maxw, ein voller Textbutton links haette bei mittleren Breiten
+   die zentrierte Marke bedraengt. Deshalb gilt das nicht erst ab einer schmalen
+   Bildschirmbreite, sondern immer. */
+.head { column-gap: 6px; }
+.head .back-link { width: 44px; padding-inline: 10px; justify-content: center; }
+.head .back-link span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
