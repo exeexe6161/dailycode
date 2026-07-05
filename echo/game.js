@@ -73,8 +73,8 @@
       help_3: 'Zwei gleiche bleiben offen. Geht das Fehlerbudget auf null, ist die Runde vorbei.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurück',
-      back_aria: 'Zurück zur Startseite',
+      home: 'Startseite',
+      home_aria: 'Zur Startseite',
       sym_circle: 'Kreis',
       sym_triangle: 'Dreieck',
       sym_square: 'Quadrat',
@@ -114,8 +114,8 @@
       help_3: 'Two matching cards stay open. When the mistake budget reaches zero, the round ends.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
-      back: 'Back',
-      back_aria: 'Back to start',
+      home: 'Home',
+      home_aria: 'Go to home',
       sym_circle: 'Circle',
       sym_triangle: 'Triangle',
       sym_square: 'Square',
@@ -155,8 +155,8 @@
       help_3: 'Eşleşen iki kart açık kalır. Hata bütçesi sıfırlanınca tur biter.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
-      back: 'Geri',
-      back_aria: 'Ana sayfaya dön',
+      home: 'Ana sayfa',
+      home_aria: 'Ana sayfaya git',
       sym_circle: 'Daire',
       sym_triangle: 'Üçgen',
       sym_square: 'Kare',
@@ -656,9 +656,9 @@
     setText('lblBest', t('lbl_best'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
-    setText('backLabel', t('back'));
-    var backLinkEl = document.getElementById('backLink');
-    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
+    setText('homeLabel', t('home'));
+    var homeLinkEl = document.getElementById('homeLink');
+    if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

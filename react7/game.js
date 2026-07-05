@@ -71,8 +71,8 @@
       help_3: 'Die Zeitleiste wird mit jeder Runde kürzer. Eine falsche Wahl oder abgelaufene Zeit kostet ein Leben. Bei null Leben ist der Lauf vorbei.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurück',
-      back_aria: 'Zurück zur Startseite',
+      home: 'Startseite',
+      home_aria: 'Zur Startseite',
       aria_lang_group: 'Sprache',
       shape_dreieck: 'Dreieck',
       shape_kreis: 'Kreis',
@@ -125,8 +125,8 @@
       help_3: 'The time bar gets shorter with each round. A wrong choice or running out of time costs one life. At zero lives the run is over.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
-      back: 'Back',
-      back_aria: 'Back to start',
+      home: 'Home',
+      home_aria: 'Go to home',
       aria_lang_group: 'Language',
       shape_dreieck: 'Triangle',
       shape_kreis: 'Circle',
@@ -179,8 +179,8 @@
       help_3: 'Zaman çubuğu turlarla birlikte kısalır. Yanlış seçim veya sürenin dolması bir can kaybettirir. Can sıfır olunca tur biter.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
-      back: 'Geri',
-      back_aria: 'Ana sayfaya dön',
+      home: 'Ana sayfa',
+      home_aria: 'Ana sayfaya git',
       aria_lang_group: 'Dil',
       shape_dreieck: 'Üçgen',
       shape_kreis: 'Daire',
@@ -808,9 +808,9 @@
     setText('lblBest', t('lbl_best'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
-    setText('backLabel', t('back'));
-    var backLinkEl = document.getElementById('backLink');
-    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
+    setText('homeLabel', t('home'));
+    var homeLinkEl = document.getElementById('homeLink');
+    if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

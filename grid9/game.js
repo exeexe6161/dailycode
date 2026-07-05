@@ -91,8 +91,8 @@
       help_3: 'Verstößt eine Zahl gegen die Regeln, wird das Feld farbig mit einem Ausrufezeichen markiert. Vorgegebene Felder sind fett und nicht änderbar.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurück',
-      back_aria: 'Zurück zur Startseite'
+      home: 'Startseite',
+      home_aria: 'Zur Startseite'
     },
     en: {
       subtitle: 'Fill the grid, each number once per row, column and block.',
@@ -141,8 +141,8 @@
       help_3: 'A violation marks the cell in color with an exclamation mark. Given cells are bold and cannot be changed.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
-      back: 'Back',
-      back_aria: 'Back to start'
+      home: 'Home',
+      home_aria: 'Go to home'
     },
     tr: {
       subtitle: 'Izgarayı doldur, her sayı her satırda, sütunda ve blokta yalnız bir kez bulunur.',
@@ -191,8 +191,8 @@
       help_3: 'Bir ihlalde hücre renkli ve ünlem işaretiyle işaretlenir. Verilen hücreler kalın ve değiştirilemez.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
-      back: 'Geri',
-      back_aria: 'Ana sayfaya dön'
+      home: 'Ana sayfa',
+      home_aria: 'Ana sayfaya git'
     }
   };
   function t(key) {
@@ -825,9 +825,9 @@
     setText('lblBest', t('lbl_best'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
-    setText('backLabel', t('back'));
-    var backLinkEl = document.getElementById('backLink');
-    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
+    setText('homeLabel', t('home'));
+    var homeLinkEl = document.getElementById('homeLink');
+    if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

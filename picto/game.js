@@ -45,8 +45,8 @@
       aria_lang_group: 'Sprache',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurück',
-      back_aria: 'Zurück zur Startseite',
+      home: 'Startseite',
+      home_aria: 'Zur Startseite',
       mode_daily: 'Tagesrätsel',
       mode_unlimited: 'Unbegrenzt',
       aria_mode_daily: 'Tagesrätsel wählen',
@@ -91,8 +91,8 @@
       aria_lang_group: 'Language',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
-      back: 'Back',
-      back_aria: 'Back to start',
+      home: 'Home',
+      home_aria: 'Go to home',
       mode_daily: 'Daily puzzle',
       mode_unlimited: 'Unlimited',
       aria_mode_daily: 'Choose daily puzzle',
@@ -137,8 +137,8 @@
       aria_lang_group: 'Dil',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
-      back: 'Geri',
-      back_aria: 'Ana sayfaya dön',
+      home: 'Ana sayfa',
+      home_aria: 'Ana sayfaya git',
       mode_daily: 'Günlük bulmaca',
       mode_unlimited: 'Sınırsız',
       aria_mode_daily: 'Günlük bulmacayı seç',
@@ -200,7 +200,7 @@
   var stageEl        = document.getElementById('stage');
   var linkPrivacyEl  = document.getElementById('linkPrivacy');
   var linkImprintEl  = document.getElementById('linkImprint');
-  var backLinkEl     = document.getElementById('backLink');
+  var homeLinkEl     = document.getElementById('homeLink');
 
   /* ---------- Theme und Sprache (geteilte Keys mit Portal und anderen Spielen) ---------- */
   var THEME_KEY = 'dailycode:theme';
@@ -1201,8 +1201,8 @@
   /* ---------- Statische Texte ---------- */
   function applyTexts() {
     if (subtitleEl) subtitleEl.textContent = t('subtitle');
-    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
-    setText('backLabel', t('back'));
+    if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
+    setText('homeLabel', t('home'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
     setText('helpSummary', t('help_summary'));

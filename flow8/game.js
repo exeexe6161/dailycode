@@ -86,8 +86,8 @@
       help_3: 'Die Stufe ist gelöst, wenn alle Paare verbunden und alle Felder belegt sind. Danach wächst das Gitter.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurück',
-      back_aria: 'Zurück zur Startseite',
+      home: 'Startseite',
+      home_aria: 'Zur Startseite',
       aria_lang_group: 'Sprache'
     },
     en: {
@@ -124,8 +124,8 @@
       help_3: 'The level is solved once all pairs are connected and every field is filled. Then the grid grows.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
-      back: 'Back',
-      back_aria: 'Back to start',
+      home: 'Home',
+      home_aria: 'Go to home',
       aria_lang_group: 'Language'
     },
     tr: {
@@ -162,8 +162,8 @@
       help_3: 'Tüm çiftler birleştiğinde ve her alan dolduğunda seviye çözülmüş olur. Ardından ızgara büyür.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
-      back: 'Geri',
-      back_aria: 'Ana sayfaya dön',
+      home: 'Ana sayfa',
+      home_aria: 'Ana sayfaya git',
       aria_lang_group: 'Dil'
     }
   };
@@ -848,9 +848,9 @@
     setText('lblBest', t('lbl_best'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
-    setText('backLabel', t('back'));
-    var backLinkEl = document.getElementById('backLink');
-    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
+    setText('homeLabel', t('home'));
+    var homeLinkEl = document.getElementById('homeLink');
+    if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

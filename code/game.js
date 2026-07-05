@@ -112,8 +112,8 @@
       aria_lang_group: 'Sprache',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurück',
-      back_aria: 'Zurück zur Startseite',
+      home: 'Startseite',
+      home_aria: 'Zur Startseite',
       theme_group: 'Darstellung',
       theme_auto: 'Auto',
       theme_light: 'Hell',
@@ -177,8 +177,8 @@
       aria_lang_group: 'Language',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
-      back: 'Back',
-      back_aria: 'Back to start',
+      home: 'Home',
+      home_aria: 'Go to home',
       theme_group: 'Appearance',
       theme_auto: 'Auto',
       theme_light: 'Light',
@@ -238,8 +238,8 @@
       aria_lang_group: 'Dil',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
-      back: 'Geri',
-      back_aria: 'Ana sayfaya dön',
+      home: 'Ana sayfa',
+      home_aria: 'Ana sayfaya git',
       theme_group: 'Görünüm',
       theme_auto: 'Otomatik',
       theme_light: 'Açık',
@@ -651,10 +651,10 @@
     for (var j = 0; j < aNodes.length; j++) {
       aNodes[j].setAttribute('aria-label', t(aNodes[j].getAttribute('data-i18n-aria')));
     }
-    var backLabelEl = document.getElementById('backLabel');
-    if (backLabelEl) backLabelEl.textContent = t('back');
-    var backLinkEl = document.getElementById('backLink');
-    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
+    var homeLabelEl = document.getElementById('homeLabel');
+    if (homeLabelEl) homeLabelEl.textContent = t('home');
+    var homeLinkEl = document.getElementById('homeLink');
+    if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
   }
 
   /* ---------- Sprachumschalter ---------- */

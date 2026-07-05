@@ -55,8 +55,8 @@
       help_3: 'Die Ränder sind offen; nur eine Kollision mit dem eigenen Körper beendet das Spiel.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
-      back: 'Zurück',
-      back_aria: 'Zurück zur Startseite',
+      home: 'Startseite',
+      home_aria: 'Zur Startseite',
       aria_lang_group: 'Sprache'
     },
     en: {
@@ -88,8 +88,8 @@
       help_3: 'The edges are open, only running into your own body ends the game.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
-      back: 'Back',
-      back_aria: 'Back to start',
+      home: 'Home',
+      home_aria: 'Go to home',
       aria_lang_group: 'Language'
     },
     tr: {
@@ -121,8 +121,8 @@
       help_3: 'Kenarlar açıktır, oyunu yalnızca kendi gövdene çarpmak bitirir.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
-      back: 'Geri',
-      back_aria: 'Ana sayfaya dön',
+      home: 'Ana sayfa',
+      home_aria: 'Ana sayfaya git',
       aria_lang_group: 'Dil'
     }
   };
@@ -751,9 +751,9 @@
     if (subtitleEl) subtitleEl.textContent = t('subtitle');
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
-    setText('backLabel', t('back'));
-    var backLinkEl = document.getElementById('backLink');
-    if (backLinkEl) backLinkEl.setAttribute('aria-label', t('back_aria'));
+    setText('homeLabel', t('home'));
+    var homeLinkEl = document.getElementById('homeLink');
+    if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));
