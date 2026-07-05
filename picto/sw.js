@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-pixela-v3';
+var CACHE = 'dailycode-pixela-v4';
 var LEGACY = ['dailycode-picto-v1'];
 var PREFIX = 'dailycode-pixela-';
 

@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-lexiq-v3';
+var CACHE = 'dailycode-lexiq-v4';
 var LEGACY = ['dailycode-glyph-v4'];
 var PREFIX = 'dailycode-lexiq-';
 
