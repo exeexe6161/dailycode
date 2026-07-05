@@ -335,6 +335,11 @@ button { touch-action: manipulation; }
 .btn-ghost { color: var(--text-muted); }
 .btn-ghost:hover { color: var(--text); }
 
+.help { margin: 0 0 16px; color: var(--text-muted); font-size: .9rem; }
+.help summary { cursor: pointer; color: var(--text); font-weight: 600; }
+.help ul { margin: 8px 0 0; padding-left: 18px; }
+.help li { margin: 4px 0; }
+
 .footer {
   display: flex;
   justify-content: center;

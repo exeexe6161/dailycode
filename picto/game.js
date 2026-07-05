@@ -55,6 +55,10 @@
       aria_prev_puzzle: 'Voriges Rätsel anzeigen',
       aria_next_puzzle: 'Nächstes Rätsel anzeigen',
       aria_random_puzzle: 'Zufälliges Rätsel anzeigen',
+      help_summary: 'So funktioniert es',
+      help_1: 'Die Zahlen an jeder Zeile und Spalte zeigen, wie viele zusammenhängende Felder dort gefüllt werden müssen.',
+      help_2: 'Tippen oder Klicken füllt ein Feld. Die rechte Maustaste oder die Umschalttaste markiert ein Feld stattdessen als leer.',
+      help_3: 'Wechsle zwischen Tagesrätsel und Unbegrenzt, nutze bei Bedarf einen Hinweis und sieh nach dem Lösen deine Sternewertung.',
       btn_hint: 'Hinweis',
       aria_hint: 'Ein Hinweisfeld aufdecken',
       hint_count: function (n) { return 'Hinweise ' + n; },
@@ -97,6 +101,10 @@
       aria_prev_puzzle: 'Show previous puzzle',
       aria_next_puzzle: 'Show next puzzle',
       aria_random_puzzle: 'Show a random puzzle',
+      help_summary: 'How it works',
+      help_1: 'The numbers on each row and column show how many connected cells need to be filled there.',
+      help_2: 'Tap or click fills a cell. Right click or Shift marks a cell as empty instead.',
+      help_3: 'Switch between daily puzzle and unlimited mode, use a hint if you get stuck, and check your star rating after solving.',
       btn_hint: 'Hint',
       aria_hint: 'Reveal one hint cell',
       hint_count: function (n) { return 'Hints ' + n; },
@@ -139,6 +147,10 @@
       aria_prev_puzzle: 'Önceki bulmacayı göster',
       aria_next_puzzle: 'Sonraki bulmacayı göster',
       aria_random_puzzle: 'Rastgele bir bulmaca göster',
+      help_summary: 'Nasıl çalışır',
+      help_1: 'Her satır ve sütundaki sayılar, orada kaç bitişik hücrenin doldurulması gerektiğini gösterir.',
+      help_2: 'Dokunma veya tıklama bir hücreyi doldurur. Sağ tık veya Shift tuşu bir hücreyi bunun yerine boş olarak işaretler.',
+      help_3: 'Günlük bulmaca ile sınırsız mod arasında geçiş yap, gerekirse ipucu kullan ve çözdükten sonra yıldız puanını gör.',
       btn_hint: 'İpucu',
       aria_hint: 'Bir ipucu hücresini ortaya çıkar',
       hint_count: function (n) { return 'İpucu sayısı ' + n; },
@@ -1193,6 +1205,10 @@
     setText('backLabel', t('back'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
+    setText('helpSummary', t('help_summary'));
+    setText('help1', t('help_1'));
+    setText('help2', t('help_2'));
+    setText('help3', t('help_3'));
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
 
