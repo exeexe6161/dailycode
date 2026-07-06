@@ -557,7 +557,7 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   text-align: center;
   margin-bottom: 16px;
 }
-.stat-num { font-size: 1.35rem; font-weight: 700; }
+.stat-num { font-size: 1.2rem; font-weight: 700; }
 .stat-cap { font-size: .72rem; color: var(--text-muted); }
 .dist-title { font-size: .95rem; margin: 0 0 8px; }
 .dist-row {

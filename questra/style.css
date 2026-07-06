@@ -140,11 +140,12 @@ button { touch-action: manipulation; }
 .langbar, .themebar { display: flex; align-items: center; gap: 6px; margin: 0; }
 
 .title {
+  font-size: clamp(1.5rem, 6vw, 2rem);
   margin: 0 0 4px;
+  letter-spacing: .5px;
   text-align: center;
   font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-weight: 700;
-  font-size: 1.3rem;
   color: var(--text);
 }
 .subtitle { margin: 0 0 12px; color: var(--text-muted); font-size: .95rem; text-align: center; }
@@ -360,7 +361,7 @@ button { touch-action: manipulation; }
   text-align: center;
 }
 .stat-cell { padding: 8px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
-.stat-num { font-size: 1.1rem; font-weight: 700; }
+.stat-num { font-size: 1.2rem; font-weight: 700; }
 .stat-cap { font-size: .68rem; color: var(--text-muted); }
 .stats-hint { color: var(--text-muted); font-size: .9rem; text-align: center; }
 

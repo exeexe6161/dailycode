@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-rankings-v3';
+var CACHE = 'dailycode-rankings-v4';
 var LEGACY = [];
 var PREFIX = 'dailycode-rankings-';
 

@@ -148,11 +148,12 @@ button { touch-action: manipulation; }
 .langbar, .themebar { display: flex; align-items: center; gap: 6px; margin: 0; }
 
 .title {
+  font-size: clamp(1.5rem, 6vw, 2rem);
   margin: 0 0 4px;
+  letter-spacing: .5px;
   text-align: center;
   font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-weight: 700;
-  font-size: 1.3rem;
   color: var(--text);
 }
 .subtitle { margin: 0 0 12px; color: var(--text-muted); font-size: .95rem; text-align: center; }
