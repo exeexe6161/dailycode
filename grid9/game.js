@@ -92,7 +92,9 @@
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
       home: 'Startseite',
-      home_aria: 'Zur Startseite'
+      home_aria: 'Zur Startseite',
+      rankings: 'Rangliste',
+      rankings_aria: 'Zur Rangliste'
     },
     en: {
       subtitle: 'Fill the grid, each number once per row, column and block.',
@@ -142,7 +144,9 @@
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
       home: 'Home',
-      home_aria: 'Go to home'
+      home_aria: 'Go to home',
+      rankings: 'Rankings',
+      rankings_aria: 'To the rankings'
     },
     tr: {
       subtitle: 'Izgarayı doldur, her sayı her satırda, sütunda ve blokta yalnız bir kez bulunur.',
@@ -192,7 +196,9 @@
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
-      home_aria: 'Ana sayfaya git'
+      home_aria: 'Ana sayfaya git',
+      rankings: 'Sıralama',
+      rankings_aria: 'Sıralamaya git'
     }
   };
   function t(key) {
@@ -867,6 +873,9 @@
     setText('homeLabel', t('home'));
     var homeLinkEl = document.getElementById('homeLink');
     if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
+    setText('rankingsLabel', t('rankings'));
+    var rankingsLinkEl = document.getElementById('rankingsLink');
+    if (rankingsLinkEl) rankingsLinkEl.setAttribute('aria-label', t('rankings_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

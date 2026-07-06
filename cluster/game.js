@@ -64,6 +64,8 @@
       nav_imprint: 'Impressum',
       home: 'Startseite',
       home_aria: 'Zur Startseite',
+      rankings: 'Rangliste',
+      rankings_aria: 'Zur Rangliste',
       aria_lang_group: 'Sprache'
     },
     en: {
@@ -95,6 +97,8 @@
       nav_imprint: 'Imprint',
       home: 'Home',
       home_aria: 'Go to home',
+      rankings: 'Rankings',
+      rankings_aria: 'To the rankings',
       aria_lang_group: 'Language'
     },
     tr: {
@@ -126,6 +130,8 @@
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
       home_aria: 'Ana sayfaya git',
+      rankings: 'Sıralama',
+      rankings_aria: 'Sıralamaya git',
       aria_lang_group: 'Dil'
     }
   };
@@ -913,6 +919,9 @@
     setText('homeLabel', t('home'));
     var homeLinkEl = document.getElementById('homeLink');
     if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
+    setText('rankingsLabel', t('rankings'));
+    var rankingsLinkEl = document.getElementById('rankingsLink');
+    if (rankingsLinkEl) rankingsLinkEl.setAttribute('aria-label', t('rankings_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

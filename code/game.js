@@ -114,6 +114,8 @@
       nav_imprint: 'Impressum',
       home: 'Startseite',
       home_aria: 'Zur Startseite',
+      rankings: 'Rangliste',
+      rankings_aria: 'Zur Rangliste',
       theme_group: 'Darstellung',
       theme_auto: 'Auto',
       theme_light: 'Hell',
@@ -179,6 +181,8 @@
       nav_imprint: 'Imprint',
       home: 'Home',
       home_aria: 'Go to home',
+      rankings: 'Rankings',
+      rankings_aria: 'To the rankings',
       theme_group: 'Appearance',
       theme_auto: 'Auto',
       theme_light: 'Light',
@@ -240,6 +244,8 @@
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
       home_aria: 'Ana sayfaya git',
+      rankings: 'Sıralama',
+      rankings_aria: 'Sıralamaya git',
       theme_group: 'Görünüm',
       theme_auto: 'Otomatik',
       theme_light: 'Açık',
@@ -662,6 +668,10 @@
     if (homeLabelEl) homeLabelEl.textContent = t('home');
     var homeLinkEl = document.getElementById('homeLink');
     if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
+    var rankingsLinkEl = document.getElementById('rankingsLink');
+    if (rankingsLinkEl) rankingsLinkEl.setAttribute('aria-label', t('rankings_aria'));
+    var rankingsLabelEl = document.getElementById('rankingsLabel');
+    if (rankingsLabelEl) rankingsLabelEl.textContent = t('rankings');
   }
 
   /* ---------- Sprachumschalter ---------- */

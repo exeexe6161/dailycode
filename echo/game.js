@@ -75,6 +75,8 @@
       nav_imprint: 'Impressum',
       home: 'Startseite',
       home_aria: 'Zur Startseite',
+      rankings: 'Rangliste',
+      rankings_aria: 'Zur Rangliste',
       sym_circle: 'Kreis',
       sym_triangle: 'Dreieck',
       sym_square: 'Quadrat',
@@ -116,6 +118,8 @@
       nav_imprint: 'Imprint',
       home: 'Home',
       home_aria: 'Go to home',
+      rankings: 'Rankings',
+      rankings_aria: 'To the rankings',
       sym_circle: 'Circle',
       sym_triangle: 'Triangle',
       sym_square: 'Square',
@@ -157,6 +161,8 @@
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
       home_aria: 'Ana sayfaya git',
+      rankings: 'Sıralama',
+      rankings_aria: 'Sıralamaya git',
       sym_circle: 'Daire',
       sym_triangle: 'Üçgen',
       sym_square: 'Kare',
@@ -685,6 +691,9 @@
     setText('homeLabel', t('home'));
     var homeLinkEl = document.getElementById('homeLink');
     if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
+    setText('rankingsLabel', t('rankings'));
+    var rankingsLinkEl = document.getElementById('rankingsLink');
+    if (rankingsLinkEl) rankingsLinkEl.setAttribute('aria-label', t('rankings_aria'));
     setText('helpSummary', t('help_summary'));
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));

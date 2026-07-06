@@ -82,7 +82,7 @@
       help_2: 'Jeder Buchstabe ist einmal nutzbar; nach einem Wort rücken neue nach.',
       help_3: 'Längere Wörter geben mehr Punkte und mehr Zeit. Die Leertaste pausiert.',
       nav_privacy: 'Datenschutz', nav_imprint: 'Impressum',
-      home: 'Startseite', home_aria: 'Zur Startseite'
+      home: 'Startseite', home_aria: 'Zur Startseite', rankings: 'Rangliste', rankings_aria: 'Zur Rangliste'
     },
     en: {
       subtitle: 'Build as many valid words as you can from the letters.',
@@ -105,7 +105,7 @@
       help_2: 'Each letter is used once; new letters slide in after a word.',
       help_3: 'Longer words give more points and more time. Space pauses.',
       nav_privacy: 'Privacy', nav_imprint: 'Imprint',
-      home: 'Home', home_aria: 'Go to home'
+      home: 'Home', home_aria: 'Go to home', rankings: 'Rankings', rankings_aria: 'To the rankings'
     }
   };
   function uiTable() { return STR[uiLang] || STR.en; }   // tr-UI faellt auf en zurueck
@@ -537,6 +537,9 @@
     setText('homeLabel', t('home'));
     var homeLinkEl = document.getElementById('homeLink');
     if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
+    setText('rankingsLabel', t('rankings'));
+    var rankingsLinkEl = document.getElementById('rankingsLink');
+    if (rankingsLinkEl) rankingsLinkEl.setAttribute('aria-label', t('rankings_aria'));
     setText('helpSummary', t('help_summary')); setText('help1', t('help_1')); setText('help2', t('help_2')); setText('help3', t('help_3'));
     if (rackEl) rackEl.setAttribute('aria-label', t('aria_rack'));
     setPauseLabel();

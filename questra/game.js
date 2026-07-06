@@ -38,6 +38,8 @@
       nav_imprint: 'Impressum',
       home: 'Startseite',
       home_aria: 'Zur Startseite',
+      rankings: 'Rangliste',
+      rankings_aria: 'Zur Rangliste',
       help_summary: 'So funktioniert es',
       help_1: 'Jede Runde hat sieben Fragen mit je vier Antworten. Genau eine Antwort ist richtig.',
       help_2: 'Tippe eine Antwort an, du siehst sofort ob sie richtig war, und bestätigst mit Weiter.',
@@ -82,6 +84,8 @@
       nav_imprint: 'Imprint',
       home: 'Home',
       home_aria: 'Go to home',
+      rankings: 'Rankings',
+      rankings_aria: 'To the rankings',
       help_summary: 'How it works',
       help_1: 'Each round has seven questions with four answers each. Exactly one answer is correct.',
       help_2: 'Tap an answer, you see right away if it was correct, then confirm with Next.',
@@ -126,6 +130,8 @@
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
       home_aria: 'Ana sayfaya git',
+      rankings: 'Sıralama',
+      rankings_aria: 'Sıralamaya git',
       help_summary: 'Nasıl çalışır',
       help_1: 'Her turda dört seçenekli yedi soru vardır. Tam olarak bir cevap doğrudur.',
       help_2: 'Bir cevaba dokun, hemen doğru olup olmadığını gör, sonra İleri ile onayla.',
@@ -428,6 +434,7 @@
   var linkPrivacyEl  = document.getElementById('linkPrivacy');
   var linkImprintEl  = document.getElementById('linkImprint');
   var homeLinkEl     = document.getElementById('homeLink');
+  var rankingsLinkEl = document.getElementById('rankingsLink');
 
   /* ---------- Theme und Sprache (geteilte Keys mit Portal und anderen Spielen) ---------- */
   var THEME_KEY = 'dailycode:theme';
@@ -1003,6 +1010,8 @@
     if (subtitleEl) subtitleEl.textContent = t('subtitle');
     if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
     setText('homeLabel', t('home'));
+    if (rankingsLinkEl) rankingsLinkEl.setAttribute('aria-label', t('rankings_aria'));
+    setText('rankingsLabel', t('rankings'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
     setText('helpSummary', t('help_summary'));

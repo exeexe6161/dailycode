@@ -371,17 +371,24 @@ button { touch-action: manipulation; }
 .head-controls .icon-btn:hover { background: var(--surface-2); }
 .head-controls .langbar, .head-controls .themebar { margin: 0; }
 
-.home-link {
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+.pill-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
   width: fit-content;
   min-height: 44px;
-  padding: 6px 16px;
-  margin: 0 auto;
+  padding: 6px 18px;
   border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   background: var(--surface);
   color: var(--text-muted);
   text-decoration: none;
@@ -389,8 +396,17 @@ button { touch-action: manipulation; }
   font-size: .95rem;
   transition: border-color var(--ease), color var(--ease), background var(--ease);
 }
-.home-link:hover { border-color: var(--accent); color: var(--text); }
-.home-link .lucide { width: 20px; height: 20px; display: block; }
+.pill-btn:hover { border-color: var(--accent); color: var(--text); }
+.pill-btn .lucide { width: 20px; height: 20px; display: block; }
+.pill-btn-accent {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--accent);
+}
+.pill-btn-accent:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  color: var(--accent);
+}
 
 .pp-score { margin: 4px 0 10px; text-align: center; }
 .pp-score-line { margin: 0; font-weight: 700; font-size: 1rem; color: var(--text); }

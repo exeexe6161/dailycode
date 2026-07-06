@@ -47,6 +47,8 @@
       nav_imprint: 'Impressum',
       home: 'Startseite',
       home_aria: 'Zur Startseite',
+      rankings: 'Rangliste',
+      rankings_aria: 'Zur Rangliste',
       mode_daily: 'Tagesrätsel',
       mode_unlimited: 'Unbegrenzt',
       aria_mode_daily: 'Tagesrätsel wählen',
@@ -93,6 +95,8 @@
       nav_imprint: 'Imprint',
       home: 'Home',
       home_aria: 'Go to home',
+      rankings: 'Rankings',
+      rankings_aria: 'To the rankings',
       mode_daily: 'Daily puzzle',
       mode_unlimited: 'Unlimited',
       aria_mode_daily: 'Choose daily puzzle',
@@ -139,6 +143,8 @@
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
       home_aria: 'Ana sayfaya git',
+      rankings: 'Sıralama',
+      rankings_aria: 'Sıralamaya git',
       mode_daily: 'Günlük bulmaca',
       mode_unlimited: 'Sınırsız',
       aria_mode_daily: 'Günlük bulmacayı seç',
@@ -201,6 +207,7 @@
   var linkPrivacyEl  = document.getElementById('linkPrivacy');
   var linkImprintEl  = document.getElementById('linkImprint');
   var homeLinkEl     = document.getElementById('homeLink');
+  var rankingsLinkEl = document.getElementById('rankingsLink');
 
   /* ---------- Theme und Sprache (geteilte Keys mit Portal und anderen Spielen) ---------- */
   var THEME_KEY = 'dailycode:theme';
@@ -1241,6 +1248,8 @@
     if (subtitleEl) subtitleEl.textContent = t('subtitle');
     if (homeLinkEl) homeLinkEl.setAttribute('aria-label', t('home_aria'));
     setText('homeLabel', t('home'));
+    if (rankingsLinkEl) rankingsLinkEl.setAttribute('aria-label', t('rankings_aria'));
+    setText('rankingsLabel', t('rankings'));
     setText('navPrivacy', t('nav_privacy'));
     setText('navImprint', t('nav_imprint'));
     setText('helpSummary', t('help_summary'));
