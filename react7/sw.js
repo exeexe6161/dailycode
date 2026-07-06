@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-reflexa-v12';
+var CACHE = 'dailycode-reflexa-v13';
 var LEGACY = ['dailycode-react7-v2'];
 var PREFIX = 'dailycode-reflexa-';
 

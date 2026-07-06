@@ -65,6 +65,9 @@
       theme_auto: 'Auto',
       theme_light: 'Hell',
       theme_dark: 'Dunkel',
+      diff_group: 'Schwierigkeit',
+      diff_1: 'Leicht', diff_2: 'Mittel', diff_3: 'Schwer', diff_4: 'Experte',
+      aria_diff_1: 'Leicht wählen', aria_diff_2: 'Mittel wählen', aria_diff_3: 'Schwer wählen', aria_diff_4: 'Experte wählen',
       help_summary: 'So funktioniert es',
       help_1: 'Oben siehst du ein Ziel aus Form und Farbe. Tippe unten die Option mit genau dieser Form an. Nur eine passt.',
       help_2: 'Mit der Tastatur: Die Ziffern eins bis sechs wählen direkt, die Pfeiltasten wechseln die Auswahl, Enter oder Leertaste bestätigt.',
@@ -121,6 +124,9 @@
       theme_auto: 'Auto',
       theme_light: 'Light',
       theme_dark: 'Dark',
+      diff_group: 'Difficulty',
+      diff_1: 'Easy', diff_2: 'Medium', diff_3: 'Hard', diff_4: 'Expert',
+      aria_diff_1: 'Select easy', aria_diff_2: 'Select medium', aria_diff_3: 'Select hard', aria_diff_4: 'Select expert',
       help_summary: 'How it works',
       help_1: 'Above you see a target made of shape and color. Tap the option below with exactly this shape. Only one matches.',
       help_2: 'With the keyboard: digits one to six choose directly, arrow keys move, Enter or Space confirms.',
@@ -177,6 +183,9 @@
       theme_auto: 'Otomatik',
       theme_light: 'Açık',
       theme_dark: 'Koyu',
+      diff_group: 'Zorluk',
+      diff_1: 'Kolay', diff_2: 'Orta', diff_3: 'Zor', diff_4: 'Uzman',
+      aria_diff_1: 'Kolay seç', aria_diff_2: 'Orta seç', aria_diff_3: 'Zor seç', aria_diff_4: 'Uzman seç',
       help_summary: 'Nasıl çalışır',
       help_1: 'Yukarıda şekil ve renkten oluşan bir hedef görürsün. Aşağıda tam olarak bu şekle sahip seçeneğe dokun. Yalnızca biri uyar.',
       help_2: 'Klavyeyle: bir ile altı arası rakamlar doğrudan seçer, ok tuşları gezdirir, Enter veya boşluk onaylar.',
@@ -270,6 +279,7 @@
   var themeColorEl  = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
   var subtitleEl    = document.getElementById('subtitle');
+  var diffRowEl     = document.getElementById('diffRow');
   var statusEl      = document.getElementById('status');
   var hudScoreEl    = document.getElementById('hudScore');
   var hudLivesEl    = document.getElementById('hudLives');
@@ -325,10 +335,13 @@
   /* ---------- Theme Zustand (geteilte Keys) ---------- */
   var THEME_KEY = 'dailycode:theme';
   var LANG_KEY = 'dailycode:lang';
+  var DIFFICULTY_KEY = 'dailycode:react7:difficulty';
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
   var theme = loadTheme();
   var lang = loadLang();
+  var difficulty = loadDifficulty();
+  var diffButtons = [];
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var themeToggleBtn = null;
   var langToggleBtn = null;
@@ -413,6 +426,51 @@
     langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
   }
 
+  /* ---------- Schwierigkeit: Wahl laden, speichern, anzeigen ----------
+     Steuert nur Leben und Startzeit der Runde (LIVES_BY_DIFF/START_MS_BY_DIFF
+     unten), keine neue Spielmechanik. Mittel (2) entspricht dem bisherigen,
+     immer gleichen Verhalten (3 Leben, 3000 ms Start). Ein Wechsel startet
+     immer einen frischen Lauf (wie der Neu Knopf), damit nie zwei Stufen
+     innerhalb eines Laufs vermischt gewertet werden. */
+  function loadDifficulty() {
+    if (hasStorage) {
+      try { var v = parseInt(window.localStorage.getItem(DIFFICULTY_KEY), 10); if ([1, 2, 3, 4].indexOf(v) !== -1) return v; } catch (e) {}
+    }
+    return 2;
+  }
+  function saveDifficulty(v) { if (!hasStorage) return; try { window.localStorage.setItem(DIFFICULTY_KEY, String(v)); } catch (e) {} }
+  function buildDiffRow() {
+    if (!diffRowEl) return;
+    diffRowEl.setAttribute('aria-label', t('diff_group'));
+    diffRowEl.innerHTML = '';
+    diffButtons = [1, 2, 3, 4].map(function (n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'diff-btn';
+      b.textContent = t('diff_' + n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_diff_' + n));
+      b.addEventListener('click', function () { selectDifficulty(n); });
+      diffRowEl.appendChild(b);
+      return b;
+    });
+  }
+  function refreshDiffButtons() {
+    diffButtons.forEach(function (b, i) {
+      var n = i + 1;
+      b.textContent = t('diff_' + n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_diff_' + n));
+    });
+  }
+  function selectDifficulty(n) {
+    if (n === difficulty) return;
+    difficulty = n;
+    saveDifficulty(n);
+    refreshDiffButtons();
+    restartRun();
+  }
+
   /* ---------- Neu Lokalisieren bei Sprachwechsel mitten im Spiel ----------
      Ziel und Optionen tragen selbst keinen Sprachtext, daher reicht ein
      Neusetzen der Labels/Texte. Das aktuelle Ziel entspricht immer exakt
@@ -447,6 +505,13 @@
     }
   }
 
+  /* Schwierigkeit ueber Leben und Startzeit der Runde. Mittel (2) entspricht
+     exakt dem bisherigen, immer gleichen Verhalten (3 Leben, 3000 ms).
+     STEP_MS/MIN_MS (Beschleunigung je Runde, Untergrenze) bleiben fuer alle
+     Stufen gleich, nur der Startwert der Zeitleiste unterscheidet sich. */
+  var LIVES_BY_DIFF = { 1: 4, 2: 3, 3: 3, 4: 2 };
+  var START_MS_BY_DIFF = { 1: 3500, 2: 3000, 3: 2500, 4: 2200 };
+
   /* ---------- Spielzustand ----------
      phase: 'init' | 'play' | 'paused' | 'reveal' | 'over'
        play   Runde laeuft, Zeitleiste schrumpft, Eingabe aktiv
@@ -455,7 +520,7 @@
        over   Lauf beendet, Overlay sichtbar */
   var phase = 'init';
   var score = 0;
-  var lives = 3;
+  var lives = LIVES_BY_DIFF[difficulty] || 3;
   var round = 1;
   var options = [];        // [{ shape, color }]
   var correctIndex = -1;
@@ -468,23 +533,17 @@
   var rafId = 0;
   var revealTimer = 0;
 
-  var START_MS = 3000, STEP_MS = 80, MIN_MS = 1200;
-  function roundMs(r) { var v = START_MS - (r - 1) * STEP_MS; return v < MIN_MS ? MIN_MS : v; }
+  var STEP_MS = 80, MIN_MS = 1200;
+  function roundMs(r) {
+    var start = START_MS_BY_DIFF[difficulty] || START_MS_BY_DIFF[2];
+    var v = start - (r - 1) * STEP_MS;
+    return v < MIN_MS ? MIN_MS : v;
+  }
   function optionCount(r) {
     if (r <= 5) return 3;
     if (r <= 12) return 4;
     if (r <= 20) return 5;
     return 6;
-  }
-  // Kein Schwierigkeit Waehler vorhanden. Fuer PuzzlePureScore wird die
-  // erreichte Rundenzahl in dieselben Stufen gebuendelt wie optionCount()
-  // oben bereits die Optionenanzahl staffelt (mehr Optionen, kuerzere Zeit,
-  // also echte hoehere Schwierigkeit), keine neue Spielmechanik.
-  function ppDifficultyFromRound(r) {
-    if (r <= 5) return 1;
-    if (r <= 12) return 2;
-    if (r <= 20) return 3;
-    return 4;
   }
 
   /* ---------- Helfer ---------- */
@@ -724,14 +783,32 @@
 
   /* ---------- Bestwert (einheitliches null-Muster, Vorbild grid9) ----------
      Score, hoeher ist besser. Kein gespeicherter Wert ergibt null, daher
-     "noch keine" statt 0. hasStorage-Preflight, try/catch, Bereichspruefung. */
-  function bestKey() { return 'dailycode:react7:best'; }
+     "noch keine" statt 0. hasStorage-Preflight, try/catch, Bereichspruefung.
+     Vor Batch 3 gab es nur einen Bestwert insgesamt (oldBestKey). Damit
+     dieser nicht verloren geht, wird er einmalig additiv (nur falls besser)
+     in den Bestwert der Stufe Mittel uebernommen, siehe migrateOldBest().
+     Der alte Schluessel bleibt unveraendert bestehen. */
+  function oldBestKey() { return 'dailycode:react7:best'; }
+  function bestKey(diff) { return 'dailycode:react7:best:' + diff; }
+  function migrateOldBest() {
+    if (!hasStorage) return;
+    try {
+      var oldV = window.localStorage.getItem(oldBestKey());
+      if (oldV == null) return;
+      var oldN = parseInt(oldV, 10);
+      if (isNaN(oldN) || oldN < 0) return;
+      var midKey = bestKey(2);
+      var curV = window.localStorage.getItem(midKey);
+      var curN = (curV == null) ? null : parseInt(curV, 10);
+      if (curN == null || isNaN(curN) || oldN > curN) { window.localStorage.setItem(midKey, String(oldN)); }
+    } catch (e) {}
+  }
   function loadBestVal() {
     if (!hasStorage) return null;
-    try { var v = window.localStorage.getItem(bestKey()); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
+    try { var v = window.localStorage.getItem(bestKey(difficulty)); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
     catch (e) { return null; }
   }
-  function saveBest(val) { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(), String(val)); } catch (e) {} }
+  function saveBest(val) { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(difficulty), String(val)); } catch (e) {} }
   function updateBest() {
     if (!hudBestEl) return;
     var v = loadBestVal();
@@ -752,12 +829,13 @@
     updateBest();
     var scoreText = fmt('over_score', { s: score, r: round }) +
       (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : '');
-    // Endlosmodus ohne Sieg/Niederlage Konzept (Runde laeuft bis 3 Leben
-    // verbraucht sind), daher 'complete'. difficulty kommt aus der
-    // erreichten Rundenzahl (siehe ppDifficultyFromRound). Verlorene Leben
-    // sind am Ende immer 3, daher kein sinnvolles mistakes Signal.
+    // Endlosmodus ohne Sieg/Niederlage Konzept (Runde laeuft bis die Leben
+    // der gewaehlten Stufe verbraucht sind), daher 'complete'. difficulty
+    // kommt aus der vorab gewaehlten Stufe (Batch 3), nicht mehr aus der
+    // erreichten Rundenzahl. Verlorene Leben sind am Ende immer die volle
+    // Anzahl der Stufe, daher weiterhin kein sinnvolles mistakes Signal.
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'react7', difficulty: ppDifficultyFromRound(round), outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'react7', difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
@@ -779,7 +857,7 @@
     stopTick();
     hideOverlay();
     score = 0;
-    lives = 3;
+    lives = LIVES_BY_DIFF[difficulty] || 3;
     round = 1;
     manualPause = false;
     setPauseLabel();
@@ -881,6 +959,8 @@
     if (timebarEl) timebarEl.setAttribute('aria-label', t('timebar_aria'));
     if (restartBtn) { restartBtn.textContent = t('btn_restart'); restartBtn.setAttribute('aria-label', t('aria_restart')); }
     setPauseLabel();
+    if (diffRowEl) diffRowEl.setAttribute('aria-label', t('diff_group'));
+    refreshDiffButtons();
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
   function setFooterLinks() {
@@ -908,9 +988,11 @@
      Kein Render greift vorher auf noch nicht existierende Optionen zu. */
   function init() {
     document.documentElement.lang = lang;
+    migrateOldBest();
     setFooterLinks();
     buildLangBar();
     buildThemeBar();
+    buildDiffRow();
     applyTheme();
     applyTexts();
     updateHud();

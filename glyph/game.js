@@ -20,9 +20,18 @@
   var RACK = 8;                 // Buchstabenkacheln
   var MIN_WORD = 3;
   var MIN_VOWELS = 3;           // Mindestanzahl Vokale im Rack (Spielbarkeit)
-  var START_TIME = 90;          // Sekunden je Lauf
-  var TIME_CAP = 120;           // Obergrenze der Uhr (Zeitbonus deckelt hier)
+  var START_TIME = 90;          // Sekunden je Lauf, Mittel (bisheriges Verhalten)
+  var TIME_CAP = 120;           // Obergrenze der Uhr bei Mittel (Zeitbonus deckelt hier)
   var LOW_WARN = [10, 5];       // Zeitwarnungen (Sekunden)
+
+  /* Schwierigkeit ueber das Zeitlimit. Mittel (2) entspricht exakt dem
+     bisherigen Verhalten (START_TIME/TIME_CAP oben). Die Deckelung der Uhr
+     behaelt denselben Abstand von 30 Sekunden ueber dem Startwert wie bisher
+     (90 zu 120), damit auch Leicht und Experte echten Spielraum fuer den
+     Zeitbonus aus laengeren Woertern haben. */
+  var TIME_BY_DIFF = { 1: 120, 2: START_TIME, 3: 70, 4: 55 };
+  var CAP_HEADROOM = TIME_CAP - START_TIME;
+  function capFor(d) { return (TIME_BY_DIFF[d] || START_TIME) + CAP_HEADROOM; }
 
   function scoreFor(len) { return len * len; }                 // progressiv (quadratisch)
   function bonusFor(len) { return 2 + (len - MIN_WORD) * 1.5; } // Sekunden, laenger = mehr
@@ -82,6 +91,9 @@
       help_2: 'Jeder Buchstabe ist einmal nutzbar; nach einem Wort rücken neue nach.',
       help_3: 'Längere Wörter geben mehr Punkte und mehr Zeit. Die Leertaste pausiert.',
       help_4: 'Wörter brauchen mindestens 3 Buchstaben. Läuft die Zeit ab, endet die Runde.',
+      diff_group: 'Schwierigkeit',
+      diff_1: 'Leicht', diff_2: 'Mittel', diff_3: 'Schwer', diff_4: 'Experte',
+      aria_diff_1: 'Leicht wählen', aria_diff_2: 'Mittel wählen', aria_diff_3: 'Schwer wählen', aria_diff_4: 'Experte wählen',
       nav_privacy: 'Datenschutz', nav_imprint: 'Impressum',
       home: 'Startseite', home_aria: 'Zur Startseite', rankings: 'Rangliste', rankings_aria: 'Zur Rangliste'
     },
@@ -106,6 +118,9 @@
       help_2: 'Each letter is used once; new letters slide in after a word.',
       help_3: 'Longer words give more points and more time. Space pauses.',
       help_4: 'Words need at least 3 letters. When time runs out, the round ends.',
+      diff_group: 'Difficulty',
+      diff_1: 'Easy', diff_2: 'Medium', diff_3: 'Hard', diff_4: 'Expert',
+      aria_diff_1: 'Select easy', aria_diff_2: 'Select medium', aria_diff_3: 'Select hard', aria_diff_4: 'Select expert',
       nav_privacy: 'Privacy', nav_imprint: 'Imprint',
       home: 'Home', home_aria: 'Go to home', rankings: 'Rankings', rankings_aria: 'To the rankings'
     }
@@ -130,6 +145,7 @@
   var themeColorEl = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
   var subtitleEl = document.getElementById('subtitle');
+  var diffRowEl = document.getElementById('diffRow');
   var noticeEl = document.getElementById('langNotice');
   var noticeTextEl = document.getElementById('langNoticeText');
   var wlDeBtn = document.getElementById('wlDe');
@@ -159,10 +175,13 @@
   /* ---------- Theme Zustand ---------- */
   var THEME_KEY = 'dailycode:theme';
   var LANG_KEY = 'dailycode:lang';
+  var DIFFICULTY_KEY = 'dailycode:glyph:difficulty';
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
   var theme = loadTheme();
   var uiLang = loadLang();
+  var difficulty = loadDifficulty();
+  var diffButtons = [];
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var themeToggleBtn = null, fbTimer = 0;
 
@@ -196,6 +215,52 @@
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', (uiLang === 'de' ? 'Darstellung' : 'Appearance'));
+  }
+
+  /* ---------- Schwierigkeit: Wahl laden, speichern, anzeigen ----------
+     Steuert nur das Zeitlimit (TIME_BY_DIFF/capFor), keine neue Wortmechanik.
+     Mittel (2) entspricht dem bisherigen, immer gleichen Verhalten. */
+  function loadDifficulty() {
+    if (hasStorage) {
+      try { var v = parseInt(window.localStorage.getItem(DIFFICULTY_KEY), 10); if ([1, 2, 3, 4].indexOf(v) !== -1) return v; } catch (e) {}
+    }
+    return 2;
+  }
+  function saveDifficulty(v) { if (!hasStorage) return; try { window.localStorage.setItem(DIFFICULTY_KEY, String(v)); } catch (e) {} }
+
+  function buildDiffRow() {
+    if (!diffRowEl) return;
+    diffRowEl.setAttribute('aria-label', t('diff_group'));
+    diffRowEl.innerHTML = '';
+    diffButtons = [1, 2, 3, 4].map(function (n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'diff-btn';
+      b.textContent = t('diff_' + n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_diff_' + n));
+      b.addEventListener('click', function () { selectDifficulty(n); });
+      diffRowEl.appendChild(b);
+      return b;
+    });
+  }
+  function refreshDiffButtons() {
+    diffButtons.forEach(function (b, i) {
+      var n = i + 1;
+      b.textContent = t('diff_' + n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_diff_' + n));
+    });
+  }
+  // Wechsel startet immer eine frische Runde (wie der Neu-Knopf), daher kann
+  // ein Schwierigkeitswechsel mitten im Lauf keine Teil- oder Mischwertung
+  // erzeugen. Ohne geladene Wortliste (TR-Wartezustand) wird nur gespeichert.
+  function selectDifficulty(n) {
+    if (n === difficulty) return;
+    difficulty = n;
+    saveDifficulty(n);
+    refreshDiffButtons();
+    if (wordSet) startRun();
   }
 
   /* ---------- Wortdaten ---------- */
@@ -359,7 +424,7 @@
     // gueltig
     var pts = scoreFor(word.length);
     score += pts;
-    remaining = Math.min(TIME_CAP, remaining + bonusFor(word.length));
+    remaining = Math.min(capFor(difficulty), remaining + bonusFor(word.length));
     if (best == null || score > best) { best = score; saveBest(); }
     var consumed = selection.slice();
     selection = [];
@@ -392,23 +457,41 @@
     }
   }
 
-  /* ---------- Highscore (pro Wortsprache, defensiv) ---------- */
-  function bestKey() { return 'dailycode:glyph:best:' + wordLang; }
+  /* ---------- Highscore (pro Wortsprache UND Schwierigkeit, defensiv) ----------
+     Vor Batch 3 gab es nur einen Bestwert je Wortsprache (oldBestKey). Damit
+     alte Ergebnisse nicht verloren gehen, wird dieser einmalig additiv (nur
+     falls besser) in den Bestwert der Stufe Mittel uebernommen, siehe
+     migrateOldBest(). Der alte Schluessel bleibt unveraendert bestehen. */
+  function oldBestKey(lang) { return 'dailycode:glyph:best:' + lang; }
+  function bestKey(lang, diff) { return 'dailycode:glyph:best:' + lang + ':' + diff; }
+  function migrateOldBest(lang) {
+    if (!hasStorage) return;
+    try {
+      var oldV = window.localStorage.getItem(oldBestKey(lang));
+      if (oldV == null) return;
+      var oldN = parseInt(oldV, 10);
+      if (isNaN(oldN) || oldN < 0) return;
+      var midKey = bestKey(lang, 2);
+      var curV = window.localStorage.getItem(midKey);
+      var curN = (curV == null) ? null : parseInt(curV, 10);
+      if (curN == null || isNaN(curN) || oldN > curN) { window.localStorage.setItem(midKey, String(oldN)); }
+    } catch (e) {}
+  }
   // Einheitliches null-Muster (Vorbild grid9): kein gespeicherter Wert ergibt
   // null, nicht 0, damit "noch keine" sauber von einem echten 0-Wert getrennt ist.
   function loadBestVal() {
     if (!hasStorage) return null;
-    try { var v = window.localStorage.getItem(bestKey()); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
+    try { var v = window.localStorage.getItem(bestKey(wordLang, difficulty)); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
     catch (e) { return null; }
   }
   function loadBest() { best = loadBestVal(); }
-  function saveBest() { if (!hasStorage || best == null) return; try { window.localStorage.setItem(bestKey(), String(best)); } catch (e) {} }
+  function saveBest() { if (!hasStorage || best == null) return; try { window.localStorage.setItem(bestKey(wordLang, difficulty), String(best)); } catch (e) {} }
 
   /* ---------- Lauf, Pause, Spielende ---------- */
   function setPauseLabel() { if (pauseBtn) pauseBtn.textContent = (phase === 'pause') ? t('btn_resume') : t('btn_pause'); }
 
   function startRun() {
-    score = 0; remaining = START_TIME; selection = []; warnedAt = {}; invalidAttempts = 0;
+    score = 0; remaining = TIME_BY_DIFF[difficulty] || START_TIME; selection = []; warnedAt = {}; invalidAttempts = 0;
     rack = generateRack(); freshFlags = rangeAll();
     phase = 'play';
     hideOverlay();
@@ -431,11 +514,13 @@
     if (best == null || score > best) { best = score; saveBest(); }
     updateHud();
     // Rundenende ist rein zeitbasiert (kein Sieg/Niederlage Konzept), daher
-    // immer 'complete'. Kein Zeitbonus: die Runde laeuft ohnehin immer voll
-    // durch, timeSeconds/parSeconds bleiben bewusst null. mistakes zaehlt
-    // echte zu kurze oder ungueltige Worteinreichungen dieser Runde.
+    // immer 'complete'. Kein Zeitbonus: die Runde laeuft immer bis zum
+    // gewaehlten Zeitlimit durch, timeSeconds/parSeconds bleiben bewusst
+    // null (ein Vergleich waere zwischen unterschiedlichen Zeitlimits nicht
+    // fair). difficulty kommt aus der vorab gewaehlten Stufe (Batch 3).
+    // mistakes zaehlt echte zu kurze oder ungueltige Worteinreichungen.
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'glyph', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: invalidAttempts, hints: 0, perfect: invalidAttempts === 0 };
+      lastPpPayload = { game: 'glyph', difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: invalidAttempts, hints: 0, perfect: invalidAttempts === 0 };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
@@ -474,6 +559,7 @@
     if (rackEl) rackEl.setAttribute('lang', lang);
     if (currentEl) currentEl.setAttribute('lang', lang);
     block = blockSet(lang);
+    migrateOldBest(lang);
     phase = 'loading';
     announce(t('loading'));
     fetch('words-' + lang + '.txt', { credentials: 'omit' })
@@ -547,6 +633,8 @@
     setText('helpSummary', t('help_summary')); setText('help1', t('help_1')); setText('help2', t('help_2')); setText('help3', t('help_3')); setText('help4', t('help_4'));
     if (rackEl) rackEl.setAttribute('aria-label', t('aria_rack'));
     setPauseLabel();
+    if (diffRowEl) diffRowEl.setAttribute('aria-label', t('diff_group'));
+    refreshDiffButtons();
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
   function setFooterLinks() {
@@ -578,6 +666,7 @@
     buildThemeBar();
     applyTheme();
     document.documentElement.lang = (uiLang === 'tr') ? 'tr' : uiLang;
+    buildDiffRow();
     applyTexts();
     setFooterLinks();
 

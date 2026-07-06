@@ -222,6 +222,25 @@ button { touch-action: manipulation; }
 }
 .toggle-feedback.show { opacity: 1; }
 
+/* Schwierigkeit (optisch wie Ciphera Stufen Buttons) */
+.diff-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 14px; }
+.diff-btn {
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 18px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+.diff-btn:hover { border-color: var(--accent); color: var(--text); }
+.diff-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
 /* HUD: Punkte, Leben, Runde */
 .hud {
   display: flex;
