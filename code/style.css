@@ -357,22 +357,25 @@ button.slot:not(:disabled):active { transform: scale(.96); }
 }
 
 /* Steuerung */
-.controls { display: flex; gap: 10px; }
+.controls { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--gap); }
 .btn {
-  flex: 1;
-  min-height: 50px;
-  border-radius: var(--radius);
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
   font: inherit;
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: background var(--ease), border-color var(--ease), opacity var(--ease), transform var(--ease);
+  transition: border-color var(--ease), background var(--ease), color var(--ease), transform var(--ease);
 }
+.btn:hover { border-color: var(--accent); }
 .btn:active:not(:disabled) { transform: translateY(1px); }
-.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 0 18px var(--btn-glow); }
 .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
-.btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-ghost { color: var(--text-muted); }
+.btn-ghost:hover { color: var(--text); }
 .btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
 
 /* Hilfe */
@@ -505,8 +508,6 @@ button.slot:not(:disabled):active { transform: scale(.96); }
 .sym-btn svg {
   filter: drop-shadow(0 0 5px var(--halo));
 }
-.btn-primary:not(:disabled) { box-shadow: 0 0 18px var(--btn-glow); }
-.btn-primary:not(:disabled):hover { box-shadow: 0 0 24px var(--btn-glow-strong); }
 :where(button, summary, a):focus-visible { box-shadow: 0 0 16px var(--focus-glow); }
 
 /* ---------- Driftender Lichthintergrund (Canvas, hinter dem Inhalt) ---------- */
@@ -541,7 +542,7 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   white-space: pre;
   letter-spacing: 2px;
 }
-.share-actions { display: flex; gap: 10px; }
+.share-actions { display: flex; justify-content: center; gap: 10px; }
 .copy-feedback {
   text-align: center;
   min-height: 1.3em;
