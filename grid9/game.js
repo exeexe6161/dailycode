@@ -89,6 +89,8 @@
       help_1: 'Tippe ein Feld an oder bewege dich mit den Pfeiltasten. Setze dann über die Leiste oder die Tastatur eine Zahl.',
       help_2: 'Jede Zahl von eins bis neun darf in jeder Zeile, jeder Spalte und jedem Dreierblock nur einmal stehen.',
       help_3: 'Verstößt eine Zahl gegen die Regeln, wird das Feld farbig mit einem Ausrufezeichen markiert. Vorgegebene Felder sind fett und nicht änderbar.',
+      help_4: 'Über die Schwierigkeit oben wählst du Leicht, Mittel oder Schwer. Das bestimmt, wie viele Felder schon vorgegeben sind.',
+      help_5: 'Deine Zeit läuft während der Runde. Deine Bestzeit je Schwierigkeit wird nur auf diesem Gerät gespeichert.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
       home: 'Startseite',
@@ -141,6 +143,8 @@
       help_1: 'Tap a cell or move with the arrow keys, then set a number with the bar or the keyboard.',
       help_2: 'Each number from one to nine may appear only once in every row, column and three by three block.',
       help_3: 'A violation marks the cell in color with an exclamation mark. Given cells are bold and cannot be changed.',
+      help_4: 'The difficulty above lets you choose Easy, Medium or Hard. This sets how many cells are already given.',
+      help_5: 'Your time runs during the round. Your best time per difficulty is only stored on this device.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
       home: 'Home',
@@ -193,6 +197,8 @@
       help_1: 'Bir hücreye dokun veya ok tuşlarıyla hareket et, sonra sayı çubuğuyla ya da klavyeyle bir sayı gir.',
       help_2: 'Birden dokuza kadar her sayı, her satırda, her sütunda ve her üçe üç blokta yalnızca bir kez bulunabilir.',
       help_3: 'Bir ihlalde hücre renkli ve ünlem işaretiyle işaretlenir. Verilen hücreler kalın ve değiştirilemez.',
+      help_4: 'Yukarıdaki zorluk seçimiyle Kolay, Orta veya Zor seçebilirsin. Bu, kaç hücrenin önceden verildiğini belirler.',
+      help_5: 'Süren tur boyunca işler. Zorluk başına en iyi süren yalnızca bu cihazda saklanır.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
@@ -916,6 +922,8 @@
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));
     setText('help3', t('help_3'));
+    setText('help4', t('help_4'));
+    setText('help5', t('help_5'));
     setText('undoBtn', t('btn_undo')); if (undoBtn) undoBtn.setAttribute('aria-label', t('aria_undo'));
     setText('restartBtn', t('btn_restart')); if (restartBtn) restartBtn.setAttribute('aria-label', t('aria_restart'));
     setText('newBtn', t('btn_new')); if (newBtn) newBtn.setAttribute('aria-label', t('aria_new'));

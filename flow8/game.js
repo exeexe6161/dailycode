@@ -93,6 +93,7 @@
       help_1: 'Ziehe mit dem Finger oder der Maus von einem Punkt entlang der Felder zum gleichfarbigen Punkt. Jeder Punkt trägt zusätzlich eine Ziffer.',
       help_2: 'Ein Weg darf einen anderen überschreiben; der fremde Weg wird dort abgeschnitten. Tippe einen Punkt oder Weg kurz an, um ihn zu löschen.',
       help_3: 'Die Stufe ist gelöst, wenn alle Paare verbunden und alle Felder belegt sind. Danach wächst das Gitter.',
+      help_4: 'Mit der Tastatur: Eine Ziffer wählt ein Paar, die Pfeiltasten ziehen den Weg, Entf löscht ihn.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
       home: 'Startseite',
@@ -133,6 +134,7 @@
       help_1: 'Drag with your finger or mouse from one point along the fields to the matching point of the same color. Each point also carries a digit.',
       help_2: 'A path may overwrite another one, the other path is cut off there. Tap a point or path briefly to clear it.',
       help_3: 'The level is solved once all pairs are connected and every field is filled. Then the grid grows.',
+      help_4: 'With the keyboard: a digit selects a pair, arrow keys draw the path, Delete clears it.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
       home: 'Home',
@@ -173,6 +175,7 @@
       help_1: 'Parmağınla veya fareyle bir noktadan, alanlar boyunca aynı renkteki eşleşen noktaya sürükle. Her nokta ayrıca bir rakam taşır.',
       help_2: 'Bir yol başka bir yolun üzerine yazabilir, diğer yol o noktada kesilir. Bir noktaya veya yola kısaca dokunarak silebilirsin.',
       help_3: 'Tüm çiftler birleştiğinde ve her alan dolduğunda seviye çözülmüş olur. Ardından ızgara büyür.',
+      help_4: 'Klavyeyle: bir rakam çifti seçer, ok tuşları yolu çizer, Delete tuşu siler.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
@@ -913,6 +916,7 @@
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));
     setText('help3', t('help_3'));
+    setText('help4', t('help_4'));
     if (canvas) canvas.setAttribute('aria-label', t('aria_board'));
     if (clearBtn) { clearBtn.textContent = t('btn_clear'); clearBtn.setAttribute('aria-label', t('aria_clear')); }
     if (newBtn) { newBtn.textContent = t('btn_new'); newBtn.setAttribute('aria-label', t('aria_new')); }

@@ -61,6 +61,7 @@
       help_1: 'Die Zahlen an jeder Zeile und Spalte zeigen, wie viele zusammenhängende Felder dort gefüllt werden müssen.',
       help_2: 'Tippen oder Klicken füllt ein Feld. Die rechte Maustaste oder die Umschalttaste markiert ein Feld stattdessen als leer.',
       help_3: 'Wechsle zwischen Tagesrätsel und Unbegrenzt, nutze bei Bedarf einen Hinweis und sieh nach dem Lösen deine Sternewertung.',
+      help_4: 'Über die Schwierigkeit oben wählst du die Rätselgröße. Hinweise und Fehler senken deine Sternewertung.',
       btn_hint: 'Hinweis',
       aria_hint: 'Ein Hinweisfeld aufdecken',
       hint_count: function (n) { return 'Hinweise ' + n; },
@@ -109,6 +110,7 @@
       help_1: 'The numbers on each row and column show how many connected cells need to be filled there.',
       help_2: 'Tap or click fills a cell. Right click or Shift marks a cell as empty instead.',
       help_3: 'Switch between daily puzzle and unlimited mode, use a hint if you get stuck, and check your star rating after solving.',
+      help_4: 'The difficulty above sets the puzzle size. Hints and mistakes lower your star rating.',
       btn_hint: 'Hint',
       aria_hint: 'Reveal one hint cell',
       hint_count: function (n) { return 'Hints ' + n; },
@@ -157,6 +159,7 @@
       help_1: 'Her satır ve sütundaki sayılar, orada kaç bitişik hücrenin doldurulması gerektiğini gösterir.',
       help_2: 'Dokunma veya tıklama bir hücreyi doldurur. Sağ tık veya Shift tuşu bir hücreyi bunun yerine boş olarak işaretler.',
       help_3: 'Günlük bulmaca ile sınırsız mod arasında geçiş yap, gerekirse ipucu kullan ve çözdükten sonra yıldız puanını gör.',
+      help_4: 'Yukarıdaki zorluk seçimi bulmaca boyutunu belirler. İpuçları ve hatalar yıldız puanını düşürür.',
       btn_hint: 'İpucu',
       aria_hint: 'Bir ipucu hücresini ortaya çıkar',
       hint_count: function (n) { return 'İpucu sayısı ' + n; },
@@ -1283,6 +1286,7 @@
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));
     setText('help3', t('help_3'));
+    setText('help4', t('help_4'));
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
 

@@ -47,6 +47,7 @@
       help_1: 'Jede Runde hat sieben Fragen mit je vier Antworten. Genau eine Antwort ist richtig.',
       help_2: 'Tippe eine Antwort an, du siehst sofort ob sie richtig war, und bestätigst mit Weiter.',
       help_3: 'Am Ende zeigt Questra deine Punktzahl, deine Zeit und eine ruhige Bewertung. Wechsle zwischen Tagesrätsel und Unbegrenzt für weitere Runden.',
+      help_4: 'Über die Schwierigkeit oben wählst du Leicht, Mittel, Schwer oder Experte. Das bestimmt die Fragenmischung.',
       mode_daily: 'Tagesrätsel',
       mode_unlimited: 'Unbegrenzt',
       aria_mode_daily: 'Tagesrätsel wählen',
@@ -96,6 +97,7 @@
       help_1: 'Each round has seven questions with four answers each. Exactly one answer is correct.',
       help_2: 'Tap an answer, you see right away if it was correct, then confirm with Next.',
       help_3: 'At the end Questra shows your score, your time and a calm rating. Switch between daily puzzle and unlimited for more rounds.',
+      help_4: 'The difficulty above lets you choose Easy, Medium, Hard or Expert. This sets the question mix.',
       mode_daily: 'Daily puzzle',
       mode_unlimited: 'Unlimited',
       aria_mode_daily: 'Choose daily puzzle',
@@ -145,6 +147,7 @@
       help_1: 'Her turda dört seçenekli yedi soru vardır. Tam olarak bir cevap doğrudur.',
       help_2: 'Bir cevaba dokun, hemen doğru olup olmadığını gör, sonra İleri ile onayla.',
       help_3: 'Sonunda Questra puanını, süreni ve sakin bir değerlendirme gösterir. Daha fazla tur için günlük bulmaca ile sınırsız mod arasında geçiş yap.',
+      help_4: 'Yukarıdaki zorluk seçimiyle Kolay, Orta, Zor veya Uzman seçebilirsin. Bu, soru karışımını belirler.',
       mode_daily: 'Günlük bulmaca',
       mode_unlimited: 'Sınırsız',
       aria_mode_daily: 'Günlük bulmacayı seç',
@@ -1193,6 +1196,7 @@
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));
     setText('help3', t('help_3'));
+    setText('help4', t('help_4'));
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
 

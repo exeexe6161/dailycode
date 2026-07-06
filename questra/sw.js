@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-questra-v9';
+var CACHE = 'dailycode-questra-v10';
 var LEGACY = [];
 var PREFIX = 'dailycode-questra-';
 
