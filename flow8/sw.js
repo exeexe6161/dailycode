@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-fluxa-v9';
+var CACHE = 'dailycode-fluxa-v10';
 var LEGACY = ['dailycode-flow8-v1'];
 var PREFIX = 'dailycode-fluxa-';
 
