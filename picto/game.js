@@ -630,6 +630,32 @@
     try { window.localStorage.setItem(PROGRESS_PREFIX + id, JSON.stringify(data)); } catch (e) {}
   }
 
+  /* ---------- Sperre gegen Mehrfachwertung ----------
+     "Alles loeschen" setzt completed lokal zurueck, damit dasselbe Raetsel
+     erneut geuebt werden kann, das ist gewuenschtes Verhalten. Ohne eigene
+     Sperre wuerde ein erneutes Loesen aber recordResult() ein zweites Mal
+     ausloesen. Gespeichert wird nur, WELCHE Raetsel IDs jemals gewertet
+     wurden, kein Score Wert, keine alten Daten geloescht. */
+  var SCORED_KEY = 'dailycode:pixela:scored:v1';
+  function loadScoredSet() {
+    if (!hasStorage) return {};
+    try {
+      var raw = window.localStorage.getItem(SCORED_KEY);
+      if (!raw) return {};
+      var o = JSON.parse(raw);
+      return (o && typeof o === 'object') ? o : {};
+    } catch (e) { return {}; }
+  }
+  function markScored(id) {
+    if (!hasStorage) return;
+    try {
+      var set = loadScoredSet();
+      set[id] = true;
+      window.localStorage.setItem(SCORED_KEY, JSON.stringify(set));
+    } catch (e) { /* Speicher voll oder gesperrt, Spiel bleibt spielbar */ }
+  }
+  function isAlreadyScored(id) { return !!loadScoredSet()[id]; }
+
   function defaultState() {
     return { mode: 'daily', difficulty: 2, unlimitedIndexByDifficulty: { 1: 0, 2: 0, 3: 0, 4: 0 }, showErrors: false };
   }
@@ -984,7 +1010,7 @@
         stopTimer();
         stars = starRating(puzzle.width, Math.floor(currentElapsed()), hintsUsed, mistakes);
         if (mode === 'daily') recordDailyWin(statsData, difficulty, dateStr);
-        if (window.PuzzlePureScore) {
+        if (window.PuzzlePureScore && !isAlreadyScored(currentPuzzleId())) {
           var parSeconds = Math.round(puzzle.width * puzzle.height * 1.1);
           lastPpPayload = {
             game: 'picto',
@@ -997,6 +1023,7 @@
             perfect: hintsUsed === 0 && mistakes === 0
           };
           ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+          markScored(currentPuzzleId());
           rewardsTriggered = false;
         }
       }

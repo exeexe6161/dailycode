@@ -21,6 +21,18 @@
   var STEP_DEC = 12;             // ms schneller je Stufe
   var POINTS_PER_LEVEL = 4;      // alle 4 Punkte eine Stufe schneller
   var START_LEN = 3;             // Anfangslaenge der Kette
+  // Kein Schwierigkeit Waehler vorhanden (Serpix hat keine Stufenauswahl).
+  // Fuer PuzzlePureScore wird die tatsaechlich erreichte, spielintern schon
+  // vorhandene Tempo Stufe (level, siehe updateSpeed) in 1 bis 4 gebuendelt,
+  // damit die Rangliste nicht fuer jede Runde denselben Wert zeigt. Das ist
+  // keine neue Spielmechanik, nur eine nachtraegliche Einordnung des bereits
+  // erreichten Tempos. STEP_MIN wird ab level 7 erreicht (STEP_BASE minus 7 mal STEP_DEC unterschreitet STEP_MIN).
+  function ppDifficultyFromLevel(lvl) {
+    if (lvl <= 1) return 1;
+    if (lvl <= 3) return 2;
+    if (lvl <= 6) return 3;
+    return 4;
+  }
   var SWIPE_MIN = 24;            // Mindestweg fuer eine Wischgeste in px
 
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ----------
@@ -672,20 +684,19 @@
     var best = loadBestVal();
     updateScore(); // aktualisiert Punkte- und Bestwertanzeige (over ist bereits true)
     // Serpix ist ein Endlosmodus ohne Sieg/Niederlage Konzept, daher zaehlt
-    // jede beendete Runde als 'complete'. Der PuzzlePure Score wird von
-    // shared/score.js eigenstaendig aus der Schwierigkeit berechnet (hier
-    // Standard Mittel, da Serpix keine Schwierigkeit waehlbar hat), der
-    // Serpix eigene Punktestand (score) fliesst NICHT direkt ein.
+    // jede beendete Runde als 'complete', auch das seltene volle Feld (won).
+    // difficulty kommt aus der tatsaechlich erreichten Tempo Stufe (siehe
+    // ppDifficultyFromLevel), perfect nur beim seltenen vollen Feld.
     if (window.PuzzlePureScore) {
       lastPpPayload = {
         game: 'drift',
-        difficulty: null,
+        difficulty: ppDifficultyFromLevel(level),
         outcome: 'complete',
         timeSeconds: null,
         parSeconds: null,
         mistakes: 0,
         hints: 0,
-        perfect: false
+        perfect: won
       };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;

@@ -604,6 +604,34 @@
   var STATS_KEY = 'dailycode:questra:stats:v2';
   var STATS_KEY_V1 = 'dailycode:questra:stats:v1';
 
+  /* ---------- Sperre gegen Mehrfachwertung ----------
+     state.round ist nur EIN Slot fuer die jeweils zuletzt aktive Runde.
+     Wechselt man die Schwierigkeit und zurueck, wird der alte Slot vorher
+     ueberschrieben, loadRoundForState() findet dann keinen passenden key
+     mehr und erzeugt ueber freshRound() dieselbe (deterministische) Runde
+     erneut, obwohl sie schon gewertet war. Diese separate, vom state.round
+     Slot unabhaengige Sperre merkt sich je Runden Schluessel (Modus, Tag
+     oder Index, Schwierigkeit), ob schon an PuzzlePureScore gemeldet wurde. */
+  var SCORED_KEY = 'dailycode:questra:scored:v1';
+  function loadScoredSet() {
+    if (!hasStorage) return {};
+    try {
+      var raw = window.localStorage.getItem(SCORED_KEY);
+      if (!raw) return {};
+      var o = JSON.parse(raw);
+      return (o && typeof o === 'object') ? o : {};
+    } catch (e) { return {}; }
+  }
+  function markScored(key) {
+    if (!hasStorage) return;
+    try {
+      var set = loadScoredSet();
+      set[key] = true;
+      window.localStorage.setItem(SCORED_KEY, JSON.stringify(set));
+    } catch (e) { /* Speicher voll oder gesperrt, Spiel bleibt spielbar */ }
+  }
+  function isAlreadyScored(key) { return !!loadScoredSet()[key]; }
+
   function defaultState() {
     return {
       mode: 'daily',
@@ -1010,7 +1038,7 @@
         var finalScore = computeScore();
         stars = ratingStars(finalScore, Math.floor(currentElapsed()), difficulty);
         if (mode === 'daily') recordDailyResult(statsData, difficulty, dateStr, finalScore);
-        if (window.PuzzlePureScore) {
+        if (window.PuzzlePureScore && !isAlreadyScored(currentRoundKey())) {
           lastPpPayload = {
             game: 'questra',
             difficulty: difficulty,
@@ -1022,6 +1050,7 @@
             perfect: finalScore === 7
           };
           ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+          markScored(currentRoundKey());
           rewardsTriggered = false;
         }
         persistState();

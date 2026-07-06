@@ -369,6 +369,7 @@
   var level = 1;
   var score = 0;
   var mistakes = MISTAKES_START;
+  var wrongFlips = 0; // Zaehlt tatsaechlich gemachte Fehlversuche, fuer PuzzlePureScore Payload
   var ppResult = null;
   var lastPpPayload = null;
   var rewardsTriggered = false;
@@ -562,6 +563,7 @@
         setCardState(firstIdx, 'down');
         setCardState(i, 'down');
         mistakes -= 1;
+        wrongFlips += 1;
         updateHud();
         if (mistakes <= 0) { gameOver(); return; }
         announceKind('nomatch');
@@ -594,8 +596,12 @@
     recordBest();
     renderOverlayTexts();
     announceKind('over');
+    // Endlosmodus ohne Sieg/Niederlage Konzept, daher 'complete'. mistakes
+    // ist die tatsaechliche Anzahl Fehlversuche dieser Runde (wrongFlips),
+    // perfect nur bei keinem einzigen Fehlversuch. Kein Zeitbonus, das
+    // Spiel ist bewusst nicht zeitkritisch (nur die Vorschau ist getaktet).
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'echo', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'echo', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: wrongFlips, hints: 0, perfect: wrongFlips === 0 };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
@@ -628,7 +634,7 @@
 
   function restartGame() {
     tCancel();
-    level = 1; score = 0; mistakes = MISTAKES_START;
+    level = 1; score = 0; mistakes = MISTAKES_START; wrongFlips = 0;
     hideOverlay();
     startLevel();
   }

@@ -29,6 +29,19 @@
   var SOFT_MS = 45;             // Fallschritt bei Soft-Drop (schneller fallen)
   var CLEARS_PER_LEVEL = 10;    // alle 10 aufgeloeste Symbole eine Stufe schneller
 
+  // Kein Schwierigkeit Waehler vorhanden. Fuer PuzzlePureScore wird die
+  // tatsaechlich erreichte, spielintern schon vorhandene Tempo Stufe
+  // (level, siehe unten) in 1 bis 4 gebuendelt, damit die Rangliste nicht
+  // fuer jede Runde denselben Wert zeigt. Keine neue Spielmechanik, nur
+  // eine nachtraegliche Einordnung des bereits erreichten Tempos.
+  // FALL_MIN wird ab level 10 erreicht (FALL_BASE minus 10 mal FALL_DEC unterschreitet FALL_MIN).
+  function ppDifficultyFromLevel(lvl) {
+    if (lvl <= 2) return 1;
+    if (lvl <= 5) return 2;
+    if (lvl <= 9) return 3;
+    return 4;
+  }
+
   var BASE_POINTS = 10;         // Punkte je aufgeloestem Symbol (mal Kaskadentiefe)
   var SWIPE_MIN = 24;           // Mindestweg fuer eine Wischgeste in px
   var FLASH_MS = 260;           // Dauer der dezenten Aufloese-Blende (nur Zier)
@@ -743,8 +756,10 @@
       t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
       t('over_restart'));
     if (scoreEl) scoreEl.textContent = t('over_title') + ', ' + t('score') + ' ' + score;
+    // Endlosmodus ohne Sieg/Niederlage Konzept, daher 'complete'. difficulty
+    // kommt aus der tatsaechlich erreichten Tempo Stufe (siehe ppDifficultyFromLevel).
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'cluster', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'cluster', difficulty: ppDifficultyFromLevel(level), outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }

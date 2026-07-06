@@ -360,6 +360,36 @@
   var numBtns = [];
   var eraseBtn = null;
   var newPuzzleClicks = 0;
+  var currentSeed = null; // Identitaet des aktuell geladenen Raetsels, siehe generate()
+
+  /* ---------- Sperre gegen Mehrfachwertung ----------
+     Neustart setzt current auf die givens zurueck, aendert aber weder
+     solution noch den Seed. Ohne Sperre koennte die nun bekannte Loesung
+     beliebig oft erneut eingetippt werden und jedes Mal recordResult()
+     ausloesen. Gespeichert wird nur der Seed des zuletzt gewerteten
+     Raetsels je Schwierigkeit, kein Score Wert, keine alten Daten geloescht. */
+  var SOLVED_KEY = 'dailycode:grid9:solved:v1';
+  function loadSolvedMap() {
+    if (!hasStorage) return {};
+    try {
+      var raw = window.localStorage.getItem(SOLVED_KEY);
+      if (!raw) return {};
+      var o = JSON.parse(raw);
+      return (o && typeof o === 'object') ? o : {};
+    } catch (e) { return {}; }
+  }
+  function saveSolvedSeed(d, seed) {
+    if (!hasStorage) return;
+    try {
+      var map = loadSolvedMap();
+      map[d] = seed;
+      window.localStorage.setItem(SOLVED_KEY, JSON.stringify(map));
+    } catch (e) { /* Speicher voll oder gesperrt, Spiel bleibt spielbar */ }
+  }
+  function alreadyScoredSeed(d, seed) {
+    var map = loadSolvedMap();
+    return !!(map && map[d] === seed);
+  }
 
   /* ---------- Tagesdeterministischer Zufall ----------
      Aus einem Textschluessel (Tag in UTC plus Schwierigkeit) wird per
@@ -662,7 +692,11 @@
     lastWinSec = sec; lastWinBestSec = bestSec;
     // Bestehende Schwierigkeit (leicht/mittel/schwer) wird durchgereicht, keine
     // neue Stufe. Par Sekunden sind grobe, vorlaeufige Schaetzwerte je Stufe.
-    if (window.PuzzlePureScore) {
+    // Gesperrt gegen Mehrfachwertung: ein Neustart tippt dieselbe, bereits
+    // bekannte Loesung erneut ein, ohne dass sich der Seed aendert. Nur ein
+    // noch nicht fuer DIESEN Seed gewertetes Ergebnis wird an PuzzlePureScore
+    // gemeldet, das lokale Bestzeit Update oben bleibt davon unberuehrt.
+    if (window.PuzzlePureScore && !alreadyScoredSeed(difficulty, currentSeed)) {
       var ppDiffMap = { leicht: 1, mittel: 2, schwer: 3 };
       var ppParByDiff = { leicht: 300, mittel: 480, schwer: 720 };
       lastPpPayload = {
@@ -676,6 +710,7 @@
         perfect: false
       };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+      saveSolvedSeed(difficulty, currentSeed);
       rewardsTriggered = false;
     }
     showOverlay(t('win_title'),
@@ -765,6 +800,7 @@
     // damit der UI-Thread nicht waehrend der Eindeutigkeitspruefung blockt.
     window.setTimeout(function () {
       var seed = 'grid9:' + dateKeyUTC() + ':' + difficulty + (extraSalt ? (':' + extraSalt) : '');
+      currentSeed = seed;
       var rng = mulberry32(fnv1a(seed));
       var res = makePuzzle(difficulty, rng);
       solution = res.solution;

@@ -222,6 +222,7 @@
   var freshFlags = [];          // fuer die Nachschub-Animation
   var selection = [];           // Indizes in rack, in Auswahlreihenfolge
   var score = 0, best = null, remaining = START_TIME;
+  var invalidAttempts = 0; // Zaehlt zu kurze oder ungueltige Worteinreichungen, fuer PuzzlePureScore Payload
   var warnedAt = {};            // Zeitwarnungen nur einmal
   var ppResult = null;          // Ergebnis der letzten PuzzlePureScore Aufzeichnung
   var lastPpPayload = null;     // an recordResult() uebergebenes Payload, fuer PuzzlePureRewards
@@ -350,9 +351,9 @@
   function submit() {
     if (phase !== 'play') return;
     var word = selection.map(function (i) { return rack[i]; }).join('');
-    if (word.length < MIN_WORD) { announce(t('too_short'), 'bad'); clearSel(); return; }
+    if (word.length < MIN_WORD) { invalidAttempts += 1; announce(t('too_short'), 'bad'); clearSel(); return; }
     // Sperrliste UND Wortliste: Sperrwort wird wie ein ungueltiges behandelt.
-    if ((block && block.has(word)) || !wordSet || !wordSet.has(word)) { announce(t('invalid'), 'bad'); clearSel(); return; }
+    if ((block && block.has(word)) || !wordSet || !wordSet.has(word)) { invalidAttempts += 1; announce(t('invalid'), 'bad'); clearSel(); return; }
     // gueltig
     var pts = scoreFor(word.length);
     score += pts;
@@ -405,7 +406,7 @@
   function setPauseLabel() { if (pauseBtn) pauseBtn.textContent = (phase === 'pause') ? t('btn_resume') : t('btn_pause'); }
 
   function startRun() {
-    score = 0; remaining = START_TIME; selection = []; warnedAt = {};
+    score = 0; remaining = START_TIME; selection = []; warnedAt = {}; invalidAttempts = 0;
     rack = generateRack(); freshFlags = rangeAll();
     phase = 'play';
     hideOverlay();
@@ -429,9 +430,10 @@
     updateHud();
     // Rundenende ist rein zeitbasiert (kein Sieg/Niederlage Konzept), daher
     // immer 'complete'. Kein Zeitbonus: die Runde laeuft ohnehin immer voll
-    // durch, timeSeconds/parSeconds bleiben bewusst null.
+    // durch, timeSeconds/parSeconds bleiben bewusst null. mistakes zaehlt
+    // echte zu kurze oder ungueltige Worteinreichungen dieser Runde.
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'glyph', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'glyph', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: invalidAttempts, hints: 0, perfect: invalidAttempts === 0 };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }

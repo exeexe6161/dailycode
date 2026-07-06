@@ -476,6 +476,16 @@
     if (r <= 20) return 5;
     return 6;
   }
+  // Kein Schwierigkeit Waehler vorhanden. Fuer PuzzlePureScore wird die
+  // erreichte Rundenzahl in dieselben Stufen gebuendelt wie optionCount()
+  // oben bereits die Optionenanzahl staffelt (mehr Optionen, kuerzere Zeit,
+  // also echte hoehere Schwierigkeit), keine neue Spielmechanik.
+  function ppDifficultyFromRound(r) {
+    if (r <= 5) return 1;
+    if (r <= 12) return 2;
+    if (r <= 20) return 3;
+    return 4;
+  }
 
   /* ---------- Helfer ---------- */
   function nowMs() { return (window.performance && window.performance.now) ? window.performance.now() : Date.now(); }
@@ -742,8 +752,12 @@
     updateBest();
     var scoreText = fmt('over_score', { s: score, r: round }) +
       (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : '');
+    // Endlosmodus ohne Sieg/Niederlage Konzept (Runde laeuft bis 3 Leben
+    // verbraucht sind), daher 'complete'. difficulty kommt aus der
+    // erreichten Rundenzahl (siehe ppDifficultyFromRound). Verlorene Leben
+    // sind am Ende immer 3, daher kein sinnvolles mistakes Signal.
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'react7', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'react7', difficulty: ppDifficultyFromRound(round), outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }

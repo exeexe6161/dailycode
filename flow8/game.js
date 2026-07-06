@@ -43,6 +43,15 @@
     if (level <= 6) return { N: 7, K: 5 };
     return { N: 8, K: 6 };
   }
+  // Kein Schwierigkeit Waehler vorhanden. Fuer PuzzlePureScore wird dieselbe
+  // Stufeneinteilung wie levelConfig() oben als difficulty 1 bis 4 verwendet,
+  // keine neue Spielmechanik, nur dieselben Schwellen fuer den Score Payload.
+  function ppDifficultyFromLevel(lvl) {
+    if (lvl <= 2) return 1;
+    if (lvl <= 4) return 2;
+    if (lvl <= 6) return 3;
+    return 4;
+  }
   var MIN_SEG = 3; // Mindestlaenge je Segment, damit Endpunkte distinkt sind
 
   /* ---------- Sprache: DE/EN/TR, Werte mit {platzhalter} ---------- */
@@ -736,8 +745,11 @@
     var prev = loadBestVal();
     if (prev == null || level > prev) saveBest(level);
     updateBest();
+    // Levelabschluss ist ein echter Sieg, daher 'win'. difficulty kommt aus
+    // der erreichten Levelstufe (siehe ppDifficultyFromLevel, dieselben
+    // Schwellen wie levelConfig()).
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'flow8', difficulty: null, outcome: 'win', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'flow8', difficulty: ppDifficultyFromLevel(level), outcome: 'win', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
