@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-pixela-v7';
+var CACHE = 'dailycode-pixela-v8';
 var LEGACY = ['dailycode-picto-v1'];
 var PREFIX = 'dailycode-pixela-';
 
@@ -22,7 +22,9 @@ var ASSETS = [
   './theme-init.js',
   './manifest.json',
   './icon.svg',
-  '../shared/score.js'
+  '../shared/score.js',
+  '../shared/rewards.css',
+  '../shared/rewards.js'
 ];
 
 self.addEventListener('install', function (event) {

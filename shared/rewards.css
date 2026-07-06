@@ -1,0 +1,104 @@
+/* ============================================================
+   dailycode  PuzzlePure Rewards  Zentrale Effekt Styles
+   Wird unveraendert von allen 10 Spielen und der Rangliste per
+   <link rel="stylesheet" href="../shared/rewards.css"> geladen.
+   Nur transform und opacity animiert, keine Layout Eigenschaften,
+   kein dauerhafter Loop. prefers-reduced-motion schaltet am Ende
+   der Datei alles auf sofort um. Keine Inline Styles noetig, die
+   Klassen hier werden nur per JS Klassen Toggle gesetzt.
+   ============================================================ */
+
+/* ---------- Stufe 1: sanftes Einblenden, bei jeder Runde ---------- */
+@keyframes ppReveal {
+  from { opacity: 0; transform: scale(.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.pp-reveal { animation: ppReveal 220ms ease-out both; }
+
+/* ---------- Stufe 2/3: dezenter Glow auf der Ergebnis oder Liga Karte ---------- */
+@keyframes ppGlow {
+  0%   { opacity: 0; }
+  35%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.pp-glow { position: relative; }
+.pp-glow::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: radial-gradient(60% 60% at 50% 50%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 72%);
+  opacity: 0;
+  pointer-events: none;
+  animation: ppGlow 900ms ease-out;
+}
+
+/* ---------- Toast Karte ---------- */
+.pp-toast-region {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  pointer-events: none;
+  z-index: 60;
+}
+.pp-toast {
+  max-width: 360px;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: .88rem;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 10px 26px rgba(20, 30, 60, .14);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: none;
+}
+.pp-toast.pp-toast-in { opacity: 1; transform: translateY(0); }
+.pp-toast.pp-toast-out { opacity: 0; transform: translateY(-6px); }
+
+/* ---------- Sterne erscheinen nacheinander (nur Spiele mit Sternen) ---------- */
+@keyframes ppStarIn {
+  from { opacity: 0; transform: scale(.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.pp-star-stagger > * { animation: ppStarIn 260ms ease-out both; }
+.pp-star-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.pp-star-stagger > *:nth-child(2) { animation-delay: 90ms; }
+.pp-star-stagger > *:nth-child(3) { animation-delay: 180ms; }
+
+/* ---------- Pokal Badge wird aktiv (Rangliste) ---------- */
+@keyframes ppTrophyPulse {
+  0%   { opacity: 0; transform: scale(.9); }
+  60%  { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.pp-trophy-pulse { animation: ppTrophyPulse 320ms ease-out both; }
+
+/* ---------- Fortschrittsbalken Impuls (Rangliste, Liga) ---------- */
+@keyframes ppBarPulse {
+  0%   { opacity: .55; transform: scaleX(.985); }
+  50%  { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 1; transform: scaleX(1); }
+}
+.pp-bar-pulse { animation: ppBarPulse 420ms ease-out both; transform-origin: left center; }
+
+/* ---------- prefers reduced motion: alles sofort, kein Zaehlen, kein Glow, kein Stagger ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pp-reveal, .pp-glow::after, .pp-star-stagger > *, .pp-trophy-pulse, .pp-bar-pulse {
+    animation: none !important;
+  }
+  .pp-toast, .pp-toast.pp-toast-in, .pp-toast.pp-toast-out {
+    transition: none !important;
+  }
+}

@@ -347,6 +347,8 @@
   var difficulty = 'mittel';
   var won = false;
   var ppResult = null;           // Ergebnis der letzten PuzzlePureScore Aufzeichnung
+  var lastPpPayload = null;      // an recordResult() uebergebenes Payload, fuer PuzzlePureRewards
+  var rewardsTriggered = false;  // verhindert doppelten Rewards Trigger je Runde (auch beim Sprachwechsel Refresh)
   var diffBtns = {};
   var lastWinSec = null, lastWinBestSec = null;
   var numBtns = [];
@@ -657,7 +659,7 @@
     if (window.PuzzlePureScore) {
       var ppDiffMap = { leicht: 1, mittel: 2, schwer: 3 };
       var ppParByDiff = { leicht: 300, mittel: 480, schwer: 720 };
-      ppResult = window.PuzzlePureScore.recordResult({
+      lastPpPayload = {
         game: 'grid9',
         difficulty: ppDiffMap[difficulty] || 2,
         outcome: 'win',
@@ -666,13 +668,26 @@
         mistakes: 0,
         hints: 0,
         perfect: false
-      });
+      };
+      ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+      rewardsTriggered = false;
     }
     showOverlay(t('win_title'),
       fmt('win_time', { t: fmtTime(sec) }) + '  ·  ' + fmt('win_best', { t: fmtTime(bestSec) }),
       t('win_restart'));
     ppScoreEl.replaceChildren();
-    if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+    var ppBlock = null;
+    if (ppResult && window.PuzzlePureScore) { ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult); ppScoreEl.append(ppBlock); }
+    if (window.PuzzlePureRewards && !rewardsTriggered) {
+      rewardsTriggered = true;
+      window.PuzzlePureRewards.trigger({
+        ppResult: ppResult,
+        payload: lastPpPayload || {},
+        lang: lang,
+        cardEl: overlayEl,
+        scoreLineEl: ppBlock ? ppBlock.querySelector('.pp-score-line') : null
+      });
+    }
     announce(t('win_title') + ', ' + fmt('win_time', { t: fmtTime(sec) }));
   }
   function showOverlay(title, scoreText, btnText) {

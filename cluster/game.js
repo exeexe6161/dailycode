@@ -341,6 +341,8 @@
   var paused = false;
   var over = false;
   var ppResult = null;
+  var lastPpPayload = null;
+  var rewardsTriggered = false;
 
   var recent = [];              // zuletzt erzeugte Typen, begrenzt Wiederholungen
   var flashes = [];             // { r, c, type, t0 } dezente Aufloese-Blende, nur Zier
@@ -736,11 +738,26 @@
       t('over_restart'));
     if (scoreEl) scoreEl.textContent = t('over_title') + ', ' + t('score') + ' ' + score;
     if (window.PuzzlePureScore) {
-      ppResult = window.PuzzlePureScore.recordResult({ game: 'cluster', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+      lastPpPayload = { game: 'cluster', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+      rewardsTriggered = false;
     }
     if (ppScoreMountEl) {
       ppScoreMountEl.replaceChildren();
-      if (ppResult && window.PuzzlePureScore) ppScoreMountEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+      if (ppResult && window.PuzzlePureScore) {
+        var ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult);
+        ppScoreMountEl.append(ppBlock);
+        if (window.PuzzlePureRewards && !rewardsTriggered) {
+          rewardsTriggered = true;
+          window.PuzzlePureRewards.trigger({
+            ppResult: ppResult,
+            payload: lastPpPayload || {},
+            lang: lang,
+            cardEl: overlayEl,
+            scoreLineEl: ppBlock.querySelector('.pp-score-line')
+          });
+        }
+      }
     }
   }
 

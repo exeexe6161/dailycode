@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-nexa-v7';
+var CACHE = 'dailycode-nexa-v8';
 var LEGACY = ['dailycode-cluster-v4'];
 var PREFIX = 'dailycode-nexa-';
 
@@ -23,7 +23,9 @@ var ASSETS = [
   './theme-init.js',
   './manifest.json',
   './icon.svg',
-  '../shared/score.js'
+  '../shared/score.js',
+  '../shared/rewards.css',
+  '../shared/rewards.js'
 ];
 
 self.addEventListener('install', function (event) {

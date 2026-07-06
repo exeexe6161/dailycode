@@ -222,10 +222,25 @@
   var ppScoreEl = document.createElement('div');
   if (overlayEl && overlayBtn) overlayEl.insertBefore(ppScoreEl, overlayBtn);
   var ppResult = null;
+  var lastPpPayload = null;
+  var rewardsTriggered = false;
   function renderPuzzlePureScore() {
     if (!ppScoreEl) return;
     ppScoreEl.replaceChildren();
-    if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+    if (ppResult && window.PuzzlePureScore) {
+      var ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult);
+      ppScoreEl.append(ppBlock);
+      if (window.PuzzlePureRewards && !rewardsTriggered) {
+        rewardsTriggered = true;
+        window.PuzzlePureRewards.trigger({
+          ppResult: ppResult,
+          payload: lastPpPayload || {},
+          lang: lang,
+          cardEl: overlayEl,
+          scoreLineEl: ppBlock.querySelector('.pp-score-line')
+        });
+      }
+    }
   }
 
   /* ---------- Theme Zustand (geteilte Keys) ---------- */
@@ -716,7 +731,9 @@
     if (prev == null || level > prev) saveBest(level);
     updateBest();
     if (window.PuzzlePureScore) {
-      ppResult = window.PuzzlePureScore.recordResult({ game: 'flow8', difficulty: null, outcome: 'win', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+      lastPpPayload = { game: 'flow8', difficulty: null, outcome: 'win', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+      rewardsTriggered = false;
     }
     showOverlay(t('solved_title'), t('solved_score', { n: level }), t('btn_continue'));
     renderPuzzlePureScore();

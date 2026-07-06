@@ -224,6 +224,8 @@
   var score = 0, best = null, remaining = START_TIME;
   var warnedAt = {};            // Zeitwarnungen nur einmal
   var ppResult = null;          // Ergebnis der letzten PuzzlePureScore Aufzeichnung
+  var lastPpPayload = null;     // an recordResult() uebergebenes Payload, fuer PuzzlePureRewards
+  var rewardsTriggered = false; // verhindert doppelten Rewards Trigger je Runde
 
   /* ---------- Generator mit Spielbarkeitsgarantie ---------- */
   function draw(lang) { var bag = bagFor(lang); return bag[Math.floor(Math.random() * bag.length)]; }
@@ -429,11 +431,24 @@
     // immer 'complete'. Kein Zeitbonus: die Runde laeuft ohnehin immer voll
     // durch, timeSeconds/parSeconds bleiben bewusst null.
     if (window.PuzzlePureScore) {
-      ppResult = window.PuzzlePureScore.recordResult({ game: 'glyph', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+      lastPpPayload = { game: 'glyph', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+      rewardsTriggered = false;
     }
     showOverlay(t('over_title'), t('lbl_score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''), t('over_restart'));
     ppScoreEl.replaceChildren();
-    if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(uiLang, ppResult));
+    var ppBlock = null;
+    if (ppResult && window.PuzzlePureScore) { ppBlock = window.PuzzlePureScore.buildResultBlock(uiLang, ppResult); ppScoreEl.append(ppBlock); }
+    if (window.PuzzlePureRewards && !rewardsTriggered) {
+      rewardsTriggered = true;
+      window.PuzzlePureRewards.trigger({
+        ppResult: ppResult,
+        payload: lastPpPayload || {},
+        lang: uiLang,
+        cardEl: overlayEl,
+        scoreLineEl: ppBlock ? ppBlock.querySelector('.pp-score-line') : null
+      });
+    }
     announce(t('over_title') + ', ' + t('lbl_score') + ' ' + score);
   }
 

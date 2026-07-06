@@ -644,6 +644,8 @@
     var answeredThisQuestion = false;
     var stars = 0;
     var ppResult = null;
+    var lastPpPayload = null;
+    var rewardsTriggered = false;
 
     container.replaceChildren();
     container.classList.add('questra-root');
@@ -861,7 +863,7 @@
         stars = ratingStars(finalScore, Math.floor(currentElapsed()));
         if (mode === 'daily') recordDailyResult(statsData, dateStr, finalScore);
         if (window.PuzzlePureScore) {
-          ppResult = window.PuzzlePureScore.recordResult({
+          lastPpPayload = {
             game: 'questra',
             difficulty: null,
             outcome: 'complete',
@@ -870,7 +872,9 @@
             mistakes: 7 - finalScore,
             hints: 0,
             perfect: finalScore === 7
-          });
+          };
+          ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+          rewardsTriggered = false;
         }
         persistState();
         render();
@@ -955,7 +959,21 @@
         resultTextEl.textContent = t('result_text')(score, fmtTime(baseElapsed));
         renderStars();
         ppScoreEl.replaceChildren();
-        if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+        if (ppResult && window.PuzzlePureScore) {
+          var ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult);
+          ppScoreEl.append(ppBlock);
+          if (window.PuzzlePureRewards && !rewardsTriggered) {
+            rewardsTriggered = true;
+            window.PuzzlePureRewards.trigger({
+              ppResult: ppResult,
+              payload: lastPpPayload || {},
+              lang: lang,
+              cardEl: resultPanel,
+              starsEl: starsEl,
+              scoreLineEl: ppBlock.querySelector('.pp-score-line')
+            });
+          }
+        }
       }
 
       renderStatsPanel();

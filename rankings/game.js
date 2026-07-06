@@ -29,6 +29,7 @@
       rk_total_points: 'Gesamtpunkte',
       rk_league_to_next: function (n, name) { return 'Noch ' + n + ' Punkte bis ' + name; },
       rk_league_max: 'Hoechste Liga erreicht',
+      rk_league_progress_aria: function (name) { return 'Fortschritt in der Liga ' + name; },
       rk_rounds_played: 'Gespielt',
       rk_rounds_solved: 'Geloest',
       rk_perfect_rounds: 'Perfekt',
@@ -52,6 +53,7 @@
       rk_total_points: 'Total Points',
       rk_league_to_next: function (n, name) { return n + ' points to ' + name; },
       rk_league_max: 'Highest league reached',
+      rk_league_progress_aria: function (name) { return 'Progress in league ' + name; },
       rk_rounds_played: 'Played',
       rk_rounds_solved: 'Solved',
       rk_perfect_rounds: 'Perfect',
@@ -75,6 +77,7 @@
       rk_total_points: 'Toplam Puan',
       rk_league_to_next: function (n, name) { return name + ' e ' + n + ' puan kaldi'; },
       rk_league_max: 'En yuksek liga ulasildi',
+      rk_league_progress_aria: function (name) { return name + ' liginde ilerleme'; },
       rk_rounds_played: 'Oynanan',
       rk_rounds_solved: 'Cozulen',
       rk_perfect_rounds: 'Mukemmel',
@@ -263,7 +266,9 @@
     html += '<div class="rk-league-row">';
     html += '<span class="rk-league-badge">' + PP.t(lang, 'league_' + profile.league) + '</span>';
     html += '<span class="rk-league-next">' + (leagueInfo.next ? t('rk_league_to_next')(leagueInfo.toNext, PP.t(lang, 'league_' + leagueInfo.next)) : t('rk_league_max')) + '</span>';
-    html += '</div></section>';
+    html += '</div>';
+    html += '<div class="rk-league-bar" id="rkLeagueBar" role="img" aria-label="' + t('rk_league_progress_aria')(PP.t(lang, 'league_' + profile.league)) + '"><div class="rk-league-bar-fill" id="rkLeagueBarFill"></div></div>';
+    html += '</section>';
 
     html += '<section class="rk-section"><div class="stat-grid">';
     html += statCellHtml(profile.roundsPlayed, t('rk_rounds_played'));
@@ -305,6 +310,27 @@
     html += '</div></section>';
 
     stageEl.innerHTML = html;
+
+    var barFillEl = document.getElementById('rkLeagueBarFill');
+    if (barFillEl) {
+      var currentLeagueDef = null, nextLeagueDef = null;
+      for (var i = 0; i < PP.LEAGUES.length; i++) {
+        if (PP.LEAGUES[i].key === profile.league) {
+          currentLeagueDef = PP.LEAGUES[i];
+          nextLeagueDef = PP.LEAGUES[i + 1] || null;
+        }
+      }
+      var fraction = 1;
+      if (currentLeagueDef && nextLeagueDef) {
+        var span = nextLeagueDef.from - currentLeagueDef.from;
+        fraction = span > 0 ? (profile.totalScore - currentLeagueDef.from) / span : 1;
+        if (fraction < 0) fraction = 0;
+        if (fraction > 1) fraction = 1;
+      }
+      barFillEl.style.setProperty('--rk-fill', String(fraction));
+    }
+    var barEl = document.getElementById('rkLeagueBar');
+    if (barEl && window.PuzzlePureRewards) window.PuzzlePureRewards.glow(barEl);
   }
 
   /* ---------- Statische Texte ---------- */

@@ -255,6 +255,22 @@ button { touch-action: manipulation; }
   font-size: .9rem;
 }
 .rk-league-next { color: var(--text-muted); font-size: .82rem; }
+.rk-league-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+  margin-top: 12px;
+}
+.rk-league-bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(var(--rk-fill, 0));
+}
 
 .stat-grid {
   display: grid;

@@ -260,13 +260,15 @@
   function recordResult(payload) {
     var game = payload && payload.game;
     if (GAMES.indexOf(game) === -1) {
-      return { score: 0, isNewBest: false, isNewDifficultyBest: false, isNewDailyBest: false, newTrophies: [], league: 'bronze', totalScore: 0 };
+      return { score: 0, isNewBest: false, isNewDifficultyBest: false, isNewDailyBest: false, newTrophies: [], league: 'bronze', previousLeague: 'bronze', streakContinued: false, totalScore: 0 };
     }
     var outcome = payload.outcome === 'loss' ? 'loss' : (payload.outcome === 'complete' ? 'complete' : 'win');
     var today = dateKeyUTC();
     var scoreStore = loadScoreStore();
     var profile = loadProfile();
     var gs = scoreStore.games[game];
+    var previousLeague = profile.league;
+    var previousStreak = profile.currentStreak;
 
     var score = outcome === 'loss' ? 0 : computeScore(payload);
     var difficultyKey = [1, 2, 3, 4].indexOf(payload.difficulty) !== -1 ? String(payload.difficulty) : null;
@@ -295,10 +297,12 @@
     profile.totalScore += score;
     if (profile.gamesPlayed.indexOf(game) === -1) profile.gamesPlayed.push(game);
 
+    var streakContinued = false;
     if (profile.lastPlayedDate !== today) {
       profile.currentStreak = (profile.lastPlayedDate === prevDayKey(today)) ? profile.currentStreak + 1 : 1;
       profile.lastPlayedDate = today;
       if (profile.currentStreak > profile.bestStreak) profile.bestStreak = profile.currentStreak;
+      streakContinued = profile.currentStreak > 1 && profile.currentStreak === previousStreak + 1;
     }
     profile.league = leagueForScore(profile.totalScore).key;
 
@@ -326,6 +330,8 @@
       isNewDailyBest: isNewDailyBest,
       newTrophies: newTrophies,
       league: profile.league,
+      previousLeague: previousLeague,
+      streakContinued: streakContinued,
       totalScore: profile.totalScore,
       highscore: gs.highscore,
       dailyBestScore: gs.dailyBestScore

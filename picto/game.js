@@ -705,6 +705,8 @@
     var startedAt = null;
     var stars = 0;
     var ppResult = null;
+    var lastPpPayload = null;
+    var rewardsTriggered = false;
 
     var pointerMode = null;
     var curR = 0; // Roving Tabindex: aktuell per Tastatur/Zeiger fokussierte Zelle
@@ -977,7 +979,7 @@
         if (mode === 'daily') recordDailyWin(statsData, difficulty, dateStr);
         if (window.PuzzlePureScore) {
           var parSeconds = Math.round(puzzle.width * puzzle.height * 1.1);
-          ppResult = window.PuzzlePureScore.recordResult({
+          lastPpPayload = {
             game: 'picto',
             difficulty: difficulty,
             outcome: 'win',
@@ -986,7 +988,9 @@
             mistakes: mistakes,
             hints: hintsUsed,
             perfect: hintsUsed === 0 && mistakes === 0
-          });
+          };
+          ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+          rewardsTriggered = false;
         }
       }
       persistCurrentProgress();
@@ -1185,7 +1189,21 @@
         winTextEl.textContent = t('win');
         renderStars();
         ppScoreEl.replaceChildren();
-        if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+        if (ppResult && window.PuzzlePureScore) {
+          var ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult);
+          ppScoreEl.append(ppBlock);
+          if (window.PuzzlePureRewards && !rewardsTriggered) {
+            rewardsTriggered = true;
+            window.PuzzlePureRewards.trigger({
+              ppResult: ppResult,
+              payload: lastPpPayload || {},
+              lang: lang,
+              cardEl: winBanner,
+              starsEl: starsEl,
+              scoreLineEl: ppBlock.querySelector('.pp-score-line')
+            });
+          }
+        }
       }
 
       renderStatsPanel();

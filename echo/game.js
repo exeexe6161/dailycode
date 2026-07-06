@@ -364,6 +364,8 @@
   var score = 0;
   var mistakes = MISTAKES_START;
   var ppResult = null;
+  var lastPpPayload = null;
+  var rewardsTriggered = false;
   var pairsThisLevel = START_PAIRS;
   var foundPairs = 0;
   var firstPick = -1;
@@ -587,11 +589,26 @@
     renderOverlayTexts();
     announceKind('over');
     if (window.PuzzlePureScore) {
-      ppResult = window.PuzzlePureScore.recordResult({ game: 'echo', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+      lastPpPayload = { game: 'echo', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+      rewardsTriggered = false;
     }
     if (ppScoreMountEl) {
       ppScoreMountEl.replaceChildren();
-      if (ppResult && window.PuzzlePureScore) ppScoreMountEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+      if (ppResult && window.PuzzlePureScore) {
+        var ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult);
+        ppScoreMountEl.append(ppBlock);
+        if (window.PuzzlePureRewards && !rewardsTriggered) {
+          rewardsTriggered = true;
+          window.PuzzlePureRewards.trigger({
+            ppResult: ppResult,
+            payload: lastPpPayload || {},
+            lang: lang,
+            cardEl: overlayEl,
+            scoreLineEl: ppBlock.querySelector('.pp-score-line')
+          });
+        }
+      }
     }
   }
 

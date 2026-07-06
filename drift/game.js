@@ -340,6 +340,8 @@
   var over = false;
   var won = false;
   var ppResult = null; // Ergebnis des gemeinsamen PuzzlePureScore Systems, gesetzt in gameOver()
+  var lastPpPayload = null; // Payload des letzten recordResult() Aufrufs, fuer PuzzlePureRewards.trigger()
+  var rewardsTriggered = false; // verhindert doppelte Toasts bei erneutem Rendern derselben Runde
 
   var rafId = 0;
   var lastTs = 0;
@@ -618,7 +620,18 @@
     if (!ppScoreEl) return;
     ppScoreEl.replaceChildren();
     if (over && ppResult && window.PuzzlePureScore) {
-      ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+      var ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult);
+      ppScoreEl.append(ppBlock);
+      if (window.PuzzlePureRewards && !rewardsTriggered) {
+        rewardsTriggered = true;
+        window.PuzzlePureRewards.trigger({
+          ppResult: ppResult,
+          payload: lastPpPayload || {},
+          lang: lang,
+          cardEl: overlayEl,
+          scoreLineEl: ppBlock.querySelector('.pp-score-line')
+        });
+      }
     }
   }
 
@@ -658,7 +671,7 @@
     // Standard Mittel, da Serpix keine Schwierigkeit waehlbar hat), der
     // Serpix eigene Punktestand (score) fliesst NICHT direkt ein.
     if (window.PuzzlePureScore) {
-      ppResult = window.PuzzlePureScore.recordResult({
+      lastPpPayload = {
         game: 'drift',
         difficulty: null,
         outcome: 'complete',
@@ -667,7 +680,9 @@
         mistakes: 0,
         hints: 0,
         perfect: false
-      });
+      };
+      ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+      rewardsTriggered = false;
     }
     renderPpScoreOverlay();
     showOverlay(won ? t('won_title') : t('over_title'),

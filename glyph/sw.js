@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-lexiq-v7';
+var CACHE = 'dailycode-lexiq-v8';
 var LEGACY = ['dailycode-glyph-v4'];
 var PREFIX = 'dailycode-lexiq-';
 
@@ -23,7 +23,9 @@ var ASSETS = [
   './theme-init.js',
   './manifest.json',
   './icon.svg',
-  '../shared/score.js'
+  '../shared/score.js',
+  '../shared/rewards.css',
+  '../shared/rewards.js'
 ];
 
 self.addEventListener('install', function (event) {

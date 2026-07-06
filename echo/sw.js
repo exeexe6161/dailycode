@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-memora-v7';
+var CACHE = 'dailycode-memora-v8';
 var LEGACY = ['dailycode-echo-v4'];
 var PREFIX = 'dailycode-memora-';
 
@@ -23,7 +23,9 @@ var ASSETS = [
   './theme-init.js',
   './manifest.json',
   './icon.svg',
-  '../shared/score.js'
+  '../shared/score.js',
+  '../shared/rewards.css',
+  '../shared/rewards.js'
 ];
 
 self.addEventListener('install', function (event) {

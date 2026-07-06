@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-rankings-v1';
+var CACHE = 'dailycode-rankings-v2';
 var LEGACY = [];
 var PREFIX = 'dailycode-rankings-';
 
@@ -22,7 +22,9 @@ var ASSETS = [
   './theme-init.js',
   './manifest.json',
   './icon.svg',
-  '../shared/score.js'
+  '../shared/score.js',
+  '../shared/rewards.css',
+  '../shared/rewards.js'
 ];
 
 self.addEventListener('install', function (event) {

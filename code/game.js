@@ -629,6 +629,8 @@
   var shareBtnEl = null;
   var lastCopyFeedback = null;
   var ppResult = null; // Ergebnis des gemeinsamen PuzzlePureScore Systems, gesetzt in submitGuess()
+  var lastPpPayload = null; // Payload des letzten recordResult() Aufrufs, fuer PuzzlePureRewards.trigger()
+  var rewardsTriggered = false; // verhindert doppelte Toasts bei erneutem Rendern derselben Runde
 
   function symbolSVG(index) {
     return '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">' +
@@ -869,7 +871,7 @@
       }
       recordResult(true, currentRow + 1);
       if (window.PuzzlePureScore) {
-        ppResult = window.PuzzlePureScore.recordResult({
+        lastPpPayload = {
           game: 'code',
           difficulty: null,
           outcome: 'win',
@@ -878,7 +880,9 @@
           mistakes: playedGuesses.length - 1,
           hints: 0,
           perfect: playedGuesses.length === 1
-        });
+        };
+        ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+        rewardsTriggered = false;
       }
       setStatus('status_win', { n: currentRow + 1, max: MAX_TRIES }, 'win');
       endGame();
@@ -891,7 +895,7 @@
       phase = 'lost';
       recordResult(false, 0);
       if (window.PuzzlePureScore) {
-        ppResult = window.PuzzlePureScore.recordResult({
+        lastPpPayload = {
           game: 'code',
           difficulty: null,
           outcome: 'loss',
@@ -900,7 +904,9 @@
           mistakes: playedGuesses.length,
           hints: 0,
           perfect: false
-        });
+        };
+        ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+        rewardsTriggered = false;
       }
       setStatus('status_lose', { code: codeNames() }, 'lose');
       revealCode();
@@ -1000,7 +1006,18 @@
     if (!ppScoreEl) return;
     ppScoreEl.replaceChildren();
     if (ppResult && window.PuzzlePureScore) {
-      ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+      var ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult);
+      ppScoreEl.append(ppBlock);
+      if (window.PuzzlePureRewards && !rewardsTriggered) {
+        rewardsTriggered = true;
+        window.PuzzlePureRewards.trigger({
+          ppResult: ppResult,
+          payload: lastPpPayload || {},
+          lang: lang,
+          cardEl: resultEl,
+          scoreLineEl: ppBlock.querySelector('.pp-score-line')
+        });
+      }
     }
   }
 

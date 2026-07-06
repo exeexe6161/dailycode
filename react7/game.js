@@ -295,10 +295,25 @@
   var ppScoreEl = document.createElement('div');
   if (overlayEl && overlayBtn) overlayEl.insertBefore(ppScoreEl, overlayBtn);
   var ppResult = null;
+  var lastPpPayload = null;
+  var rewardsTriggered = false;
   function renderPuzzlePureScore() {
     if (!ppScoreEl) return;
     ppScoreEl.replaceChildren();
-    if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+    if (ppResult && window.PuzzlePureScore) {
+      var ppBlock = window.PuzzlePureScore.buildResultBlock(lang, ppResult);
+      ppScoreEl.append(ppBlock);
+      if (window.PuzzlePureRewards && !rewardsTriggered) {
+        rewardsTriggered = true;
+        window.PuzzlePureRewards.trigger({
+          ppResult: ppResult,
+          payload: lastPpPayload || {},
+          lang: lang,
+          cardEl: overlayEl,
+          scoreLineEl: ppBlock.querySelector('.pp-score-line')
+        });
+      }
+    }
   }
 
   /* ---------- Theme Zustand (geteilte Keys) ---------- */
@@ -722,7 +737,9 @@
     var scoreText = fmt('over_score', { s: score, r: round }) +
       (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : '');
     if (window.PuzzlePureScore) {
-      ppResult = window.PuzzlePureScore.recordResult({ game: 'react7', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+      lastPpPayload = { game: 'react7', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
+      rewardsTriggered = false;
     }
     showOverlay(t('over_title'), scoreText, t('over_restart'));
     renderPuzzlePureScore();
