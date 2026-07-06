@@ -38,6 +38,10 @@
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ---------- */
   var I18N = {
     de: {
+      hero_subtitle: 'Tägliche Puzzles für kurze Denkpausen.',
+      hero_rankings: 'Rangliste',
+      hero_rankings_aria: 'Zur Rangliste',
+      hero_hint: 'Deine Werte werden nur auf diesem Gerät gespeichert.',
       aria_tiles: 'Spielesammlung',
       tile_game_name: 'Ciphera',
       tile_game_aria: 'Öffnen: Ciphera',
@@ -71,6 +75,10 @@
       nav_imprint: 'Impressum'
     },
     en: {
+      hero_subtitle: 'Daily puzzles for short thinking breaks.',
+      hero_rankings: 'Rankings',
+      hero_rankings_aria: 'To the rankings',
+      hero_hint: 'Your results are stored only on this device.',
       aria_tiles: 'Puzzle collection',
       tile_game_name: 'Ciphera',
       tile_game_aria: 'Open: Ciphera',
@@ -104,6 +112,10 @@
       nav_imprint: 'Imprint'
     },
     tr: {
+      hero_subtitle: 'Kısa düşünme molaları için günlük bulmacalar.',
+      hero_rankings: 'Sıralama',
+      hero_rankings_aria: 'Sıralamaya git',
+      hero_hint: 'Sonuçların yalnızca bu cihazda saklanır.',
       aria_tiles: 'Bulmaca koleksiyonu',
       tile_game_name: 'Ciphera',
       tile_game_aria: 'Aç: Ciphera',

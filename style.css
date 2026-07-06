@@ -377,6 +377,48 @@ body::before {
 }
 
 /* ============================================================
+   Hero: kurze Markenvorstellung oberhalb des Kachelrasters. Logo
+   bleibt im Kopf, hier folgt sichtbares h1 (nutzt die bereits
+   vorhandene .title Regel oben), Untertitel, Rangliste Pill Button
+   und ein kleiner, dezenter Datenschutz Hinweis darunter.
+   ============================================================ */
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 0 0 32px; }
+.hero .title { margin: 0 0 6px; }
+.hero-subtitle { margin: 0 0 18px; color: var(--text-muted); font-size: .98rem; }
+.hero-hint { margin: 10px 0 0; color: var(--text-muted); font-size: .78rem; }
+
+/* Pill Buttons, Zeichen fuer Zeichen wie auf allen zehn Spielseiten,
+   damit der Rangliste Button hier genauso hochwertig wirkt. */
+.pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: fit-content;
+  min-height: 44px;
+  padding: 6px 18px;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .95rem;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.pill-btn:hover { border-color: var(--accent); color: var(--text); }
+.pill-btn .lucide { width: 20px; height: 20px; display: block; }
+.pill-btn-accent {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--accent);
+}
+.pill-btn-accent:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  color: var(--accent);
+}
+
+/* ============================================================
    Rechtstexte (zuvor Inline <style> in den sechs Rechtsseiten).
    Hierher gezogen, damit die strikte CSP ohne 'unsafe-inline'
    fuer styles auskommt.

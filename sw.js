@@ -12,7 +12,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-portal-v18';
+var CACHE = 'dailycode-portal-v19';
 var PREFIX = 'dailycode-portal-';
 var LEGACY = ['dailycode-cache-v2'];
 
