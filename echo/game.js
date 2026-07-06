@@ -31,9 +31,22 @@
   var PREVIEW_MIN = 1800;       // Untergrenze der Vorab-Ansicht (Konstante)
   var FLIP_BACK_MS = 850;       // wie lange ein Fehlpaar sichtbar bleibt
   var LEVEL_CLEAR_MS = 700;     // kurze Pause nach geschaffter Stufe
-  var MISTAKES_START = 5;       // laufweites Fehlerbudget
-  var MISTAKES_REFILL = 3;      // Nachschlag je geschaffter Stufe
-  var MISTAKES_CAP = 9;         // Obergrenze des Budgets
+  var MISTAKES_START = 5;       // laufweites Fehlerbudget, Mittel (bisheriges Verhalten)
+  var MISTAKES_REFILL = 3;      // Nachschlag je geschaffter Stufe, fuer alle Stufen gleich
+  var MISTAKES_CAP = 9;         // Obergrenze des Budgets, fuer alle Stufen gleich
+
+  /* Schwierigkeit ueber Startpaare, Vorschauzeit und Fehlerbudget der
+     ersten Stufe. Mittel (2) entspricht exakt dem bisherigen Verhalten
+     (START_PAIRS/PREVIEW_BASE/MISTAKES_START oben). PAIRS_STEP/PREVIEW_STEP/
+     MISTAKES_REFILL/MISTAKES_CAP bleiben fuer alle Stufen gleich, nur der
+     Startwert je Lauf unterscheidet sich, die Eskalation je Stufe bleibt
+     identisch. Kein Timer, ruhiges Einpraegen bleibt Teil der Spielidee. */
+  var DIFF_BASE = {
+    1: { pairs: 4, preview: 3800, mistakes: 6 },
+    2: { pairs: START_PAIRS, preview: PREVIEW_BASE, mistakes: MISTAKES_START },
+    3: { pairs: 8, preview: 2400, mistakes: 4 },
+    4: { pairs: 10, preview: PREVIEW_MIN, mistakes: 3 }
+  };
 
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ---------- */
   var LANGS = [
@@ -67,10 +80,14 @@
       aria_restart: 'Neu starten',
       aria_hidden: 'Verdecktes Feld',
       aria_found: 'gefunden',
+      diff_group: 'Schwierigkeit',
+      diff_1: 'Leicht', diff_2: 'Mittel', diff_3: 'Schwer', diff_4: 'Experte',
+      aria_diff_1: 'Leicht wählen', aria_diff_2: 'Mittel wählen', aria_diff_3: 'Schwer wählen', aria_diff_4: 'Experte wählen',
       help_summary: 'So funktioniert es',
       help_1: 'Zu Beginn jeder Stufe siehst du kurz alle Symbole, dann werden sie verdeckt.',
       help_2: 'Tippe zwei Felder an oder bewege den Rahmen mit den Pfeiltasten und bestätige mit Enter.',
       help_3: 'Zwei gleiche bleiben offen. Geht das Fehlerbudget auf null, ist die Runde vorbei.',
+      help_4: 'Die Schwierigkeit verändert Paare, Vorschau und Fehlerbudget.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
       home: 'Startseite',
@@ -110,10 +127,14 @@
       aria_restart: 'Restart',
       aria_hidden: 'Hidden card',
       aria_found: 'found',
+      diff_group: 'Difficulty',
+      diff_1: 'Easy', diff_2: 'Medium', diff_3: 'Hard', diff_4: 'Expert',
+      aria_diff_1: 'Select easy', aria_diff_2: 'Select medium', aria_diff_3: 'Select hard', aria_diff_4: 'Select expert',
       help_summary: 'How it works',
       help_1: 'At the start of each level you briefly see all symbols, then they are hidden.',
       help_2: 'Tap two cards, or move the frame with the arrow keys and confirm with Enter.',
       help_3: 'Two matching cards stay open. When the mistake budget reaches zero, the round ends.',
+      help_4: 'The difficulty changes pairs, preview and mistake budget.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
       home: 'Home',
@@ -153,10 +174,14 @@
       aria_restart: 'Yeniden başlat',
       aria_hidden: 'Kapalı kart',
       aria_found: 'bulundu',
+      diff_group: 'Zorluk',
+      diff_1: 'Kolay', diff_2: 'Orta', diff_3: 'Zor', diff_4: 'Uzman',
+      aria_diff_1: 'Kolay seç', aria_diff_2: 'Orta seç', aria_diff_3: 'Zor seç', aria_diff_4: 'Uzman seç',
       help_summary: 'Nasıl çalışır',
       help_1: 'Her seviyenin başında tüm simgeleri kısaca görürsün, sonra kapanırlar.',
       help_2: 'İki karta dokun veya çerçeveyi ok tuşlarıyla hareket ettirip Enter ile onayla.',
       help_3: 'Eşleşen iki kart açık kalır. Hata bütçesi sıfırlanınca tur biter.',
+      help_4: 'Zorluk çiftleri, ön izlemeyi ve hata bütçesini değiştirir.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
@@ -220,6 +245,7 @@
   var themeColorEl  = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
   var subtitleEl    = document.getElementById('subtitle');
+  var diffRowEl     = document.getElementById('diffRow');
   var statusEl      = document.getElementById('status');
   var boardEl       = document.getElementById('board');
   var overlayEl     = document.getElementById('overlay');
@@ -238,10 +264,13 @@
   /* ---------- Theme Zustand (geteilte Keys) ---------- */
   var THEME_KEY = 'dailycode:theme';
   var LANG_KEY = 'dailycode:lang';
+  var DIFFICULTY_KEY = 'dailycode:echo:difficulty';
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
   var theme = loadTheme();
   var lang = loadLang();
+  var difficulty = loadDifficulty();
+  var diffButtons = [];
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
   var themeToggleBtn = null;
@@ -330,6 +359,51 @@
     langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
   }
 
+  /* ---------- Schwierigkeit: Wahl laden, speichern, anzeigen ----------
+     Steuert Startpaare, Vorschauzeit und Fehlerbudget der ersten Stufe
+     (DIFF_BASE oben), kein Timer. Mittel (2) entspricht dem bisherigen,
+     immer gleichen Verhalten. Ein Wechsel startet immer einen frischen
+     Lauf (wie der Neu Knopf), damit nie zwei Stufen innerhalb eines
+     Laufs vermischt gewertet werden. */
+  function loadDifficulty() {
+    if (hasStorage) {
+      try { var v = parseInt(window.localStorage.getItem(DIFFICULTY_KEY), 10); if ([1, 2, 3, 4].indexOf(v) !== -1) return v; } catch (e) {}
+    }
+    return 2;
+  }
+  function saveDifficulty(v) { if (!hasStorage) return; try { window.localStorage.setItem(DIFFICULTY_KEY, String(v)); } catch (e) {} }
+  function buildDiffRow() {
+    if (!diffRowEl) return;
+    diffRowEl.setAttribute('aria-label', t('diff_group'));
+    diffRowEl.innerHTML = '';
+    diffButtons = [1, 2, 3, 4].map(function (n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'diff-btn';
+      b.textContent = t('diff_' + n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_diff_' + n));
+      b.addEventListener('click', function () { selectDifficulty(n); });
+      diffRowEl.appendChild(b);
+      return b;
+    });
+  }
+  function refreshDiffButtons() {
+    diffButtons.forEach(function (b, i) {
+      var n = i + 1;
+      b.textContent = t('diff_' + n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_diff_' + n));
+    });
+  }
+  function selectDifficulty(n) {
+    if (n === difficulty) return;
+    difficulty = n;
+    saveDifficulty(n);
+    refreshDiffButtons();
+    restartGame();
+  }
+
   /* ---------- Pausierbarer Timer ----------
      Einer reicht, da die Phasen sich gegenseitig ausschliessen. Wird
      der Tab versteckt, friert die verbleibende Zeit ein (tPause), beim
@@ -368,7 +442,7 @@
   var cols = 3;
   var level = 1;
   var score = 0;
-  var mistakes = MISTAKES_START;
+  var mistakes = (DIFF_BASE[difficulty] || DIFF_BASE[2]).mistakes;
   var wrongFlips = 0; // Zaehlt tatsaechlich gemachte Fehlversuche, fuer PuzzlePureScore Payload
   var ppResult = null;
   var lastPpPayload = null;
@@ -378,20 +452,44 @@
   var firstPick = -1;
   var focusIndex = 0;
 
-  function pairsForLevel(lvl) { return Math.min(MAX_PAIRS, START_PAIRS + (lvl - 1) * PAIRS_STEP); }
+  function pairsForLevel(lvl) {
+    var base = (DIFF_BASE[difficulty] || DIFF_BASE[2]).pairs;
+    return Math.min(MAX_PAIRS, base + (lvl - 1) * PAIRS_STEP);
+  }
   function colsForPairs(p) { return (p <= 6) ? 3 : 4; }
-  function previewMs(lvl) { return Math.max(PREVIEW_MIN, PREVIEW_BASE - (lvl - 1) * PREVIEW_STEP); }
+  function previewMs(lvl) {
+    var base = (DIFF_BASE[difficulty] || DIFF_BASE[2]).preview;
+    return Math.max(PREVIEW_MIN, base - (lvl - 1) * PREVIEW_STEP);
+  }
 
   /* ---------- Bestwert (einheitliches null-Muster, Vorbild grid9) ----------
      Score, hoeher ist besser. Kein gespeicherter Wert ergibt null, daher
-     "noch keine" statt 0. hasStorage-Preflight, try/catch, Bereichspruefung. */
-  function bestKey() { return 'dailycode:echo:best'; }
+     "noch keine" statt 0. hasStorage-Preflight, try/catch, Bereichspruefung.
+     Vor Batch 3 gab es nur einen Bestwert insgesamt (oldBestKey). Damit
+     dieser nicht verloren geht, wird er einmalig additiv (nur falls besser)
+     in den Bestwert der Stufe Mittel uebernommen, siehe migrateOldBest().
+     Der alte Schluessel bleibt unveraendert bestehen. */
+  function oldBestKey() { return 'dailycode:echo:best'; }
+  function bestKey(diff) { return 'dailycode:echo:best:' + diff; }
+  function migrateOldBest() {
+    if (!hasStorage) return;
+    try {
+      var oldV = window.localStorage.getItem(oldBestKey());
+      if (oldV == null) return;
+      var oldN = parseInt(oldV, 10);
+      if (isNaN(oldN) || oldN < 0) return;
+      var midKey = bestKey(2);
+      var curV = window.localStorage.getItem(midKey);
+      var curN = (curV == null) ? null : parseInt(curV, 10);
+      if (curN == null || isNaN(curN) || oldN > curN) { window.localStorage.setItem(midKey, String(oldN)); }
+    } catch (e) {}
+  }
   function loadBestVal() {
     if (!hasStorage) return null;
-    try { var v = window.localStorage.getItem(bestKey()); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
+    try { var v = window.localStorage.getItem(bestKey(difficulty)); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
     catch (e) { return null; }
   }
-  function saveBest(val) { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(), String(val)); } catch (e) {} }
+  function saveBest(val) { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(difficulty), String(val)); } catch (e) {} }
   function updateBest() {
     if (!hudBestEl) return;
     var v = loadBestVal();
@@ -600,8 +698,9 @@
     // ist die tatsaechliche Anzahl Fehlversuche dieser Runde (wrongFlips),
     // perfect nur bei keinem einzigen Fehlversuch. Kein Zeitbonus, das
     // Spiel ist bewusst nicht zeitkritisch (nur die Vorschau ist getaktet).
+    // difficulty kommt aus der vorab gewaehlten Stufe (Batch 3).
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'echo', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: wrongFlips, hints: 0, perfect: wrongFlips === 0 };
+      lastPpPayload = { game: 'echo', difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: wrongFlips, hints: 0, perfect: wrongFlips === 0 };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
@@ -634,7 +733,7 @@
 
   function restartGame() {
     tCancel();
-    level = 1; score = 0; mistakes = MISTAKES_START; wrongFlips = 0;
+    level = 1; score = 0; mistakes = (DIFF_BASE[difficulty] || DIFF_BASE[2]).mistakes; wrongFlips = 0;
     hideOverlay();
     startLevel();
   }
@@ -704,9 +803,12 @@
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));
     setText('help3', t('help_3'));
+    setText('help4', t('help_4'));
     setText('restartBtn', t('restart'));
     if (restartBtn) restartBtn.setAttribute('aria-label', t('aria_restart'));
     if (boardEl) boardEl.setAttribute('aria-label', t('aria_board'));
+    if (diffRowEl) diffRowEl.setAttribute('aria-label', t('diff_group'));
+    refreshDiffButtons();
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
   function setFooterLinks() {
@@ -750,10 +852,12 @@
      machen (startLevel). Kein sichtbarer Aufbau greift auf ein noch
      nicht existierendes Brett zu. */
   function init() {
+    migrateOldBest();
     document.documentElement.lang = lang;
     setFooterLinks();
     buildLangBar();
     buildThemeBar();
+    buildDiffRow();
     applyTheme();
     applyTexts();
 

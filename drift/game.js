@@ -16,24 +16,20 @@
      Schrittzeit sinkt mit der Punktzahl stufenweise bis zu einer
      Obergrenze (STEP_MIN), darunter wird nicht weiter beschleunigt. */
   var GRID = 17;                 // Raster 17 x 17
-  var STEP_BASE = 150;           // ms pro Schritt bei Punktzahl 0
-  var STEP_MIN = 70;             // Obergrenze fuer das Tempo (untere ms Grenze)
-  var STEP_DEC = 12;             // ms schneller je Stufe
+  var STEP_BASE = 150;           // ms pro Schritt bei Punktzahl 0, Mittel (bisheriges Verhalten)
+  var STEP_MIN = 70;             // Obergrenze fuer das Tempo (untere ms Grenze), fuer alle Stufen gleich
+  var STEP_DEC = 12;             // ms schneller je Stufe, fuer alle Stufen gleich
   var POINTS_PER_LEVEL = 4;      // alle 4 Punkte eine Stufe schneller
   var START_LEN = 3;             // Anfangslaenge der Kette
-  // Kein Schwierigkeit Waehler vorhanden (Serpix hat keine Stufenauswahl).
-  // Fuer PuzzlePureScore wird die tatsaechlich erreichte, spielintern schon
-  // vorhandene Tempo Stufe (level, siehe updateSpeed) in 1 bis 4 gebuendelt,
-  // damit die Rangliste nicht fuer jede Runde denselben Wert zeigt. Das ist
-  // keine neue Spielmechanik, nur eine nachtraegliche Einordnung des bereits
-  // erreichten Tempos. STEP_MIN wird ab level 7 erreicht (STEP_BASE minus 7 mal STEP_DEC unterschreitet STEP_MIN).
-  function ppDifficultyFromLevel(lvl) {
-    if (lvl <= 1) return 1;
-    if (lvl <= 3) return 2;
-    if (lvl <= 6) return 3;
-    return 4;
-  }
   var SWIPE_MIN = 24;            // Mindestweg fuer eine Wischgeste in px
+
+  /* Schwierigkeit ueber das Starttempo (STEP_BY_DIFF). Mittel (2) entspricht
+     exakt dem bisherigen Verhalten (STEP_BASE oben). STEP_MIN und STEP_DEC
+     bleiben fuer alle Stufen gleich, nur der Startwert unterscheidet sich,
+     daher bleibt die Beschleunigungskurve gleich, nur verschoben. Kein
+     Timer, ein Endlosmodus soll fuer langes Ueberleben nicht bestraft
+     werden (siehe Batch 3 Konzept). */
+  var STEP_BY_DIFF = { 1: 180, 2: STEP_BASE, 3: 120, 4: 95 };
 
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ----------
      Struktur und Fallback-Muster identisch zu code/game.js (Ciphera). */
@@ -61,10 +57,14 @@
       aria_pause: 'Pausieren',
       aria_resume: 'Fortsetzen',
       aria_restart: 'Neu starten',
+      diff_group: 'Schwierigkeit',
+      diff_1: 'Leicht', diff_2: 'Mittel', diff_3: 'Schwer', diff_4: 'Experte',
+      aria_diff_1: 'Leicht wählen', aria_diff_2: 'Mittel wählen', aria_diff_3: 'Schwer wählen', aria_diff_4: 'Experte wählen',
       help_summary: 'So funktioniert es',
       help_1: 'Pfeiltasten oder WASD steuern die Kette, Wischen geht auch.',
       help_2: 'Sammle die leuchtenden Punkte. Die Kette wächst und wird schneller.',
       help_3: 'Die Ränder sind offen; nur eine Kollision mit dem eigenen Körper beendet das Spiel.',
+      help_4: 'Die Schwierigkeit verändert das Starttempo.',
       nav_privacy: 'Datenschutz',
       nav_imprint: 'Impressum',
       home: 'Startseite',
@@ -96,10 +96,14 @@
       aria_pause: 'Pause',
       aria_resume: 'Resume',
       aria_restart: 'Restart',
+      diff_group: 'Difficulty',
+      diff_1: 'Easy', diff_2: 'Medium', diff_3: 'Hard', diff_4: 'Expert',
+      aria_diff_1: 'Select easy', aria_diff_2: 'Select medium', aria_diff_3: 'Select hard', aria_diff_4: 'Select expert',
       help_summary: 'How it works',
       help_1: 'Arrow keys or WASD steer the chain, swiping works too.',
       help_2: 'Collect the glowing points, the chain grows and speeds up.',
       help_3: 'The edges are open, only running into your own body ends the game.',
+      help_4: 'The difficulty changes the starting speed.',
       nav_privacy: 'Privacy',
       nav_imprint: 'Imprint',
       home: 'Home',
@@ -131,10 +135,14 @@
       aria_pause: 'Duraklat',
       aria_resume: 'Devam et',
       aria_restart: 'Yeniden başlat',
+      diff_group: 'Zorluk',
+      diff_1: 'Kolay', diff_2: 'Orta', diff_3: 'Zor', diff_4: 'Uzman',
+      aria_diff_1: 'Kolay seç', aria_diff_2: 'Orta seç', aria_diff_3: 'Zor seç', aria_diff_4: 'Uzman seç',
       help_summary: 'Nasıl çalışır',
       help_1: 'Ok tuşları veya WASD zinciri yönlendirir, kaydırma da işe yarar.',
       help_2: 'Parlayan puanları topla, zincir büyür ve hızlanır.',
       help_3: 'Kenarlar açıktır, oyunu yalnızca kendi gövdene çarpmak bitirir.',
+      help_4: 'Zorluk başlangıç hızını değiştirir.',
       nav_privacy: 'Gizlilik',
       nav_imprint: 'Künye',
       home: 'Ana sayfa',
@@ -177,6 +185,7 @@
   var themeColorEl  = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
   var subtitleEl    = document.getElementById('subtitle');
+  var diffRowEl     = document.getElementById('diffRow');
   var scoreEl       = document.getElementById('score');
   var bestEl        = document.getElementById('best');
   var canvas        = document.getElementById('playfield');
@@ -200,10 +209,13 @@
   /* ---------- Theme Zustand (geteilte Keys mit Portal und Spiel 1) ---------- */
   var THEME_KEY = 'dailycode:theme';
   var LANG_KEY = 'dailycode:lang';
+  var DIFFICULTY_KEY = 'dailycode:drift:difficulty';
   var THEMES = ['auto', 'light', 'dark'];
   var hasStorage = storageOK();
   var theme = loadTheme();
   var lang = loadLang();
+  var difficulty = loadDifficulty();
+  var diffButtons = [];
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
   var reduceMotion = reduceMQ.matches;
@@ -329,6 +341,50 @@
     return c;
   }
 
+  /* ---------- Schwierigkeit: Wahl laden, speichern, anzeigen ----------
+     Steuert nur das Starttempo (STEP_BY_DIFF oben), keine neue Spielidee.
+     Mittel (2) entspricht dem bisherigen, immer gleichen Verhalten. Ein
+     Wechsel startet immer einen frischen Lauf (wie der Neu Knopf), damit
+     nie zwei Stufen innerhalb eines Laufs vermischt gewertet werden. */
+  function loadDifficulty() {
+    if (hasStorage) {
+      try { var v = parseInt(window.localStorage.getItem(DIFFICULTY_KEY), 10); if ([1, 2, 3, 4].indexOf(v) !== -1) return v; } catch (e) {}
+    }
+    return 2;
+  }
+  function saveDifficulty(v) { if (!hasStorage) return; try { window.localStorage.setItem(DIFFICULTY_KEY, String(v)); } catch (e) {} }
+  function buildDiffRow() {
+    if (!diffRowEl) return;
+    diffRowEl.setAttribute('aria-label', t('diff_group'));
+    diffRowEl.innerHTML = '';
+    diffButtons = [1, 2, 3, 4].map(function (n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'diff-btn';
+      b.textContent = t('diff_' + n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_diff_' + n));
+      b.addEventListener('click', function () { selectDifficulty(n); });
+      diffRowEl.appendChild(b);
+      return b;
+    });
+  }
+  function refreshDiffButtons() {
+    diffButtons.forEach(function (b, i) {
+      var n = i + 1;
+      b.textContent = t('diff_' + n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_diff_' + n));
+    });
+  }
+  function selectDifficulty(n) {
+    if (n === difficulty) return;
+    difficulty = n;
+    saveDifficulty(n);
+    refreshDiffButtons();
+    restartGame();
+  }
+
   /* ---------- Canvas Farben aus Tokens lesen (Theme Parität) ---------- */
   var COL = {};
   function cssVar(name) {
@@ -382,7 +438,7 @@
     pending = [];
     score = 0;
     level = 0;
-    stepMs = STEP_BASE;
+    stepMs = STEP_BY_DIFF[difficulty] || STEP_BASE;
     paused = false;
     over = false;
     won = false;
@@ -407,7 +463,8 @@
 
   function updateSpeed() {
     level = Math.floor(score / POINTS_PER_LEVEL);
-    stepMs = Math.max(STEP_MIN, STEP_BASE - level * STEP_DEC);
+    var base = STEP_BY_DIFF[difficulty] || STEP_BASE;
+    stepMs = Math.max(STEP_MIN, base - level * STEP_DEC);
   }
 
   function updateScore() {
@@ -425,14 +482,32 @@
 
   /* ---------- Bestwert (einheitliches null-Muster, Vorbild grid9) ----------
      Score, hoeher ist besser. Kein gespeicherter Wert ergibt null, daher
-     "noch keine" statt 0. hasStorage-Preflight, try/catch, Bereichspruefung. */
-  function bestKey() { return 'dailycode:drift:best'; }
+     "noch keine" statt 0. hasStorage-Preflight, try/catch, Bereichspruefung.
+     Vor Batch 3 gab es nur einen Bestwert insgesamt (oldBestKey). Damit
+     dieser nicht verloren geht, wird er einmalig additiv (nur falls besser)
+     in den Bestwert der Stufe Mittel uebernommen, siehe migrateOldBest().
+     Der alte Schluessel bleibt unveraendert bestehen. */
+  function oldBestKey() { return 'dailycode:drift:best'; }
+  function bestKey(diff) { return 'dailycode:drift:best:' + diff; }
+  function migrateOldBest() {
+    if (!hasStorage) return;
+    try {
+      var oldV = window.localStorage.getItem(oldBestKey());
+      if (oldV == null) return;
+      var oldN = parseInt(oldV, 10);
+      if (isNaN(oldN) || oldN < 0) return;
+      var midKey = bestKey(2);
+      var curV = window.localStorage.getItem(midKey);
+      var curN = (curV == null) ? null : parseInt(curV, 10);
+      if (curN == null || isNaN(curN) || oldN > curN) { window.localStorage.setItem(midKey, String(oldN)); }
+    } catch (e) {}
+  }
   function loadBestVal() {
     if (!hasStorage) return null;
-    try { var v = window.localStorage.getItem(bestKey()); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
+    try { var v = window.localStorage.getItem(bestKey(difficulty)); if (v == null) return null; var n = parseInt(v, 10); return (isNaN(n) || n < 0) ? null : n; }
     catch (e) { return null; }
   }
-  function saveBest(val) { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(), String(val)); } catch (e) {} }
+  function saveBest(val) { if (!hasStorage) return; try { window.localStorage.setItem(bestKey(difficulty), String(val)); } catch (e) {} }
   function updateBest() {
     if (!bestEl) return;
     var v = loadBestVal();
@@ -684,13 +759,14 @@
     var best = loadBestVal();
     updateScore(); // aktualisiert Punkte- und Bestwertanzeige (over ist bereits true)
     // Serpix ist ein Endlosmodus ohne Sieg/Niederlage Konzept, daher zaehlt
-    // jede beendete Runde als 'complete', auch das seltene volle Feld (won).
-    // difficulty kommt aus der tatsaechlich erreichten Tempo Stufe (siehe
-    // ppDifficultyFromLevel), perfect nur beim seltenen vollen Feld.
+    // jede beendete Runde als 'complete', auch das seltene volle Feld (won),
+    // unveraendert aus Batch 1. difficulty kommt jetzt aus der vorab
+    // gewaehlten Stufe (Batch 3), nicht mehr aus dem erreichten Tempo.
+    // perfect nur beim seltenen vollen Feld.
     if (window.PuzzlePureScore) {
       lastPpPayload = {
         game: 'drift',
-        difficulty: ppDifficultyFromLevel(level),
+        difficulty: difficulty,
         outcome: 'complete',
         timeSeconds: null,
         parSeconds: null,
@@ -833,10 +909,13 @@
     setText('restartBtn', t('restart'));
     if (restartBtn) restartBtn.setAttribute('aria-label', t('aria_restart'));
     if (canvas) canvas.setAttribute('aria-label', t('aria_field'));
+    setText('help4', t('help_4'));
     setPauseLabels();
     applyDpadLabels();
     refreshThemeBar();
     refreshLangBar();
+    if (diffRowEl) diffRowEl.setAttribute('aria-label', t('diff_group'));
+    refreshDiffButtons();
     updateScore();
     refreshOverlayTexts();
   }
@@ -869,8 +948,10 @@
 
   /* ---------- Start ---------- */
   function init() {
+    migrateOldBest();
     buildThemeBar();
     buildLangBar();
+    buildDiffRow();
     document.documentElement.lang = lang;
     applyTheme();         // setzt data-theme, Farben, erstes Render kommt nach reset
     applyTexts();
