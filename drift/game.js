@@ -166,6 +166,11 @@
   var overlayTitleEl = document.getElementById('overlayTitle');
   var overlayScoreEl = document.getElementById('overlayScore');
   var overlayBtn    = document.getElementById('overlayBtn');
+  // Zusaetzlicher, neuer Bereich fuer das gemeinsame PuzzlePureScore System,
+  // zwischen Punktestand und Neustart Button eingehaengt. Bestehende Overlay
+  // Elemente werden weder entfernt noch der kombinierte overlayScore Text veraendert.
+  var ppScoreEl     = document.createElement('div');
+  if (overlayScoreEl && overlayScoreEl.after) overlayScoreEl.after(ppScoreEl);
   var pauseBtn      = document.getElementById('pauseBtn');
   var restartBtn    = document.getElementById('restartBtn');
   var dpadEl        = document.getElementById('dpad');
@@ -334,6 +339,7 @@
   var paused = false;
   var over = false;
   var won = false;
+  var ppResult = null; // Ergebnis des gemeinsamen PuzzlePureScore Systems, gesetzt in gameOver()
 
   var rafId = 0;
   var lastTs = 0;
@@ -599,8 +605,20 @@
       setOverlayTexts(won ? t('won_title') : t('over_title'),
         t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
         t('over_restart'));
+      renderPpScoreOverlay();
     } else if (paused) {
       setOverlayTexts(t('pause'), '', t('resume'));
+      renderPpScoreOverlay();
+    }
+  }
+
+  // Baut den gemeinsamen PuzzlePureScore Block nur bei echtem Spielende auf
+  // (nicht bei blosser Pause), ergaenzt das Overlay, ersetzt nichts Bestehendes.
+  function renderPpScoreOverlay() {
+    if (!ppScoreEl) return;
+    ppScoreEl.replaceChildren();
+    if (over && ppResult && window.PuzzlePureScore) {
+      ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
     }
   }
 
@@ -609,6 +627,7 @@
     paused = true;
     stopLoop();
     setPauseLabels();
+    renderPpScoreOverlay();
     showOverlay(t('pause'), '', t('resume'));
     render();
   }
@@ -633,6 +652,24 @@
     if (prev == null || score > prev) saveBest(score);
     var best = loadBestVal();
     updateScore(); // aktualisiert Punkte- und Bestwertanzeige (over ist bereits true)
+    // Serpix ist ein Endlosmodus ohne Sieg/Niederlage Konzept, daher zaehlt
+    // jede beendete Runde als 'complete'. Der PuzzlePure Score wird von
+    // shared/score.js eigenstaendig aus der Schwierigkeit berechnet (hier
+    // Standard Mittel, da Serpix keine Schwierigkeit waehlbar hat), der
+    // Serpix eigene Punktestand (score) fliesst NICHT direkt ein.
+    if (window.PuzzlePureScore) {
+      ppResult = window.PuzzlePureScore.recordResult({
+        game: 'drift',
+        difficulty: null,
+        outcome: 'complete',
+        timeSeconds: null,
+        parSeconds: null,
+        mistakes: 0,
+        hints: 0,
+        perfect: false
+      });
+    }
+    renderPpScoreOverlay();
     showOverlay(won ? t('won_title') : t('over_title'),
       t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
       t('over_restart'));

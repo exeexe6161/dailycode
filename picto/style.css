@@ -366,6 +366,14 @@ button { touch-action: manipulation; }
 .picto-star.is-lit { color: var(--accent); }
 .picto-star.is-lit .lucide { fill: currentColor; }
 
+/* Gemeinsamer PuzzlePure Score Block, siehe shared/score.js buildResultBlock.
+   Dieselben Klassen werden in allen zehn Spielen identisch verwendet. */
+.pp-score { margin: 4px 0 10px; text-align: center; }
+.pp-score-line { margin: 0; font-weight: 700; font-size: 1rem; color: var(--text); }
+.pp-score-best { margin: 2px 0 0; font-size: .85rem; color: var(--text-muted); }
+.pp-score-record { margin: 4px 0 0; font-size: .85rem; font-weight: 700; color: var(--good); }
+.pp-score-league { margin: 2px 0 0; font-size: .78rem; color: var(--text-muted); }
+
 .picto-stats { margin-top: 8px; }
 .picto-stats-title { font-size: .95rem; margin: 0 0 8px; text-align: center; }
 .stat-grid {

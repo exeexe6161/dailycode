@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-questra-v1';
+var CACHE = 'dailycode-questra-v2';
 var LEGACY = [];
 var PREFIX = 'dailycode-questra-';
 
@@ -21,7 +21,8 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  '../shared/score.js'
 ];
 
 self.addEventListener('install', function (event) {

@@ -23,6 +23,7 @@
   --accent:      #3b5bdb;
   --accent-ink:  #ffffff;
   --focus:       #1f6feb;
+  --good:        #0f7a4f;
 
   /* Spielfeld (Hell: ruhig, kein Glow) */
   --field-bg:    #eceef1;
@@ -62,6 +63,7 @@
   --accent:      #6b8cff;
   --accent-ink:  #0a0c11;
   --focus:       #9ab0ff;
+  --good:        #4ade80;
 
   --field-bg:    #0e1119;
   --field-grid:  rgba(255, 255, 255, .05);
@@ -95,6 +97,7 @@
     --accent:      #6b8cff;
     --accent-ink:  #0a0c11;
     --focus:       #9ab0ff;
+    --good:        #4ade80;
 
     --field-bg:    #0e1119;
     --field-grid:  rgba(255, 255, 255, .05);
@@ -426,4 +429,10 @@ button { touch-action: manipulation; }
   font-display: swap;
   src: url('../fonts/Inter-Bold.woff2') format('woff2');
 }
+
+.pp-score { margin: 4px 0 10px; text-align: center; }
+.pp-score-line { margin: 0; font-weight: 700; font-size: 1rem; color: var(--text); }
+.pp-score-best { margin: 2px 0 0; font-size: .85rem; color: var(--text-muted); }
+.pp-score-record { margin: 4px 0 0; font-size: .85rem; font-weight: 700; color: var(--good); }
+.pp-score-league { margin: 2px 0 0; font-size: .78rem; color: var(--text-muted); }
 

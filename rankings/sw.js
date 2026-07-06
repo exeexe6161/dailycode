@@ -1,7 +1,7 @@
 /* ============================================================
-   dailycode  Sechstes Spiel  Service Worker (Scope /grid9/)
+   dailycode  Rangliste  Service Worker (Scope /rankings/)
    Cache first fuer die App Shell. Versionierter Cache, es werden
-   NUR Caches des eigenen Praefix (dailycode-numora-) aufgeraeumt,
+   NUR Caches des eigenen Praefix (dailycode-rankings-) aufgeraeumt,
    damit der Portal Worker (dailycode-portal-) und die anderen Spiel
    Worker nicht beruehrt werden. Cache Storage ist origin weit, daher
    ist diese Praefix Trennung noetig, um eine gegenseitige Loeschung
@@ -10,9 +10,9 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-numora-v7';
-var LEGACY = ['dailycode-grid9-v1'];
-var PREFIX = 'dailycode-numora-';
+var CACHE = 'dailycode-rankings-v1';
+var LEGACY = [];
+var PREFIX = 'dailycode-rankings-';
 
 var ASSETS = [
   './',
@@ -42,9 +42,9 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(keys.map(function (key) {
-        // Nur eigenen Namespace aufraeumen: Praefix dailycode-numora-, aber
-        // nicht die aktuelle Version. Fremde Caches bleiben unberuehrt.
-        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) { return caches.delete(key); }
+        if ((key.indexOf(PREFIX) === 0 && key !== CACHE) || LEGACY.indexOf(key) !== -1) {
+          return caches.delete(key);
+        }
         return null;
       }));
     }).then(function () {
@@ -61,14 +61,12 @@ self.addEventListener('fetch', function (event) {
     caches.match(req).then(function (cached) {
       if (cached) { return cached; }
       return fetch(req).then(function (res) {
-        // Nur erfolgreiche, gleiche Herkunft Antworten nachtraeglich ablegen.
         if (res && res.ok && res.type === 'basic') {
           var copy = res.clone();
           caches.open(CACHE).then(function (cache) { cache.put(req, copy); });
         }
         return res;
       }).catch(function () {
-        // Offline und nicht im Cache: bei Navigationen die App Shell liefern.
         if (req.mode === 'navigate') { return caches.match('./index.html'); }
         return undefined;
       });

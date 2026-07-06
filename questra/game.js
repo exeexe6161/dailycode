@@ -643,6 +643,7 @@
     var startedAt = null;
     var answeredThisQuestion = false;
     var stars = 0;
+    var ppResult = null;
 
     container.replaceChildren();
     container.classList.add('questra-root');
@@ -704,7 +705,8 @@
     resultTextEl.className = 'questra-result-text';
     var starsEl = document.createElement('div');
     starsEl.className = 'questra-stars';
-    resultPanel.append(resultHeadingEl, resultTextEl, starsEl);
+    var ppScoreEl = document.createElement('div');
+    resultPanel.append(resultHeadingEl, resultTextEl, starsEl, ppScoreEl);
 
     var statsPanel = document.createElement('div');
     statsPanel.className = 'questra-stats';
@@ -855,8 +857,21 @@
       } else {
         finished = true;
         stopTimer();
-        stars = ratingStars(computeScore(), Math.floor(currentElapsed()));
-        if (mode === 'daily') recordDailyResult(statsData, dateStr, computeScore());
+        var finalScore = computeScore();
+        stars = ratingStars(finalScore, Math.floor(currentElapsed()));
+        if (mode === 'daily') recordDailyResult(statsData, dateStr, finalScore);
+        if (window.PuzzlePureScore) {
+          ppResult = window.PuzzlePureScore.recordResult({
+            game: 'questra',
+            difficulty: null,
+            outcome: 'complete',
+            timeSeconds: Math.floor(currentElapsed()),
+            parSeconds: 70,
+            mistakes: 7 - finalScore,
+            hints: 0,
+            perfect: finalScore === 7
+          });
+        }
         persistState();
         render();
       }
@@ -939,6 +954,8 @@
         resultHeadingEl.textContent = t('result_heading');
         resultTextEl.textContent = t('result_text')(score, fmtTime(baseElapsed));
         renderStars();
+        ppScoreEl.replaceChildren();
+        if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
       }
 
       renderStatsPanel();

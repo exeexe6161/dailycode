@@ -234,6 +234,10 @@
   var overlayTitleEl = document.getElementById('overlayTitle');
   var overlayScoreEl = document.getElementById('overlayScore');
   var overlayBtn    = document.getElementById('overlayBtn');
+  /* PuzzlePureScore: eigener Container zwischen Score-Text und Neustart-Button,
+     einmalig eingehaengt, Inhalt wird erst in gameWon() befuellt. */
+  var ppScoreEl = document.createElement('div');
+  if (overlayEl && overlayBtn) overlayEl.insertBefore(ppScoreEl, overlayBtn);
   var hudTimeEl     = document.getElementById('hudTime');
   var hudBestEl     = document.getElementById('hudBest');
   var undoBtn       = document.getElementById('undoBtn');
@@ -342,6 +346,7 @@
   var selected = -1;
   var difficulty = 'mittel';
   var won = false;
+  var ppResult = null;           // Ergebnis der letzten PuzzlePureScore Aufzeichnung
   var diffBtns = {};
   var lastWinSec = null, lastWinBestSec = null;
   var numBtns = [];
@@ -647,9 +652,27 @@
     if (prev == null || sec < prev) saveBest(difficulty, sec);
     updateBest();
     lastWinSec = sec; lastWinBestSec = bestSec;
+    // Bestehende Schwierigkeit (leicht/mittel/schwer) wird durchgereicht, keine
+    // neue Stufe. Par Sekunden sind grobe, vorlaeufige Schaetzwerte je Stufe.
+    if (window.PuzzlePureScore) {
+      var ppDiffMap = { leicht: 1, mittel: 2, schwer: 3 };
+      var ppParByDiff = { leicht: 300, mittel: 480, schwer: 720 };
+      ppResult = window.PuzzlePureScore.recordResult({
+        game: 'grid9',
+        difficulty: ppDiffMap[difficulty] || 2,
+        outcome: 'win',
+        timeSeconds: sec,
+        parSeconds: ppParByDiff[difficulty] || 480,
+        mistakes: 0,
+        hints: 0,
+        perfect: false
+      });
+    }
     showOverlay(t('win_title'),
       fmt('win_time', { t: fmtTime(sec) }) + '  ·  ' + fmt('win_best', { t: fmtTime(bestSec) }),
       t('win_restart'));
+    ppScoreEl.replaceChildren();
+    if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
     announce(t('win_title') + ', ' + fmt('win_time', { t: fmtTime(sec) }));
   }
   function showOverlay(title, scoreText, btnText) {
@@ -665,6 +688,7 @@
     if (overlayScoreEl) overlayScoreEl.textContent =
       fmt('win_time', { t: fmtTime(lastWinSec) }) + '  ·  ' + fmt('win_best', { t: fmtTime(lastWinBestSec) });
     if (overlayBtn) overlayBtn.textContent = t('win_restart');
+    if (ppResult && window.PuzzlePureScore) { ppScoreEl.replaceChildren(); ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult)); }
   }
   function hideOverlay() { if (overlayEl) overlayEl.hidden = true; }
 

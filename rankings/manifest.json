@@ -1,0 +1,25 @@
+{
+  "id": "dailycode-rankings",
+  "name": "Rangliste",
+  "short_name": "Rangliste",
+  "description": "Gesamtpunkte, Liga, Pokale und Highscores, nur lokal auf diesem Geraet gespeichert.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#f4f5f7",
+  "background_color": "#f4f5f7",
+  "categories": [
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

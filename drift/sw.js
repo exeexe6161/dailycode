@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-serpix-v6';
+var CACHE = 'dailycode-serpix-v7';
 var LEGACY = ['dailycode-drift-v4'];
 var PREFIX = 'dailycode-serpix-';
 
@@ -21,7 +21,8 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  '../shared/score.js'
 ];
 
 self.addEventListener('install', function (event) {

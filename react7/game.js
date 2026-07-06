@@ -59,7 +59,7 @@
       msg_paused: 'Pausiert',
       msg_resumed: 'Weiter',
       over_title: 'Vorbei',
-      over_score: 'Punkte {s}, Runde {r}',
+      over_score: 'Rundenpunkte {s}, Runde {r}',
       over_restart: 'Neu starten',
       theme_group: 'Darstellung',
       theme_auto: 'Auto',
@@ -113,7 +113,7 @@
       msg_paused: 'Paused',
       msg_resumed: 'Resumed',
       over_title: 'Game over',
-      over_score: 'Points {s}, round {r}',
+      over_score: 'Round points {s}, round {r}',
       over_restart: 'Restart',
       theme_group: 'Appearance',
       theme_auto: 'Auto',
@@ -167,7 +167,7 @@
       msg_paused: 'Duraklatıldı',
       msg_resumed: 'Devam ediyor',
       over_title: 'Oyun bitti',
-      over_score: 'Puan {s}, tur {r}',
+      over_score: 'Tur puanı {s}, tur {r}',
       over_restart: 'Yeniden başlat',
       theme_group: 'Görünüm',
       theme_auto: 'Otomatik',
@@ -284,6 +284,23 @@
   var linkPrivacyEl = document.getElementById('linkPrivacy');
   var linkImprintEl = document.getElementById('linkImprint');
 
+  /* ---------- PuzzlePure Score Anzeige ----------
+     Eigenes Element zwischen #overlayScore und #overlayBtn, getrennt vom
+     spielinternen Rundenpunktestand (score, Formel 100 + frac*100). Der
+     bestehende Overlay Text (over_score) wurde von "Punkte {s}, Runde {r}"
+     auf "Rundenpunkte {s}, Runde {r}" praezisiert, damit er direkt ueber der
+     neuen Zeile "PuzzlePure Punkte: ..." eindeutig als spielrundenbezogen
+     erkennbar bleibt und nicht mit dem neuen plattformweiten Wert verwechselt
+     werden kann. */
+  var ppScoreEl = document.createElement('div');
+  if (overlayEl && overlayBtn) overlayEl.insertBefore(ppScoreEl, overlayBtn);
+  var ppResult = null;
+  function renderPuzzlePureScore() {
+    if (!ppScoreEl) return;
+    ppScoreEl.replaceChildren();
+    if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+  }
+
   /* ---------- Theme Zustand (geteilte Keys) ---------- */
   var THEME_KEY = 'dailycode:theme';
   var LANG_KEY = 'dailycode:lang';
@@ -396,6 +413,7 @@
       if (overlayTitleEl) overlayTitleEl.textContent = t('over_title');
       if (overlayScoreEl) { overlayScoreEl.textContent = scoreText; overlayScoreEl.hidden = !scoreText; }
       if (overlayBtn) overlayBtn.textContent = t('over_restart');
+      renderPuzzlePureScore();
     }
     updateBest();
   }
@@ -703,7 +721,11 @@
     updateBest();
     var scoreText = fmt('over_score', { s: score, r: round }) +
       (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : '');
+    if (window.PuzzlePureScore) {
+      ppResult = window.PuzzlePureScore.recordResult({ game: 'react7', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+    }
     showOverlay(t('over_title'), scoreText, t('over_restart'));
+    renderPuzzlePureScore();
     announce(t('over_title') + ', ' + fmt('over_score', { s: score, r: round }), 'bad');
     setPauseLabel();
   }

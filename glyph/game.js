@@ -142,6 +142,10 @@
   var overlayTitleEl = document.getElementById('overlayTitle');
   var overlayScoreEl = document.getElementById('overlayScore');
   var overlayBtn = document.getElementById('overlayBtn');
+  /* PuzzlePureScore: eigener Container zwischen Score-Text und Neustart-Button,
+     einmalig eingehaengt, Inhalt wird erst in gameOver() befuellt. */
+  var ppScoreEl = document.createElement('div');
+  if (overlayEl && overlayBtn) overlayEl.insertBefore(ppScoreEl, overlayBtn);
   var undoBtn = document.getElementById('undoBtn');
   var clearBtn = document.getElementById('clearBtn');
   var submitBtn = document.getElementById('submitBtn');
@@ -219,6 +223,7 @@
   var selection = [];           // Indizes in rack, in Auswahlreihenfolge
   var score = 0, best = null, remaining = START_TIME;
   var warnedAt = {};            // Zeitwarnungen nur einmal
+  var ppResult = null;          // Ergebnis der letzten PuzzlePureScore Aufzeichnung
 
   /* ---------- Generator mit Spielbarkeitsgarantie ---------- */
   function draw(lang) { var bag = bagFor(lang); return bag[Math.floor(Math.random() * bag.length)]; }
@@ -420,7 +425,15 @@
     stopClock();
     if (best == null || score > best) { best = score; saveBest(); }
     updateHud();
+    // Rundenende ist rein zeitbasiert (kein Sieg/Niederlage Konzept), daher
+    // immer 'complete'. Kein Zeitbonus: die Runde laeuft ohnehin immer voll
+    // durch, timeSeconds/parSeconds bleiben bewusst null.
+    if (window.PuzzlePureScore) {
+      ppResult = window.PuzzlePureScore.recordResult({ game: 'glyph', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+    }
     showOverlay(t('over_title'), t('lbl_score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''), t('over_restart'));
+    ppScoreEl.replaceChildren();
+    if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(uiLang, ppResult));
     announce(t('over_title') + ', ' + t('lbl_score') + ' ' + score);
   }
 

@@ -167,6 +167,7 @@
   var overlayEl     = document.getElementById('overlay');
   var overlayTitleEl = document.getElementById('overlayTitle');
   var overlayScoreEl = document.getElementById('overlayScore');
+  var ppScoreMountEl = document.getElementById('ppScoreMount');
   var overlayBtn    = document.getElementById('overlayBtn');
   var pauseBtn      = document.getElementById('pauseBtn');
   var restartBtn    = document.getElementById('restartBtn');
@@ -339,6 +340,7 @@
   var softDrop = false;
   var paused = false;
   var over = false;
+  var ppResult = null;
 
   var recent = [];              // zuletzt erzeugte Typen, begrenzt Wiederholungen
   var flashes = [];             // { r, c, type, t0 } dezente Aufloese-Blende, nur Zier
@@ -733,6 +735,13 @@
       t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
       t('over_restart'));
     if (scoreEl) scoreEl.textContent = t('over_title') + ', ' + t('score') + ' ' + score;
+    if (window.PuzzlePureScore) {
+      ppResult = window.PuzzlePureScore.recordResult({ game: 'cluster', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+    }
+    if (ppScoreMountEl) {
+      ppScoreMountEl.replaceChildren();
+      if (ppResult && window.PuzzlePureScore) ppScoreMountEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+    }
   }
 
   function restartGame() {

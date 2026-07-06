@@ -215,6 +215,19 @@
   var linkPrivacyEl = document.getElementById('linkPrivacy');
   var linkImprintEl = document.getElementById('linkImprint');
 
+  /* ---------- PuzzlePure Score Anzeige ----------
+     Eigenes Element zwischen #overlayScore und #overlayBtn. Fluxa hat kein
+     eigenes Punktesystem (nur die erreichte Stufe level), daher keine
+     Begriffskollision wie bei Reflexa. */
+  var ppScoreEl = document.createElement('div');
+  if (overlayEl && overlayBtn) overlayEl.insertBefore(ppScoreEl, overlayBtn);
+  var ppResult = null;
+  function renderPuzzlePureScore() {
+    if (!ppScoreEl) return;
+    ppScoreEl.replaceChildren();
+    if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+  }
+
   /* ---------- Theme Zustand (geteilte Keys) ---------- */
   var THEME_KEY = 'dailycode:theme';
   var LANG_KEY = 'dailycode:lang';
@@ -302,7 +315,10 @@
     setFooterLinks();
     updateBest();
     if (lastStatus) announce(lastStatus.key, lastStatus.params, lastStatus.kind);
-    if (phase === 'solved') showOverlay(t('solved_title'), t('solved_score', { n: level }), t('btn_continue'));
+    if (phase === 'solved') {
+      showOverlay(t('solved_title'), t('solved_score', { n: level }), t('btn_continue'));
+      renderPuzzlePureScore();
+    }
   }
   function langName(c) {
     for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) return LANGS[i].name; }
@@ -699,7 +715,11 @@
     var prev = loadBestVal();
     if (prev == null || level > prev) saveBest(level);
     updateBest();
+    if (window.PuzzlePureScore) {
+      ppResult = window.PuzzlePureScore.recordResult({ game: 'flow8', difficulty: null, outcome: 'win', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+    }
     showOverlay(t('solved_title'), t('solved_score', { n: level }), t('btn_continue'));
+    renderPuzzlePureScore();
     announce('solved_announce', { n: level }, 'good');
   }
 

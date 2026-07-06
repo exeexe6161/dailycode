@@ -1,8 +1,8 @@
 /* ============================================================
-   dailycode  Questra  Tokens und Styles
+   dailycode  Rangliste  Tokens und Styles
    Token Disziplin: Werte als CSS Variablen, Hell und Dunkel Paritaet.
    Der Token Block ist aus dem System uebernommen, damit Portal und
-   alle Spiele dieselben Themewerte zeigen.
+   alle Spiele dieselben Themewerte zeigen. Keine Inline-Styles.
    ============================================================ */
 
 :root {
@@ -20,7 +20,6 @@
   --focus:       #1f6feb;
 
   --good:        #0f7a4f;
-  --bad:         #b91c1c;
 
   --halo:            transparent;
   --btn-glow:        transparent;
@@ -46,7 +45,6 @@
   --focus:       #9ab0ff;
 
   --good:        #4ade80;
-  --bad:         #fca5a5;
 
   --halo:            rgba(255, 255, 255, .16);
   --btn-glow:        rgba(108, 140, 255, .32);
@@ -67,7 +65,6 @@
     --focus:       #9ab0ff;
 
     --good:        #4ade80;
-    --bad:         #fca5a5;
 
     --halo:            rgba(255, 255, 255, .16);
     --btn-glow:        rgba(108, 140, 255, .32);
@@ -148,6 +145,16 @@ button { touch-action: manipulation; }
   color: var(--text);
 }
 .subtitle { margin: 0 0 12px; color: var(--text-muted); font-size: .95rem; text-align: center; }
+.privacy-note {
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: .82rem;
+  text-align: center;
+}
 
 .home-link {
   display: flex;
@@ -209,7 +216,7 @@ button { touch-action: manipulation; }
 .toggle-feedback {
   text-align: center;
   min-height: 1.3em;
-  margin: 0 0 12px;
+  margin: 0 0 4px;
   font-weight: 600;
   color: var(--text-muted);
   opacity: 0;
@@ -218,134 +225,82 @@ button { touch-action: manipulation; }
 .toggle-feedback.show { opacity: 1; }
 
 /* ============================================================
-   Questra Spielbereich: Modus, Status, Frage, vier Antworten,
-   Feedback, Ergebnis, Statistik.
+   Rangliste Inhalt: Gesamtpunkte und Liga Karte, Pokal Gitter,
+   Highscore Liste je Spiel. Bewusst ruhig gehalten, keine Charts,
+   keine Farbverlaeufe, kein Glow. Zustaende (leer, mit Daten)
+   unterscheiden sich nur im Text, nie in der Struktur.
    ============================================================ */
-.questra-root { margin: 0 0 16px; }
+.rk-section { margin: 0 0 20px; }
+.rk-section-title { font-size: .95rem; margin: 0 0 10px; text-align: center; color: var(--text); }
 
-.questra-modes { display: flex; justify-content: center; gap: 8px; margin: 0 0 12px; }
-.questra-mode-btn {
-  font: inherit;
-  font-size: .85rem;
-  font-weight: 700;
-  padding: 6px 14px;
-  min-height: 36px;
-  border-radius: 18px;
-  border: 2px solid var(--border);
-  background: var(--surface);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: border-color var(--ease), background var(--ease), color var(--ease);
-}
-.questra-mode-btn:hover { border-color: var(--accent); color: var(--text); }
-.questra-mode-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-
-.questra-unlimited-nav { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0 0 12px; }
-.questra-unlimited-nav[hidden] { display: none; }
-.questra-round-number { min-width: 9em; text-align: center; font-weight: 700; color: var(--text-muted); }
-
-.questra-status {
-  text-align: center;
-  margin: 0 0 12px;
-  min-height: 1.4em;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.questra-quiz { margin: 0 0 4px; }
-.questra-question {
-  margin: 0 0 16px;
-  padding: 18px;
+.rk-summary {
+  padding: 16px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  box-shadow: 0 10px 28px rgba(20, 30, 60, .08);
-  font-size: 1.1rem;
-  font-weight: 600;
   text-align: center;
-  line-height: 1.4;
+  margin: 0 0 20px;
 }
-
-.questra-options { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 0 0 12px; }
-.questra-option {
-  min-height: 56px;
-  padding: 12px 18px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 600;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color var(--ease), background var(--ease), color var(--ease);
-}
-.questra-option:hover:not(:disabled) { border-color: var(--accent); }
-.questra-option:disabled { cursor: default; }
-.questra-option.is-correct { border-color: var(--good); background: var(--surface-2); color: var(--good); }
-.questra-option.is-wrong { border-color: var(--bad); color: var(--bad); }
-.questra-option.is-correct::after { content: "\2713"; margin-left: 8px; font-weight: 800; }
-.questra-option.is-wrong::after { content: "\2717"; margin-left: 8px; font-weight: 800; }
-
-.questra-feedback {
-  min-height: 1.4em;
-  text-align: center;
+.rk-total-score { font-size: 2rem; font-weight: 700; line-height: 1.1; }
+.rk-total-cap { color: var(--text-muted); font-size: .82rem; margin: 2px 0 12px; }
+.rk-league-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.rk-league-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--accent);
+  color: var(--accent);
   font-weight: 700;
-  color: var(--text);
-  margin: 0 0 8px;
+  font-size: .9rem;
 }
+.rk-league-next { color: var(--text-muted); font-size: .82rem; }
 
-.questra-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--gap); margin: 0 0 16px; }
-
-.questra-result { text-align: center; margin: 0 0 16px; }
-.questra-result-heading { font-size: 1.1rem; margin: 0 0 6px; }
-.questra-result-text { color: var(--text-muted); margin: 0 0 10px; }
-
-.questra-stars { display: flex; justify-content: center; gap: 6px; margin: 0 0 8px; }
-.questra-star { display: inline-flex; color: var(--border); }
-.questra-star .lucide { width: 22px; height: 22px; }
-.questra-star.is-lit { color: var(--accent); }
-.questra-star.is-lit .lucide { fill: currentColor; }
-
-/* Gemeinsamer PuzzlePure Score Block, siehe shared/score.js buildResultBlock.
-   Dieselben Klassen werden in allen zehn Spielen identisch verwendet. */
-.pp-score { margin: 4px 0 10px; text-align: center; }
-.pp-score-line { margin: 0; font-weight: 700; font-size: 1rem; color: var(--text); }
-.pp-score-best { margin: 2px 0 0; font-size: .85rem; color: var(--text-muted); }
-.pp-score-record { margin: 4px 0 0; font-size: .85rem; font-weight: 700; color: var(--good); }
-.pp-score-league { margin: 2px 0 0; font-size: .78rem; color: var(--text-muted); }
-
-.questra-stats { margin-top: 8px; }
-.questra-stats-title { font-size: .95rem; margin: 0 0 8px; text-align: center; }
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   text-align: center;
 }
 .stat-cell { padding: 8px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
-.stat-num { font-size: 1.1rem; font-weight: 700; }
-.stat-cap { font-size: .68rem; color: var(--text-muted); }
-.stats-hint { color: var(--text-muted); font-size: .9rem; text-align: center; }
+.stat-num { font-size: 1.2rem; font-weight: 700; }
+.stat-cap { font-size: .72rem; color: var(--text-muted); }
 
-.btn {
-  min-height: 44px;
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  transition: border-color var(--ease), background var(--ease), color var(--ease);
+.rk-trophies {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
 }
-.btn:hover { border-color: var(--accent); }
-.btn:disabled { opacity: .45; cursor: default; }
-.btn:disabled:hover { border-color: var(--border); }
-.btn-ghost { color: var(--text-muted); }
-.btn-ghost:hover { color: var(--text); }
+.rk-trophy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+.rk-trophy.is-earned { color: var(--text); border-color: var(--accent); }
+.rk-trophy-icon { display: inline-flex; flex: none; width: 20px; height: 20px; }
+.rk-trophy.is-earned .rk-trophy-icon { color: var(--accent); }
+.rk-trophy-name { font-size: .82rem; font-weight: 600; line-height: 1.25; }
+
+.rk-games { display: flex; flex-direction: column; gap: 6px; }
+.rk-game-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.rk-game-name { font-weight: 700; }
+.rk-game-meta { grid-column: 1 / -1; color: var(--text-muted); font-size: .78rem; }
+.rk-game-score { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.rk-empty { color: var(--text-muted); font-size: .9rem; text-align: center; padding: 20px 10px; }
 
 .help { margin: 0 0 16px; color: var(--text-muted); font-size: .9rem; }
 .help summary { cursor: pointer; color: var(--text); font-weight: 600; }
@@ -388,7 +343,5 @@ button { touch-action: manipulation; }
 
 @media (max-width: 420px) {
   body { padding-inline: 8px; }
-  .questra-modes { gap: 5px; }
-  .questra-actions .btn { min-width: 0; padding-inline: 8px; }
-  .questra-question { padding: 14px; font-size: 1.02rem; }
+  .rk-trophies { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 }

@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-ciphera-v6';
+var CACHE = 'dailycode-ciphera-v7';
 var LEGACY = ['dailycode-game-v5'];
 var PREFIX = 'dailycode-ciphera-';
 
@@ -24,7 +24,8 @@ var ASSETS = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  './icon-maskable-512.png'
+  './icon-maskable-512.png',
+  '../shared/score.js'
 ];
 
 self.addEventListener('install', function (event) {

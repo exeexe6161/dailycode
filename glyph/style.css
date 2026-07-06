@@ -242,6 +242,11 @@ button { touch-action: manipulation; }
 .overlay[hidden] { display: none; }
 .overlay-title { margin: 0; font-size: 1.3rem; font-weight: 700; }
 .overlay-score { margin: 0; color: var(--text-muted); font-weight: 600; }
+.pp-score { margin: 4px 0 10px; text-align: center; }
+.pp-score-line { margin: 0; font-weight: 700; font-size: 1rem; color: var(--text); }
+.pp-score-best { margin: 2px 0 0; font-size: .85rem; color: var(--text-muted); }
+.pp-score-record { margin: 4px 0 0; font-size: .85rem; font-weight: 700; color: var(--good); }
+.pp-score-league { margin: 2px 0 0; font-size: .78rem; color: var(--text-muted); }
 
 .controls { display: flex; justify-content: center; gap: var(--gap); margin: 0 0 10px; }
 .btn {

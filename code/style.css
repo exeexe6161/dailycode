@@ -18,6 +18,7 @@
   --accent:      #3b5bdb;
   --accent-ink:  #ffffff;
   --focus:       #1f6feb;
+  --good:        #0f7a4f;
 
   /* Feedback Signal Tokens (Statuszeile, Statistik, weiße Tinte) */
   --correct-bg:  #15803d;
@@ -71,6 +72,7 @@
   --accent:      #6b8cff;
   --accent-ink:  #0a0c11;
   --focus:       #9ab0ff;
+  --good:        #4ade80;
 
   /* Signal Tokens, lesbar auf tiefem Grund */
   --correct-bg:  #34d399;
@@ -109,6 +111,7 @@
     --accent:      #6b8cff;
     --accent-ink:  #0a0c11;
     --focus:       #9ab0ff;
+    --good:        #4ade80;
 
     /* Signal Tokens, lesbar auf tiefem Grund */
     --correct-bg:  #34d399;
@@ -709,6 +712,12 @@ button.slot:not(:disabled):active { transform: scale(.96); }
 }
 .home-link:hover { border-color: var(--accent); color: var(--text); }
 .home-link .lucide { width: 20px; height: 20px; display: block; }
+
+.pp-score { margin: 4px 0 10px; text-align: center; }
+.pp-score-line { margin: 0; font-weight: 700; font-size: 1rem; color: var(--text); }
+.pp-score-best { margin: 2px 0 0; font-size: .85rem; color: var(--text-muted); }
+.pp-score-record { margin: 4px 0 0; font-size: .85rem; font-weight: 700; color: var(--good); }
+.pp-score-league { margin: 2px 0 0; font-size: .78rem; color: var(--text-muted); }
 
 @font-face {
   font-family: 'Inter';

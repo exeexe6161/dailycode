@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-reflexa-v6';
+var CACHE = 'dailycode-reflexa-v7';
 var LEGACY = ['dailycode-react7-v2'];
 var PREFIX = 'dailycode-reflexa-';
 
@@ -18,6 +18,7 @@ var ASSETS = [
   './',
   './index.html',
   './style.css',
+  '../shared/score.js',
   './game.js',
   './theme-init.js',
   './manifest.json',

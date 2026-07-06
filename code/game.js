@@ -596,6 +596,10 @@
   var linkImprintEl  = document.getElementById('linkImprint');
   var themeFeedbackEl = document.getElementById('themeFeedback');
   var shareActionsEl = resultEl ? resultEl.querySelector('.share-actions') : null;
+  // Zusaetzlicher, eigenstaendiger Bereich fuer das gemeinsame PuzzlePureScore
+  // System. Ergaenzt das bestehende #stats Element, ersetzt es nicht.
+  var ppScoreEl      = document.createElement('div');
+  if (resultEl) resultEl.append(ppScoreEl);
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -624,6 +628,7 @@
   var resultTries = 0;
   var shareBtnEl = null;
   var lastCopyFeedback = null;
+  var ppResult = null; // Ergebnis des gemeinsamen PuzzlePureScore Systems, gesetzt in submitGuess()
 
   function symbolSVG(index) {
     return '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">' +
@@ -863,6 +868,18 @@
         if (winRow) winRow.classList.add('win-row');
       }
       recordResult(true, currentRow + 1);
+      if (window.PuzzlePureScore) {
+        ppResult = window.PuzzlePureScore.recordResult({
+          game: 'code',
+          difficulty: null,
+          outcome: 'win',
+          timeSeconds: null,
+          parSeconds: null,
+          mistakes: playedGuesses.length - 1,
+          hints: 0,
+          perfect: playedGuesses.length === 1
+        });
+      }
       setStatus('status_win', { n: currentRow + 1, max: MAX_TRIES }, 'win');
       endGame();
       showResult(true, currentRow + 1);
@@ -873,6 +890,18 @@
     if (currentRow >= MAX_TRIES) {
       phase = 'lost';
       recordResult(false, 0);
+      if (window.PuzzlePureScore) {
+        ppResult = window.PuzzlePureScore.recordResult({
+          game: 'code',
+          difficulty: null,
+          outcome: 'loss',
+          timeSeconds: null,
+          parSeconds: null,
+          mistakes: playedGuesses.length,
+          hints: 0,
+          perfect: false
+        });
+      }
       setStatus('status_lose', { code: codeNames() }, 'lose');
       revealCode();
       endGame();
@@ -964,10 +993,22 @@
            '<div class="stat-cap">' + cap + '</div></div>';
   }
 
+  // Ergaenzt den bestehenden #stats Bereich um den gemeinsamen PuzzlePureScore
+  // Block. Eigenes Container Element per DOM API, da buildResultBlock() ein
+  // DOM Element zurueckgibt und statsEl per innerHTML String gebaut wird.
+  function renderPpScore() {
+    if (!ppScoreEl) return;
+    ppScoreEl.replaceChildren();
+    if (ppResult && window.PuzzlePureScore) {
+      ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+    }
+  }
+
   function renderStats(highlightTries) {
     if (!statsEl) return;
     if (!hasStorage) {
       statsEl.innerHTML = '<p class="stats-hint">' + t('stats_hint') + '</p>';
+      renderPpScore();
       return;
     }
     var played = stats.played;
@@ -1000,6 +1041,7 @@
     for (var b = 0; b < bars.length; b++) {
       bars[b].style.width = bars[b].getAttribute('data-width') + '%';
     }
+    renderPpScore();
   }
 
   function copyFeedback(key) {

@@ -219,6 +219,7 @@
   var overlayEl     = document.getElementById('overlay');
   var overlayTitleEl = document.getElementById('overlayTitle');
   var overlayScoreEl = document.getElementById('overlayScore');
+  var ppScoreMountEl = document.getElementById('ppScoreMount');
   var overlayBtn    = document.getElementById('overlayBtn');
   var restartBtn    = document.getElementById('restartBtn');
   var hudLevelEl    = document.getElementById('hudLevel');
@@ -362,6 +363,7 @@
   var level = 1;
   var score = 0;
   var mistakes = MISTAKES_START;
+  var ppResult = null;
   var pairsThisLevel = START_PAIRS;
   var foundPairs = 0;
   var firstPick = -1;
@@ -584,6 +586,13 @@
     recordBest();
     renderOverlayTexts();
     announceKind('over');
+    if (window.PuzzlePureScore) {
+      ppResult = window.PuzzlePureScore.recordResult({ game: 'echo', difficulty: null, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false });
+    }
+    if (ppScoreMountEl) {
+      ppScoreMountEl.replaceChildren();
+      if (ppResult && window.PuzzlePureScore) ppScoreMountEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+    }
   }
 
   function showOverlay(title, scoreText, btnText) {

@@ -704,6 +704,7 @@
     var timerId = 0;
     var startedAt = null;
     var stars = 0;
+    var ppResult = null;
 
     var pointerMode = null;
     var curR = 0; // Roving Tabindex: aktuell per Tastatur/Zeiger fokussierte Zelle
@@ -815,7 +816,8 @@
     winTextEl.className = 'picto-win-text';
     var starsEl = document.createElement('div');
     starsEl.className = 'picto-stars';
-    winBanner.append(winTextEl, starsEl);
+    var ppScoreEl = document.createElement('div');
+    winBanner.append(winTextEl, starsEl, ppScoreEl);
 
     var statsPanel = document.createElement('div');
     statsPanel.className = 'picto-stats';
@@ -973,6 +975,19 @@
         stopTimer();
         stars = starRating(puzzle.width, Math.floor(currentElapsed()), hintsUsed, mistakes);
         if (mode === 'daily') recordDailyWin(statsData, difficulty, dateStr);
+        if (window.PuzzlePureScore) {
+          var parSeconds = Math.round(puzzle.width * puzzle.height * 1.1);
+          ppResult = window.PuzzlePureScore.recordResult({
+            game: 'picto',
+            difficulty: difficulty,
+            outcome: 'win',
+            timeSeconds: Math.floor(currentElapsed()),
+            parSeconds: parSeconds,
+            mistakes: mistakes,
+            hints: hintsUsed,
+            perfect: hintsUsed === 0 && mistakes === 0
+          });
+        }
       }
       persistCurrentProgress();
     }
@@ -1166,7 +1181,12 @@
       if (showErrors) errorCountEl.textContent = t('error_count')(countErrors(player, puzzle.solution));
 
       winBanner.hidden = !won;
-      if (won) { winTextEl.textContent = t('win'); renderStars(); }
+      if (won) {
+        winTextEl.textContent = t('win');
+        renderStars();
+        ppScoreEl.replaceChildren();
+        if (ppResult && window.PuzzlePureScore) ppScoreEl.append(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+      }
 
       renderStatsPanel();
 
