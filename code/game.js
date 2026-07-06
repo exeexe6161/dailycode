@@ -6,11 +6,25 @@
 (function () {
   'use strict';
 
+  /* Schwierigkeit: Mittel (2) entspricht exakt dem bisherigen, immer
+     gleichen Verhalten (4 Positionen, 6 Symbole, 6 Versuche). Leicht
+     nutzt bewusst nur eine Teilmenge der bestehenden 6 Symbole (keine
+     neue Symbolgrafik noetig), Experte verlaengert den Code auf 5
+     Positionen (nutzt weiterhin nur die vorhandenen 6 Symbole). */
+  var DIFFICULTIES = [
+    { level: 1, positions: 4, symbolCount: 4, maxTries: 8, parSeconds: 80 },
+    { level: 2, positions: 4, symbolCount: 6, maxTries: 6, parSeconds: 150 },
+    { level: 3, positions: 4, symbolCount: 6, maxTries: 5, parSeconds: 140 },
+    { level: 4, positions: 5, symbolCount: 6, maxTries: 6, parSeconds: 220 }
+  ];
   var POSITIONS = 4;
   var SYMBOL_COUNT = 6;
   var MAX_TRIES = 6;
-  var STORAGE_KEY = 'dailycode:ciphera:v1';
+  var PAR_SECONDS = 150;
+  var STORAGE_KEY = 'dailycode:ciphera:v2';
+  var LEGACY_STORAGE_KEY_V1 = 'dailycode:ciphera:v1';
   var LEGACY_STORAGE_KEY = 'dailycode:v1';
+  var DIFFICULTY_KEY = 'dailycode:ciphera:difficulty';
   var LANG_KEY = 'dailycode:lang';
   var THEME_KEY = 'dailycode:theme';
   var THEMES = ['auto', 'light', 'dark'];
@@ -97,6 +111,12 @@
       status_restore_lose: 'Bereits gespielt. Der Code war: {code}.',
       status_resume: 'Spiel fortgesetzt. Versuch {n} von {max}.',
       result_lose: 'Nicht gelöst.',
+      level: function (p) { return ['Leicht', 'Mittel', 'Schwer', 'Experte'][p.n - 1] || 'Mittel'; },
+      aria_difficulty_group: 'Schwierigkeit',
+      aria_difficulty: function (p) { return t('level', { n: p.n }) + ' wählen'; },
+      lbl_time: 'Zeit',
+      result_time_win: function (p) { return 'Gelöst in ' + p.t; },
+      result_time_lose: function (p) { return 'Zeit ' + p.t; },
       stat_played: 'Gespielt',
       stat_winrate: 'Siegquote',
       stat_streak: 'Streak',
@@ -164,6 +184,12 @@
       status_restore_lose: 'Already played. The code was: {code}.',
       status_resume: 'Game resumed. Try {n} of {max}.',
       result_lose: 'Not solved.',
+      level: function (p) { return ['Easy', 'Medium', 'Hard', 'Expert'][p.n - 1] || 'Medium'; },
+      aria_difficulty_group: 'Difficulty',
+      aria_difficulty: function (p) { return 'Select ' + t('level', { n: p.n }); },
+      lbl_time: 'Time',
+      result_time_win: function (p) { return 'Solved in ' + p.t; },
+      result_time_lose: function (p) { return 'Time ' + p.t; },
       stat_played: 'Played',
       stat_winrate: 'Win rate',
       stat_streak: 'Streak',
@@ -229,6 +255,12 @@
       status_restore_lose: 'Bugün zaten oynandı. Kod şuydu: {code}.',
       status_resume: 'Oyun sürdürüldü. Deneme {n} / {max}.',
       result_lose: 'Çözülemedi.',
+      level: function (p) { return ['Kolay', 'Orta', 'Zor', 'Uzman'][p.n - 1] || 'Orta'; },
+      aria_difficulty_group: 'Zorluk',
+      aria_difficulty: function (p) { return t('level', { n: p.n }) + ' seç'; },
+      lbl_time: 'Süre',
+      result_time_win: function (p) { return 'Çözüm süresi ' + p.t; },
+      result_time_lose: function (p) { return 'Süre ' + p.t; },
       stat_played: 'Oynanan',
       stat_winrate: 'Kazanma oranı',
       stat_streak: 'Seri',
@@ -311,6 +343,20 @@
     };
   }
 
+  // Setzt POSITIONS/SYMBOL_COUNT/MAX_TRIES/PAR_SECONDS aus DIFFICULTIES.
+  // Muss vor makeCode(), buildBoard() und buildPalette() laufen.
+  function applyDifficultyParams(level) {
+    var cfg = difficultyConfig(level);
+    POSITIONS = cfg.positions;
+    SYMBOL_COUNT = cfg.symbolCount;
+    MAX_TRIES = cfg.maxTries;
+    PAR_SECONDS = cfg.parSeconds;
+  }
+
+  // Der taegliche Code haengt zusaetzlich von der Schwierigkeit ab, damit
+  // jede Stufe ihr eigenes, aber weiterhin deterministisches Taegliches
+  // Raetsel hat (wie bei den anderen Spielen ueblich, z.B. grid9 Seed aus
+  // Tag plus Schwierigkeit).
   function makeCode(key) {
     var rng = mulberry32(fnv1a(key));
     var out = [];
@@ -368,16 +414,20 @@
     return v < 0 ? d : v;
   }
 
-  function normalizeGuesses(g) {
+  function difficultyConfig(level) {
+    return DIFFICULTIES[[1, 2, 3, 4].indexOf(level) !== -1 ? level - 1 : 1];
+  }
+
+  function normalizeGuessesFor(g, positions, symbolCount, maxTries) {
     if (!Array.isArray(g)) return null;
     var rows = [];
-    for (var i = 0; i < g.length && i < MAX_TRIES; i++) {
+    for (var i = 0; i < g.length && i < maxTries; i++) {
       var row = g[i];
-      if (!Array.isArray(row) || row.length !== POSITIONS) return null;
+      if (!Array.isArray(row) || row.length !== positions) return null;
       var clean = [];
-      for (var c = 0; c < POSITIONS; c++) {
+      for (var c = 0; c < positions; c++) {
         var v = row[c];
-        if (typeof v !== 'number' || !isFinite(v) || Math.floor(v) !== v || v < 0 || v >= SYMBOL_COUNT) {
+        if (typeof v !== 'number' || !isFinite(v) || Math.floor(v) !== v || v < 0 || v >= symbolCount) {
           return null;
         }
         clean.push(v);
@@ -387,12 +437,16 @@
     return rows;
   }
 
-  function normalizeDayRecord(o) {
+  // dayRecord traegt zusaetzlich die gemessene Zeit, damit der Ergebnis
+  // Bildschirm nach einem Reload weiter "Geloest in mm:ss" zeigen kann,
+  // ohne die Runde erneut an PuzzlePureScore zu melden.
+  function normalizeDayRecordFor(o, cfg) {
     if (!o || typeof o !== 'object') return null;
     if (!isDateKey(o.date)) return null;
-    var rows = normalizeGuesses(o.guesses);
+    var rows = normalizeGuessesFor(o.guesses, cfg.positions, cfg.symbolCount, cfg.maxTries);
     if (!rows || rows.length === 0) return null;
-    return { date: o.date, guesses: rows };
+    var timeSeconds = intOr(o.timeSeconds, null);
+    return { date: o.date, guesses: rows, timeSeconds: timeSeconds };
   }
 
   function defaultStats() {
@@ -403,10 +457,20 @@
       lastWinDate: null,
       played: 0,
       wins: 0,
-      dist: [0, 0, 0, 0, 0, 0],
-      last: null,
-      progress: null
+      dist: [0, 0, 0, 0, 0, 0, 0, 0],
+      lastByDifficulty: {},
+      progressByDifficulty: {}
     };
+  }
+
+  function normalizeByDifficultyMap(o) {
+    var out = {};
+    if (!o || typeof o !== 'object') return out;
+    for (var lvl = 1; lvl <= 4; lvl++) {
+      var rec = normalizeDayRecordFor(o[String(lvl)], difficultyConfig(lvl));
+      if (rec) out[String(lvl)] = rec;
+    }
+    return out;
   }
 
   function normalizeStats(o) {
@@ -419,21 +483,50 @@
     d.played = intOr(o.played, 0);
     d.wins = intOr(o.wins, 0);
     if (Array.isArray(o.dist)) {
-      for (var i = 0; i < 6; i++) { d.dist[i] = intOr(o.dist[i], 0); }
+      for (var i = 0; i < 8; i++) { d.dist[i] = intOr(o.dist[i], 0); }
     }
-    d.last = normalizeDayRecord(o.last);
-    d.progress = normalizeDayRecord(o.progress);
+    d.lastByDifficulty = normalizeByDifficultyMap(o.lastByDifficulty);
+    d.progressByDifficulty = normalizeByDifficultyMap(o.progressByDifficulty);
     if (d.wins > d.played) d.played = d.wins;
     if (d.currentStreak > d.maxStreak) d.maxStreak = d.currentStreak;
     return d;
+  }
+
+  // Einmalige, rein additive Migration: die alten Aggregatwerte (Serie,
+  // gespielt, gewonnen, Verteilung) aus dailycode:ciphera:v1 uebernehmen,
+  // falls v2 noch nicht existiert. Die alte, einzelne Tagesrunde (last/
+  // progress) wird bewusst NICHT migriert, sie passte zu genau einer
+  // festen Schwierigkeit und laesst sich nicht sicher zuordnen. v1 bleibt
+  // unveraendert im Speicher liegen, es wird nur gelesen, nie geloescht.
+  function migrateFromV1() {
+    var seeded = defaultStats();
+    if (!hasStorage) return seeded;
+    try {
+      var raw = window.localStorage.getItem(LEGACY_STORAGE_KEY_V1);
+      if (!raw) return seeded;
+      var legacy = JSON.parse(raw);
+      if (!legacy || typeof legacy !== 'object') return seeded;
+      seeded.currentStreak = intOr(legacy.currentStreak, 0);
+      seeded.maxStreak = intOr(legacy.maxStreak, 0);
+      seeded.lastPlayedDate = isDateKey(legacy.lastPlayedDate) ? legacy.lastPlayedDate : null;
+      seeded.lastWinDate = isDateKey(legacy.lastWinDate) ? legacy.lastWinDate : null;
+      seeded.played = intOr(legacy.played, 0);
+      seeded.wins = intOr(legacy.wins, 0);
+      if (Array.isArray(legacy.dist)) {
+        for (var i = 0; i < 6; i++) { seeded.dist[i] = intOr(legacy.dist[i], 0); }
+      }
+      if (seeded.wins > seeded.played) seeded.played = seeded.wins;
+      if (seeded.currentStreak > seeded.maxStreak) seeded.maxStreak = seeded.currentStreak;
+    } catch (e) { /* v1 fehlt oder ist kaputt, sauber bei defaultStats() bleiben */ }
+    return seeded;
   }
 
   function loadStats() {
     if (!hasStorage) return defaultStats();
     try {
       var raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return defaultStats();
-      return normalizeStats(JSON.parse(raw));
+      if (raw) return normalizeStats(JSON.parse(raw));
+      return migrateFromV1();
     } catch (e) {
       return defaultStats();
     }
@@ -448,27 +541,55 @@
     }
   }
 
-  function recordResult(won, tries) {
-    if (stats.lastPlayedDate === todayKey) return; // bereits gezaehlt, Idempotenz
+  // Idempotent je Tag UND Schwierigkeit: eine bereits fuer heute vorhandene
+  // lastByDifficulty[level] Eintragung verhindert eine zweite Zaehlung,
+  // auch wenn submitGuess() nach einem Reload theoretisch erneut liefe.
+  // Serie/Streak reagiert nur auf die JEWEILS ERSTE heute abgeschlossene
+  // Runde (ueber irgendeine Schwierigkeit), damit ein zweiter Sieg am
+  // selben Tag (andere Schwierigkeit) die Serie nicht faelschlich zuruecksetzt.
+  function recordResult(won, tries, level, timeSeconds) {
+    var key = String(level);
+    var already = stats.lastByDifficulty[key] && stats.lastByDifficulty[key].date === todayKey;
+    if (already) return;
+    var firstToday = stats.lastPlayedDate !== todayKey;
+
     stats.played += 1;
     if (won) {
       stats.wins += 1;
       if (tries >= 1 && tries <= MAX_TRIES) stats.dist[tries - 1] += 1;
-      stats.currentStreak = (stats.lastWinDate === prevDayKey(todayKey)) ? stats.currentStreak + 1 : 1;
-      stats.lastWinDate = todayKey;
-    } else {
+      if (firstToday) {
+        stats.currentStreak = (stats.lastWinDate === prevDayKey(todayKey)) ? stats.currentStreak + 1 : 1;
+        stats.lastWinDate = todayKey;
+      }
+    } else if (firstToday) {
       stats.currentStreak = 0;
     }
     if (stats.currentStreak > stats.maxStreak) stats.maxStreak = stats.currentStreak;
     stats.lastPlayedDate = todayKey;
-    stats.last = { date: todayKey, guesses: playedGuesses.slice() };
-    stats.progress = null;
+    stats.lastByDifficulty[key] = { date: todayKey, guesses: playedGuesses.slice(), timeSeconds: timeSeconds };
+    delete stats.progressByDifficulty[key];
     saveStats(stats);
   }
 
   function saveProgress() {
-    stats.progress = { date: todayKey, guesses: playedGuesses.slice() };
+    stats.progressByDifficulty[String(difficulty)] = { date: todayKey, guesses: playedGuesses.slice(), timeSeconds: null };
     saveStats(stats);
+  }
+
+  /* ---------- Schwierigkeit: Wahl laden und speichern ---------- */
+  function loadDifficulty() {
+    if (hasStorage) {
+      try {
+        var v = parseInt(window.localStorage.getItem(DIFFICULTY_KEY), 10);
+        if ([1, 2, 3, 4].indexOf(v) !== -1) return v;
+      } catch (e) { /* kein Storage */ }
+    }
+    return 2; // Mittel, entspricht dem bisherigen Standardverhalten
+  }
+
+  function saveDifficulty(v) {
+    if (!hasStorage) return;
+    try { window.localStorage.setItem(DIFFICULTY_KEY, String(v)); } catch (e) { /* nur Sitzung */ }
   }
 
   /* ---------- Sprache: Wahl laden, speichern, setzen ---------- */
@@ -602,6 +723,9 @@
   var linkImprintEl  = document.getElementById('linkImprint');
   var themeFeedbackEl = document.getElementById('themeFeedback');
   var shareActionsEl = resultEl ? resultEl.querySelector('.share-actions') : null;
+  var diffRowEl      = document.getElementById('diffRow');
+  var hudTimeEl      = document.getElementById('hudTime');
+  var resultTimeEl   = document.getElementById('resultTime');
   // Zusaetzlicher, eigenstaendiger Bereich fuer das gemeinsame PuzzlePureScore
   // System. Ergaenzt das bestehende #stats Element, ersetzt es nicht.
   var ppScoreEl      = document.createElement('div');
@@ -616,12 +740,14 @@
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
   var stats = loadStats();
   var todayKey = dateKeyUTC();
-  var code = makeCode(todayKey);
+  var difficulty = loadDifficulty();
+  var code = null;
   var currentRow = 0;
-  var guess = new Array(POSITIONS).fill(null);
+  var guess = [];
   var phase = 'playing'; // 'playing' | 'won' | 'lost'
   var slotRefs = [];
   var paletteButtons = [];
+  var diffButtons = [];
   var themeToggleBtn = null;
   var langToggleBtn = null;
   var fbTimer = 0;
@@ -632,6 +758,7 @@
   var resultShown = false;
   var resultWon = false;
   var resultTries = 0;
+  var resultTimeSeconds = null;
   var shareBtnEl = null;
   var lastCopyFeedback = null;
   var ppResult = null; // Ergebnis des gemeinsamen PuzzlePureScore Systems, gesetzt in submitGuess()
@@ -715,6 +842,11 @@
   /* ---------- Aufbau ---------- */
   function buildPalette() {
     paletteEl.innerHTML = '';
+    // Nur abweichend von der CSS Standardspaltenzahl (6) per CSSOM setzen,
+    // damit der bestehende Schmalbildschirm Fallback (@media max-width:344px)
+    // fuer den Standardfall unangetastet bleibt.
+    if (SYMBOL_COUNT === 6) { paletteEl.style.removeProperty('grid-template-columns'); }
+    else { paletteEl.style.setProperty('grid-template-columns', 'repeat(' + SYMBOL_COUNT + ', 1fr)'); }
     paletteButtons = [];
     for (var i = 0; i < SYMBOL_COUNT; i++) {
       var b = document.createElement('button');
@@ -739,12 +871,46 @@
     }
   }
 
+  /* ---------- Schwierigkeit Auswahl (optisch wie Questra Stufen Buttons) ---------- */
+  function buildDiffRow() {
+    if (!diffRowEl) return;
+    diffRowEl.innerHTML = '';
+    diffButtons = [1, 2, 3, 4].map(function (n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'diff-btn';
+      b.textContent = t('level', { n: n });
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_difficulty', { n: n }));
+      b.addEventListener('click', function () { selectDifficulty(n); });
+      diffRowEl.appendChild(b);
+      return b;
+    });
+  }
+
+  function refreshDiffButtons() {
+    diffButtons.forEach(function (b, i) {
+      b.textContent = t('level', { n: i + 1 });
+      b.setAttribute('aria-pressed', String(difficulty === i + 1));
+      b.setAttribute('aria-label', t('aria_difficulty', { n: i + 1 }));
+    });
+  }
+
+  function selectDifficulty(n) {
+    if (n === difficulty) return;
+    if (phase === 'playing' && playedGuesses.length) saveProgress();
+    difficulty = n;
+    saveDifficulty(n);
+    setupRound();
+  }
+
   function buildBoard() {
     boardEl.innerHTML = '';
     slotRefs = [];
     for (var r = 0; r < MAX_TRIES; r++) {
       var row = document.createElement('div');
       row.className = 'row';
+      row.style.setProperty('grid-template-columns', 'repeat(' + POSITIONS + ', 1fr)');
       row.setAttribute('role', 'group');
       row.setAttribute('aria-label', t('aria_row', { n: r + 1, max: MAX_TRIES }));
       var refs = [];
@@ -879,14 +1045,15 @@
         var winRow = boardEl.children[currentRow];
         if (winRow) winRow.classList.add('win-row');
       }
-      recordResult(true, currentRow + 1);
+      var winSeconds = Math.floor(currentElapsed());
+      recordResult(true, currentRow + 1, difficulty, winSeconds);
       if (window.PuzzlePureScore) {
         lastPpPayload = {
           game: 'code',
-          difficulty: null,
+          difficulty: difficulty,
           outcome: 'win',
-          timeSeconds: null,
-          parSeconds: null,
+          timeSeconds: winSeconds,
+          parSeconds: PAR_SECONDS,
           mistakes: playedGuesses.length - 1,
           hints: 0,
           perfect: playedGuesses.length === 1
@@ -896,21 +1063,22 @@
       }
       setStatus('status_win', { n: currentRow + 1, max: MAX_TRIES }, 'win');
       endGame();
-      showResult(true, currentRow + 1);
+      showResult(true, currentRow + 1, winSeconds);
       return;
     }
 
     currentRow += 1;
     if (currentRow >= MAX_TRIES) {
       phase = 'lost';
-      recordResult(false, 0);
+      var loseSeconds = Math.floor(currentElapsed());
+      recordResult(false, 0, difficulty, loseSeconds);
       if (window.PuzzlePureScore) {
         lastPpPayload = {
           game: 'code',
-          difficulty: null,
+          difficulty: difficulty,
           outcome: 'loss',
-          timeSeconds: null,
-          parSeconds: null,
+          timeSeconds: loseSeconds,
+          parSeconds: PAR_SECONDS,
           mistakes: playedGuesses.length,
           hints: 0,
           perfect: false
@@ -921,7 +1089,7 @@
       setStatus('status_lose', { code: codeNames() }, 'lose');
       revealCode();
       endGame();
-      showResult(false, MAX_TRIES);
+      showResult(false, MAX_TRIES, loseSeconds);
       return;
     }
 
@@ -961,7 +1129,33 @@
     if (label) label.textContent = t('reveal_label');
   }
 
+  /* ---------- Timer (friert bei verstecktem Tab, Muster wie grid9) ----------
+     Startet nur bei einer wirklich neuen oder fortgesetzten, noch nicht
+     abgeschlossenen Runde. Wird bei Sieg oder Niederlage in endGame()
+     gestoppt. Kein Persistieren der laufenden Sekunden ueber einen Reload
+     hinweg, ein wiederaufgenommenes Spiel zaehlt bewusst wieder ab 0. */
+  var baseElapsed = 0, segStart = 0, timerId = 0;
+  function nowMs() { return (window.performance && window.performance.now) ? window.performance.now() : Date.now(); }
+  function currentElapsed() { return baseElapsed + (segStart ? (nowMs() - segStart) / 1000 : 0); }
+  function fmtTime(sec) { var m = Math.floor(sec / 60), s = Math.floor(sec) % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
+  function updateTime() { if (hudTimeEl) hudTimeEl.textContent = fmtTime(currentElapsed()); }
+  function startTimer() {
+    stopTimer();
+    baseElapsed = 0; segStart = nowMs();
+    updateTime();
+    timerId = window.setInterval(function () { if (phase === 'playing') updateTime(); }, 500);
+  }
+  function stopTimer() {
+    if (timerId) { window.clearInterval(timerId); timerId = 0; }
+    if (segStart) { baseElapsed = currentElapsed(); segStart = 0; }
+  }
+  function onVisibility() {
+    if (document.hidden) { if (segStart) { baseElapsed = currentElapsed(); segStart = 0; } }
+    else if (phase === 'playing' && !segStart) { segStart = nowMs(); }
+  }
+
   function endGame() {
+    stopTimer();
     checkBtn.disabled = true;
     clearBtn.disabled = true;
     for (var i = 0; i < paletteButtons.length; i++) {
@@ -972,10 +1166,11 @@
   }
 
   /* ---------- Ergebnis, Teilen, Statistik ---------- */
-  function showResult(won, tries) {
+  function showResult(won, tries, timeSeconds) {
     resultShown = true;
     resultWon = won;
     resultTries = tries;
+    resultTimeSeconds = (typeof timeSeconds === 'number' && isFinite(timeSeconds) && timeSeconds >= 0) ? timeSeconds : null;
     shareText = buildShareText(won, tries);
     if (shareGridEl) shareGridEl.textContent = shareText;
     renderResultTexts();
@@ -988,12 +1183,24 @@
         ? t('status_win', { n: resultTries, max: MAX_TRIES })
         : t('result_lose');
     }
+    if (resultTimeEl) {
+      if (resultTimeSeconds === null) {
+        resultTimeEl.textContent = '';
+      } else {
+        var timeText = fmtTime(resultTimeSeconds);
+        resultTimeEl.textContent = resultWon
+          ? t('result_time_win', { t: timeText })
+          : t('result_time_lose', { t: timeText });
+      }
+    }
     renderStats(resultWon ? resultTries : 0);
   }
 
   // Kompaktes Emoji Raster, eine Zeile pro Versuch, sprachneutral, kein Code Spoiler.
+  // Nennt zusaetzlich die Schwierigkeit, da Spielstaende zwischen Stufen
+  // sonst nicht vergleichbar waeren.
   function buildShareText(won, tries) {
-    var header = 'Ciphera ' + todayKey + '  ' + (won ? String(tries) : 'X') + '/' + MAX_TRIES;
+    var header = 'Ciphera ' + todayKey + ' [' + t('level', { n: difficulty }) + ']  ' + (won ? String(tries) : 'X') + '/' + MAX_TRIES;
     var lines = [header, ''];
     for (var r = 0; r < playedGuesses.length; r++) {
       var result = evaluate(playedGuesses[r], code);
@@ -1041,7 +1248,7 @@
     var played = stats.played;
     var winPct = played ? Math.round((stats.wins / played) * 100) : 0;
     var maxDist = 1;
-    for (var k = 0; k < 6; k++) { if (stats.dist[k] > maxDist) maxDist = stats.dist[k]; }
+    for (var k = 0; k < MAX_TRIES; k++) { if (stats.dist[k] > maxDist) maxDist = stats.dist[k]; }
 
     var html = '<div class="stat-grid">';
     html += statCell(played, t('stat_played'));
@@ -1050,7 +1257,7 @@
     html += statCell(stats.maxStreak, t('stat_max'));
     html += '</div>';
     html += '<h3 class="dist-title">' + t('dist_title') + '</h3>';
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < MAX_TRIES; i++) {
       var count = stats.dist[i];
       var pct = Math.round((count / maxDist) * 100);
       var width = count > 0 ? Math.max(pct, 12) : 8;
@@ -1133,8 +1340,12 @@
     shareActionsEl.appendChild(shareBtnEl);
   }
 
-  /* ---------- Wiederherstellen ---------- */
-  function restoreToday(rows) {
+  /* ---------- Wiederherstellen ----------
+     storedTimeSeconds kommt nur bei einer bereits ABGESCHLOSSENEN Runde
+     (lastByDifficulty) vor, sonst null. Bei fortgesetzter, noch offener
+     Runde (progressByDifficulty) zaehlt der Timer bewusst wieder ab 0,
+     die urspruengliche Dauer wird nicht persistiert. */
+  function restoreToday(rows, storedTimeSeconds) {
     playedGuesses = [];
     var won = false;
     for (var r = 0; r < rows.length && r < MAX_TRIES; r++) {
@@ -1149,21 +1360,24 @@
       phase = 'won';
       currentRow = used - 1;
       endGame();
+      if (hudTimeEl) hudTimeEl.textContent = (storedTimeSeconds === null) ? '0:00' : fmtTime(storedTimeSeconds);
       setStatus('status_restore_win', { n: used, max: MAX_TRIES }, 'win');
-      showResult(true, used);
+      showResult(true, used, storedTimeSeconds);
     } else if (used >= MAX_TRIES) {
       phase = 'lost';
       currentRow = MAX_TRIES - 1;
       endGame();
       revealCode();
+      if (hudTimeEl) hudTimeEl.textContent = (storedTimeSeconds === null) ? '0:00' : fmtTime(storedTimeSeconds);
       setStatus('status_restore_lose', { code: codeNames() }, 'lose');
-      showResult(false, MAX_TRIES);
+      showResult(false, MAX_TRIES, storedTimeSeconds);
     } else {
       phase = 'playing';
       currentRow = used;
       guess = new Array(POSITIONS).fill(null);
       renderGuess();
       setStatus('status_resume', { n: currentRow + 1, max: MAX_TRIES }, '');
+      startTimer();
     }
   }
 
@@ -1194,6 +1408,7 @@
     refreshThemeBar();
     setFooterLinks();
     refreshPaletteLabels();
+    refreshDiffButtons();
     renderBoardFull();
     updateRevealCode();
     if (lastStatus) statusEl.textContent = t(lastStatus.key, lastStatus.params);
@@ -1342,25 +1557,57 @@
     refresh();
   }
 
+  /* ---------- Runde aufsetzen (Erstladung UND Schwierigkeitswechsel) ----------
+     Setzt die schwierigkeitsabhaengigen Parameter, erzeugt den Tagescode
+     dieser Schwierigkeit und stellt entweder eine bereits abgeschlossene
+     Runde, eine offene Runde oder ein frisches Raetsel wieder her. */
+  function setupRound() {
+    stopTimer();
+    applyDifficultyParams(difficulty);
+    code = makeCode(todayKey + ':' + difficulty);
+    currentRow = 0;
+    guess = new Array(POSITIONS).fill(null);
+    phase = 'playing';
+    playedGuesses = [];
+    ppResult = null;
+    lastPpPayload = null;
+    rewardsTriggered = false;
+    resultShown = false;
+    resultWon = false;
+    resultTries = 0;
+    resultTimeSeconds = null;
+    shareText = '';
+    if (resultEl) resultEl.hidden = true;
+    if (hudTimeEl) hudTimeEl.textContent = '0:00';
+
+    buildPalette();
+    buildBoard();
+    refreshDiffButtons();
+
+    var key = String(difficulty);
+    var lastRec = stats.lastByDifficulty[key];
+    var progRec = stats.progressByDifficulty[key];
+    if (lastRec && lastRec.date === todayKey) {
+      restoreToday(lastRec.guesses, lastRec.timeSeconds);
+    } else if (progRec && progRec.date === todayKey) {
+      restoreToday(progRec.guesses, null);
+    } else {
+      var dirty = false;
+      if (progRec) { delete stats.progressByDifficulty[key]; dirty = true; }
+      if (lastRec && lastRec.date !== todayKey) { delete stats.lastByDifficulty[key]; dirty = true; }
+      if (dirty) saveStats(stats);
+      renderGuess();
+      setStatus('status_fresh', { date: todayKey, pos: POSITIONS, sym: SYMBOL_COUNT, max: MAX_TRIES }, '');
+      startTimer();
+    }
+  }
+
   /* ---------- Start ---------- */
   function init() {
     buildLangBar();
     buildThemeBar();
-    buildPalette();
-    buildBoard();
-
-    if (stats.last && stats.last.date === todayKey) {
-      restoreToday(stats.last.guesses);
-    } else if (stats.progress && stats.progress.date === todayKey) {
-      restoreToday(stats.progress.guesses);
-    } else {
-      var dirty = false;
-      if (stats.progress) { stats.progress = null; dirty = true; }
-      if (stats.last && stats.last.date !== todayKey) { stats.last = null; dirty = true; }
-      if (dirty) saveStats(stats);
-      renderGuess();
-      setStatus('status_fresh', { date: todayKey, pos: POSITIONS, sym: SYMBOL_COUNT, max: MAX_TRIES }, '');
-    }
+    buildDiffRow();
+    setupRound();
 
     document.documentElement.lang = lang;
     applyStaticI18n();
@@ -1377,6 +1624,7 @@
     } else if (systemDarkMQ.addListener) {
       systemDarkMQ.addListener(onSystemSchemeChange);
     }
+    document.addEventListener('visibilitychange', onVisibility);
     setupShareButton();
     registerServiceWorker();
     initBackground();

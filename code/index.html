@@ -72,6 +72,12 @@
 
     <p class="toggle-feedback" id="themeFeedback" role="status" aria-live="polite"></p>
 
+    <div class="diff-row" id="diffRow" role="group" data-i18n-aria="aria_difficulty_group"></div>
+
+    <div class="hud" id="hud">
+      <span class="hud-item"><span class="hud-label" data-i18n="lbl_time"></span> <span class="hud-val" id="hudTime">0:00</span></span>
+    </div>
+
     <section class="board" id="board" data-i18n-aria="aria_board"></section>
 
     <p class="status" id="status" role="status" aria-live="polite"></p>
@@ -85,6 +91,7 @@
 
     <section class="result" id="result" hidden data-i18n-aria="aria_result">
       <p class="result-line" id="resultLine"></p>
+      <p class="result-time" id="resultTime"></p>
       <pre class="share-grid" id="shareGrid" aria-hidden="true"></pre>
       <div class="share-actions">
         <button type="button" class="btn btn-primary" id="copyBtn" data-i18n="btn_copy"></button>

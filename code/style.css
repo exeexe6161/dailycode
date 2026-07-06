@@ -201,6 +201,36 @@ button { touch-action: manipulation; }
   margin: 0 0 16px;
 }
 
+/* Schwierigkeit (optisch wie Questra Stufen Buttons) */
+.diff-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 14px; }
+.diff-btn {
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 18px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+.diff-btn:hover { border-color: var(--accent); color: var(--text); }
+.diff-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+/* Timer, ruhig in einer schmalen HUD Zeile, keine Animation */
+.hud {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 0 0 12px;
+  font-weight: 700;
+}
+.hud-label { color: var(--text-muted); font-weight: 600; }
+.hud-val { color: var(--text); font-variant-numeric: tabular-nums; }
+
 /* Spielfeld */
 .board { display: grid; gap: var(--gap); margin: 8px 0 14px; }
 .row {
@@ -489,6 +519,14 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   font-size: 1.05rem;
   margin: 0 0 12px;
 }
+.result-time {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: .9rem;
+  font-variant-numeric: tabular-nums;
+  margin: -6px 0 12px;
+}
+.result-time:empty { margin: 0; }
 .share-grid {
   margin: 0 0 12px;
   font-family: inherit;
