@@ -12,7 +12,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-portal-v20';
+var CACHE = 'dailycode-portal-v22';
 var PREFIX = 'dailycode-portal-';
 var LEGACY = ['dailycode-cache-v2'];
 
@@ -48,7 +48,8 @@ var ASSETS = [
   './assets/games/numora.png',
   './assets/games/reflexa.png',
   './assets/games/fluxa.png',
-  './assets/games/pixela.png'
+  './assets/games/pixela.png',
+  './assets/games/questra.png'
 ];
 
 self.addEventListener('install', function (event) {

@@ -325,14 +325,19 @@ button { touch-action: manipulation; }
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 4px 10px;
-  padding: 10px 12px;
+  padding: 12px;
+  min-height: 44px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color var(--ease), background var(--ease);
 }
+.rk-game-row:hover { border-color: var(--accent); background: var(--surface-2); }
 .rk-game-name { font-weight: 700; }
 .rk-game-meta { grid-column: 1 / -1; color: var(--text-muted); font-size: .78rem; }
-.rk-game-score { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.rk-game-score { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; color: var(--accent); }
 .rk-empty { color: var(--text-muted); font-size: .9rem; text-align: center; padding: 20px 10px; }
 
 .help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
