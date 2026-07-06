@@ -26,7 +26,10 @@
   var I18N = {
     de: {
       subtitle: 'Beantworte sieben kurze Fragen und sieh, wie ruhig und klar du denkst.',
-      level: function (n) { return 'Stufe ' + n; },
+      level: function (n) { return ['Leicht', 'Mittel', 'Schwer', 'Experte'][n - 1] || 'Mittel'; },
+      aria_difficulty_group: 'Schwierigkeit',
+      aria_difficulty: function (n) { return t('level')(n) + ' wählen'; },
+      result_difficulty: function (n) { return 'Schwierigkeit: ' + t('level')(n); },
       solved: 'Gelöst',
       unsolved: 'noch nicht gelöst',
       theme_group: 'Darstellung',
@@ -72,7 +75,10 @@
     },
     en: {
       subtitle: 'Answer seven short questions and see how calm and clear your thinking is.',
-      level: function (n) { return 'Level ' + n; },
+      level: function (n) { return ['Easy', 'Medium', 'Hard', 'Expert'][n - 1] || 'Medium'; },
+      aria_difficulty_group: 'Difficulty',
+      aria_difficulty: function (n) { return 'Select ' + t('level')(n); },
+      result_difficulty: function (n) { return 'Difficulty: ' + t('level')(n); },
       solved: 'Solved',
       unsolved: 'not solved yet',
       theme_group: 'Appearance',
@@ -118,7 +124,10 @@
     },
     tr: {
       subtitle: 'Yedi kısa soruyu yanıtla ve ne kadar sakin ve net düşündüğünü gör.',
-      level: function (n) { return 'Seviye ' + n; },
+      level: function (n) { return ['Kolay', 'Orta', 'Zor', 'Uzman'][n - 1] || 'Orta'; },
+      aria_difficulty_group: 'Zorluk',
+      aria_difficulty: function (n) { return t('level')(n) + ' seç'; },
+      result_difficulty: function (n) { return 'Zorluk: ' + t('level')(n); },
       solved: 'Çözüldü',
       unsolved: 'henüz çözülmedi',
       theme_group: 'Görünüm',
@@ -329,7 +338,6 @@
       { q: 'Bir olay ancak başka bir olaydan sonra gerçekleşir. Hangi olay daha önce oldu?', o: ['Sonraki olay', 'Önceki olay', 'İkisi aynı anda', 'Bu şansa bağlıdır'], c: 1 }
     ]
   };
-  var POOL_SIZE = POOL.de.length;
 
   /* ============================================================
      Logik: gleiche mulberry32/hashStringToSeed wie in den anderen
@@ -354,30 +362,69 @@
     }
     return h >>> 0;
   }
-  /* Waehlt sieben eindeutige Fragenindizes aus dem Pool, per Fisher Yates mit seeded RNG. */
-  function pickIndices(seed, poolSize, count) {
+  /* ============================================================
+     Kategorie Struktur fuer Schwierigkeit: sieben Kategorien in
+     Poolreihenfolge (Logik, Zahlenmuster, Wortverstaendnis, Formen und
+     Farben, Alltagswissen, Mini Rechnen, neutrale Denkfragen), je
+     CATEGORY_SIZES Fragen. Groessen bewusst als Array, nicht als feste
+     Indexbereiche im Code verstreut, damit spaeter einzelne Kategorien
+     um weitere Fragen ergaenzt werden koennen, ohne die Auswahl Logik
+     anzufassen (nur die Zahl in CATEGORY_SIZES aendert sich).
+     ============================================================ */
+  var CATEGORY_SIZES = [6, 6, 6, 6, 6, 6, 6];
+  function categoryStart(catIndex) {
+    var start = 0;
+    for (var i = 0; i < catIndex; i++) start += CATEGORY_SIZES[i];
+    return start;
+  }
+  /* Welche der sieben Kategorien liefert je Frage einer Runde, je Schwierigkeit.
+     1 Leicht: Wortverstaendnis/Formen und Farben/Alltagswissen mehrfach, 1x Mini Rechnen.
+     2 Mittel: eine Frage je Kategorie, nah am bisherigen, ungewichteten Verhalten.
+     3 Schwer: Logik/Zahlenmuster/neutrale Denkfragen mehrfach, 1x Mini Rechnen.
+     4 Experte: Logik/Zahlenmuster/neutrale Denkfragen maximal gewichtet, kein Mini Rechnen. */
+  var CATEGORY_MIX_BY_DIFFICULTY = {
+    1: [2, 3, 4, 2, 3, 4, 5],
+    2: [0, 1, 2, 3, 4, 5, 6],
+    3: [0, 1, 6, 0, 1, 6, 5],
+    4: [0, 1, 6, 0, 1, 6, 0]
+  };
+  var PAR_SECONDS_BY_DIFFICULTY = { 1: 90, 2: 70, 3: 60, 4: 50 };
+  function normalizeDifficulty(d) { return [1, 2, 3, 4].indexOf(d) !== -1 ? d : 2; }
+
+  /* Waehlt sieben Fragenindizes gemaess der Kategorie Gewichtung der Schwierigkeit,
+     deterministisch aus dem Seed, ohne dieselbe Frage zweimal in einer Runde. */
+  function pickRoundIndices(seed, difficulty) {
     var rng = mulberry32(seed);
-    var arr = [];
-    for (var i = 0; i < poolSize; i++) arr.push(i);
-    for (var j = arr.length - 1; j > 0; j--) {
-      var k = Math.floor(rng() * (j + 1));
-      var tmp = arr[j]; arr[j] = arr[k]; arr[k] = tmp;
-    }
-    return arr.slice(0, count);
+    var mix = CATEGORY_MIX_BY_DIFFICULTY[normalizeDifficulty(difficulty)];
+    var usedByCategory = {};
+    var result = [];
+    mix.forEach(function (cat) {
+      var size = CATEGORY_SIZES[cat];
+      var start = categoryStart(cat);
+      var used = usedByCategory[cat] || (usedByCategory[cat] = []);
+      var localIdx, guard = 0;
+      do {
+        localIdx = Math.floor(rng() * size);
+        guard++;
+      } while (used.indexOf(localIdx) !== -1 && guard < 50);
+      used.push(localIdx);
+      result.push(start + localIdx);
+    });
+    return result;
   }
-  function generateDailyRound(dateStr) {
-    var seed = hashStringToSeed('questra:daily:' + dateStr);
-    return pickIndices(seed, POOL_SIZE, 7);
+  function generateDailyRound(dateStr, difficulty) {
+    var seed = hashStringToSeed('questra:daily:' + dateStr + ':d' + normalizeDifficulty(difficulty));
+    return pickRoundIndices(seed, difficulty);
   }
-  function generateUnlimitedRound(index) {
+  function generateUnlimitedRound(index, difficulty) {
     var idx = Math.max(0, Math.floor(index) || 0);
-    var seed = hashStringToSeed('questra:unlimited:' + idx);
-    return pickIndices(seed, POOL_SIZE, 7);
+    var seed = hashStringToSeed('questra:unlimited:' + idx + ':d' + normalizeDifficulty(difficulty));
+    return pickRoundIndices(seed, difficulty);
   }
   function randomUnlimitedIndex() { return Math.floor(Math.random() * 1000000); }
-  /* 1 bis 3 Sterne aus Punktzahl und Zeit, ruhiger Richtwert, nie 0 Sterne. */
-  function ratingStars(score, elapsedSeconds) {
-    var par = 70;
+  /* 1 bis 3 Sterne aus Punktzahl und Zeit, ruhiger Richtwert, nie 0 Sterne. Parzeit sinkt mit steigender Schwierigkeit. */
+  function ratingStars(score, elapsedSeconds, difficulty) {
+    var par = PAR_SECONDS_BY_DIFFICULTY[normalizeDifficulty(difficulty)];
     if (score === 7 && elapsedSeconds <= par) return 3;
     if (score >= 5) return 2;
     return 1;
@@ -552,13 +599,16 @@
      Persistenz: Sitzungszustand (Modus, laufende Runde) und
      Tagesstatistik mit Streak, defensiv gegen kaputte/fehlende Daten.
      ============================================================ */
-  var STATE_KEY = 'dailycode:questra:state:v1';
-  var STATS_KEY = 'dailycode:questra:stats:v1';
+  var STATE_KEY = 'dailycode:questra:state:v2';
+  var STATE_KEY_V1 = 'dailycode:questra:state:v1';
+  var STATS_KEY = 'dailycode:questra:stats:v2';
+  var STATS_KEY_V1 = 'dailycode:questra:stats:v1';
 
   function defaultState() {
     return {
       mode: 'daily',
-      unlimitedIndexCurrent: 0,
+      difficulty: 2,
+      unlimitedIndexByDifficulty: { 1: 0, 2: 0, 3: 0, 4: 0 },
       round: {
         key: null,
         indices: [],
@@ -584,47 +634,100 @@
     d.finished = !!o.finished;
     return d;
   }
+  /* Migration v1 zu v2: die alte Runde wird bewusst NICHT uebernommen, da das alte
+     Auswahlverfahren (reiner Fisher Yates ueber den ganzen Pool) nicht mit der neuen
+     Kategorie Gewichtung kompatibel ist. Eine frische Mittel Runde entsteht beim
+     naechsten Laden automatisch, das ist sicherer als inkonsistente Indizes zu
+     uebernehmen. Der bisherige Unbegrenzt Rundenzaehler wandert nach Mittel (Stufe 2),
+     da Mittel dem bisherigen, ungewichteten Verhalten am naechsten kommt.  */
+  function migrateStateFromV1() {
+    if (!hasStorage) return null;
+    try {
+      var raw = window.localStorage.getItem(STATE_KEY_V1);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      var d = defaultState();
+      if (o.mode === 'daily' || o.mode === 'unlimited') d.mode = o.mode;
+      d.unlimitedIndexByDifficulty[2] = intOr(o.unlimitedIndexCurrent, 0);
+      return d;
+    } catch (e) { return null; }
+  }
   function loadState() {
     if (!hasStorage) return defaultState();
     try {
       var raw = window.localStorage.getItem(STATE_KEY);
-      if (!raw) return defaultState();
-      var o = JSON.parse(raw);
-      var d = defaultState();
-      if (o.mode === 'daily' || o.mode === 'unlimited') d.mode = o.mode;
-      d.unlimitedIndexCurrent = intOr(o.unlimitedIndexCurrent, 0);
-      d.round = normalizeRound(o.round);
-      return d;
+      if (raw) {
+        var o = JSON.parse(raw);
+        var d = defaultState();
+        if (o.mode === 'daily' || o.mode === 'unlimited') d.mode = o.mode;
+        if ([1, 2, 3, 4].indexOf(o.difficulty) !== -1) d.difficulty = o.difficulty;
+        if (o.unlimitedIndexByDifficulty && typeof o.unlimitedIndexByDifficulty === 'object') {
+          for (var k = 1; k <= 4; k++) d.unlimitedIndexByDifficulty[k] = intOr(o.unlimitedIndexByDifficulty[k], 0);
+        }
+        d.round = normalizeRound(o.round);
+        return d;
+      }
+      var migrated = migrateStateFromV1();
+      if (migrated) { saveState(migrated); return migrated; }
+      return defaultState();
     } catch (e) { return defaultState(); }
   }
   function saveState(s) { if (!hasStorage) return; try { window.localStorage.setItem(STATE_KEY, JSON.stringify(s)); } catch (e) {} }
 
-  function defaultStats() { return { currentStreak: 0, maxStreak: 0, lastWinDate: null, totalSolved: 0, bestScore: 0 }; }
+  function defaultDifficultyStats() { return { currentStreak: 0, maxStreak: 0, lastWinDate: null, totalSolved: 0, bestScore: 0 }; }
+  function defaultStats() {
+    return { byDifficulty: { 1: defaultDifficultyStats(), 2: defaultDifficultyStats(), 3: defaultDifficultyStats(), 4: defaultDifficultyStats() } };
+  }
+  function normalizeDifficultyStats(o) {
+    var d = defaultDifficultyStats();
+    if (!o || typeof o !== 'object') return d;
+    d.currentStreak = intOr(o.currentStreak, 0);
+    d.maxStreak = intOr(o.maxStreak, 0);
+    d.lastWinDate = isDateKey(o.lastWinDate) ? o.lastWinDate : null;
+    d.totalSolved = intOr(o.totalSolved, 0);
+    d.bestScore = intOr(o.bestScore, 0);
+    if (d.currentStreak > d.maxStreak) d.maxStreak = d.currentStreak;
+    return d;
+  }
+  /* Migration v1 zu v2: die bisherige, einzige Statistik ist inhaltlich am naehesten an
+     Mittel (Stufe 2) und wandert dorthin, unveraendert. Leicht, Schwer und Experte
+     starten leer, kein bestehender Wert geht dabei verloren. */
+  function migrateStatsFromV1() {
+    if (!hasStorage) return null;
+    try {
+      var raw = window.localStorage.getItem(STATS_KEY_V1);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      var d = defaultStats();
+      d.byDifficulty[2] = normalizeDifficultyStats(o);
+      return d;
+    } catch (e) { return null; }
+  }
   function loadStats() {
     if (!hasStorage) return defaultStats();
     try {
       var raw = window.localStorage.getItem(STATS_KEY);
-      if (!raw) return defaultStats();
-      var o = JSON.parse(raw);
-      var d = defaultStats();
-      d.currentStreak = intOr(o.currentStreak, 0);
-      d.maxStreak = intOr(o.maxStreak, 0);
-      d.lastWinDate = isDateKey(o.lastWinDate) ? o.lastWinDate : null;
-      d.totalSolved = intOr(o.totalSolved, 0);
-      d.bestScore = intOr(o.bestScore, 0);
-      if (d.currentStreak > d.maxStreak) d.maxStreak = d.currentStreak;
-      return d;
+      if (raw) {
+        var o = JSON.parse(raw);
+        var d = defaultStats();
+        if (o && o.byDifficulty) { for (var k = 1; k <= 4; k++) d.byDifficulty[k] = normalizeDifficultyStats(o.byDifficulty[k]); }
+        return d;
+      }
+      var migrated = migrateStatsFromV1();
+      if (migrated) { saveStats(migrated); return migrated; }
+      return defaultStats();
     } catch (e) { return defaultStats(); }
   }
   function saveStats(s) { if (!hasStorage) return; try { window.localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch (e) {} }
-  function recordDailyResult(stats, dateStr, score) {
-    if (stats.lastWinDate !== dateStr) {
-      stats.totalSolved += 1;
-      stats.currentStreak = (stats.lastWinDate === prevDayKey(dateStr)) ? stats.currentStreak + 1 : 1;
-      stats.lastWinDate = dateStr;
-      if (stats.currentStreak > stats.maxStreak) stats.maxStreak = stats.currentStreak;
+  function recordDailyResult(stats, difficulty, dateStr, score) {
+    var ds = stats.byDifficulty[normalizeDifficulty(difficulty)];
+    if (ds.lastWinDate !== dateStr) {
+      ds.totalSolved += 1;
+      ds.currentStreak = (ds.lastWinDate === prevDayKey(dateStr)) ? ds.currentStreak + 1 : 1;
+      ds.lastWinDate = dateStr;
+      if (ds.currentStreak > ds.maxStreak) ds.maxStreak = ds.currentStreak;
     }
-    if (score > stats.bestScore) stats.bestScore = score;
+    if (score > ds.bestScore) ds.bestScore = score;
     saveStats(stats);
     return stats;
   }
@@ -635,8 +738,9 @@
   function mountQuestra(container) {
     var state = loadState();
     var mode = state.mode;
+    var difficulty = state.difficulty;
     var dateStr = dateKeyUTC();
-    var unlimitedIndex = state.unlimitedIndexCurrent || 0;
+    var unlimitedIndex = state.unlimitedIndexByDifficulty[difficulty] || 0;
     var statsData = loadStats();
 
     var indices = [];
@@ -662,6 +766,13 @@
     var modeDailyBtn = modeButton('daily');
     var modeUnlimitedBtn = modeButton('unlimited');
     modeRow.append(modeDailyBtn, modeUnlimitedBtn);
+
+    var diffRow = document.createElement('div');
+    diffRow.className = 'questra-diff';
+    diffRow.setAttribute('role', 'group');
+    diffRow.setAttribute('aria-label', t('aria_difficulty_group'));
+    var diffButtons = [1, 2, 3, 4].map(function (n) { return difficultyButton(n); });
+    diffRow.append.apply(diffRow, diffButtons);
 
     var unlimitedNav = document.createElement('div');
     unlimitedNav.className = 'questra-unlimited-nav';
@@ -712,15 +823,17 @@
     resultHeadingEl.className = 'questra-result-heading';
     var resultTextEl = document.createElement('p');
     resultTextEl.className = 'questra-result-text';
+    var resultDifficultyEl = document.createElement('p');
+    resultDifficultyEl.className = 'questra-result-difficulty';
     var starsEl = document.createElement('div');
     starsEl.className = 'questra-stars';
     var ppScoreEl = document.createElement('div');
-    resultPanel.append(resultHeadingEl, resultTextEl, starsEl, ppScoreEl);
+    resultPanel.append(resultHeadingEl, resultTextEl, resultDifficultyEl, starsEl, ppScoreEl);
 
     var statsPanel = document.createElement('div');
     statsPanel.className = 'questra-stats';
 
-    container.append(modeRow, unlimitedNav, statusLine, quizArea, actions, resultPanel, statsPanel);
+    container.append(modeRow, diffRow, unlimitedNav, statusLine, quizArea, actions, resultPanel, statsPanel);
 
     function modeButton(m) {
       var b = document.createElement('button');
@@ -739,6 +852,34 @@
         render();
       });
       return b;
+    }
+    function difficultyButton(n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'questra-diff-btn';
+      b.textContent = t('level')(n);
+      b.setAttribute('aria-pressed', String(difficulty === n));
+      b.setAttribute('aria-label', t('aria_difficulty')(n));
+      b.addEventListener('click', function () { selectDifficulty(n); });
+      return b;
+    }
+    function refreshDiffButtons() {
+      diffButtons.forEach(function (b, i) {
+        b.textContent = t('level')(i + 1);
+        b.setAttribute('aria-pressed', String(difficulty === i + 1));
+        b.setAttribute('aria-label', t('aria_difficulty')(i + 1));
+      });
+    }
+    function selectDifficulty(n) {
+      if (difficulty === n) return;
+      persistState();
+      difficulty = n;
+      state.difficulty = difficulty;
+      unlimitedIndex = state.unlimitedIndexByDifficulty[difficulty] || 0;
+      saveState(state);
+      loadRoundForState(false);
+      refreshDiffButtons();
+      render();
     }
     function iconNavButton(iconKey, onClick, ariaKey) {
       var b = document.createElement('button');
@@ -759,20 +900,20 @@
     }
 
     function currentRoundKey() {
-      return mode === 'daily' ? ('daily:' + dateStr) : ('unlimited:' + unlimitedIndex);
+      return (mode === 'daily' ? ('daily:' + dateStr) : ('unlimited:' + unlimitedIndex)) + ':d' + difficulty;
     }
 
     function goToIndex(idx) {
       persistState();
       unlimitedIndex = Math.max(0, idx);
-      state.unlimitedIndexCurrent = unlimitedIndex;
+      state.unlimitedIndexByDifficulty[difficulty] = unlimitedIndex;
       saveState(state);
       loadRoundForState(true);
       render();
     }
 
     function freshRound() {
-      indices = mode === 'daily' ? generateDailyRound(dateStr) : generateUnlimitedRound(unlimitedIndex);
+      indices = mode === 'daily' ? generateDailyRound(dateStr, difficulty) : generateUnlimitedRound(unlimitedIndex, difficulty);
       answers = [null, null, null, null, null, null, null];
       currentQ = 0;
       finished = false;
@@ -792,7 +933,7 @@
         baseElapsed = state.round.elapsedSeconds;
         startedAt = state.round.startedAt;
         timerStarted = baseElapsed > 0 || finished;
-        stars = finished ? ratingStars(computeScore(), baseElapsed) : 0;
+        stars = finished ? ratingStars(computeScore(), baseElapsed, difficulty) : 0;
       } else {
         freshRound();
       }
@@ -867,15 +1008,15 @@
         finished = true;
         stopTimer();
         var finalScore = computeScore();
-        stars = ratingStars(finalScore, Math.floor(currentElapsed()));
-        if (mode === 'daily') recordDailyResult(statsData, dateStr, finalScore);
+        stars = ratingStars(finalScore, Math.floor(currentElapsed()), difficulty);
+        if (mode === 'daily') recordDailyResult(statsData, difficulty, dateStr, finalScore);
         if (window.PuzzlePureScore) {
           lastPpPayload = {
             game: 'questra',
-            difficulty: null,
+            difficulty: difficulty,
             outcome: 'complete',
             timeSeconds: Math.floor(currentElapsed()),
-            parSeconds: 70,
+            parSeconds: PAR_SECONDS_BY_DIFFICULTY[difficulty],
             mistakes: 7 - finalScore,
             hints: 0,
             perfect: finalScore === 7
@@ -908,12 +1049,13 @@
         statsPanel.innerHTML = '<p class="stats-hint">' + t('stats_hint') + '</p>';
         return;
       }
+      var ds = statsData.byDifficulty[difficulty];
       var html = '<h2 class="questra-stats-title">' + t('stats_title') + '</h2>';
       html += '<div class="stat-grid">';
-      html += statCellHtml(statsData.totalSolved, t('stat_solved_cap'));
-      html += statCellHtml(statsData.currentStreak, t('stat_current_cap'));
-      html += statCellHtml(statsData.maxStreak, t('stat_best_cap'));
-      html += statCellHtml(statsData.bestScore, t('stat_bestscore_cap'));
+      html += statCellHtml(ds.totalSolved, t('stat_solved_cap'));
+      html += statCellHtml(ds.currentStreak, t('stat_current_cap'));
+      html += statCellHtml(ds.maxStreak, t('stat_best_cap'));
+      html += statCellHtml(ds.bestScore, t('stat_bestscore_cap'));
       html += '</div>';
       statsPanel.innerHTML = html;
     }
@@ -925,6 +1067,7 @@
       if (mode === 'unlimited') numberEl.textContent = t('round_number')(unlimitedIndex + 1);
 
       var modeLabel = mode === 'daily' ? (t('mode_daily') + ' ' + dateStr) : (t('mode_unlimited') + ' · ' + t('round_number')(unlimitedIndex + 1));
+      modeLabel += ' · ' + t('level')(difficulty);
       statusLine.textContent = modeLabel + (finished ? '' : (' · ' + t('question_progress')(currentQ + 1)));
 
       quizArea.hidden = finished;
@@ -964,6 +1107,7 @@
         var score = computeScore();
         resultHeadingEl.textContent = t('result_heading');
         resultTextEl.textContent = t('result_text')(score, fmtTime(baseElapsed));
+        resultDifficultyEl.textContent = t('result_difficulty')(difficulty);
         renderStars();
         ppScoreEl.replaceChildren();
         if (ppResult && window.PuzzlePureScore) {
@@ -991,6 +1135,8 @@
       modeDailyBtn.setAttribute('aria-label', t('aria_mode_daily'));
       modeUnlimitedBtn.textContent = t('mode_unlimited');
       modeUnlimitedBtn.setAttribute('aria-label', t('aria_mode_unlimited'));
+      diffRow.setAttribute('aria-label', t('aria_difficulty_group'));
+      refreshDiffButtons();
       prevBtn.setAttribute('aria-label', t('aria_prev_round'));
       nextRoundBtn.setAttribute('aria-label', t('aria_next_round'));
       randomBtn.setAttribute('aria-label', t('aria_random_round'));
