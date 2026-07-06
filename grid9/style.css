@@ -202,19 +202,21 @@ button { touch-action: manipulation; }
 /* Schwierigkeitsleiste */
 .diffbar { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
 .diff-btn {
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  min-width: 44px;
   min-height: 44px;
-  padding: 8px 16px;
+  border-radius: 18px;
   border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text-muted);
-  font: inherit;
-  font-weight: 700;
   cursor: pointer;
-  transition: border-color var(--ease), color var(--ease), background var(--ease);
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
 }
 .diff-btn:hover { border-color: var(--accent); color: var(--text); }
-.diff-btn.is-active { border-color: var(--accent); color: var(--text); background: var(--surface-2); }
+.diff-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 .hud {
   display: flex;
@@ -394,6 +396,7 @@ button { touch-action: manipulation; }
   text-decoration: none;
   font-weight: 600;
   padding: 4px 2px;
+  min-height: 44px;
 }
 .footer-link:hover { color: var(--accent); }
 .footer-sep { color: var(--text-muted); }

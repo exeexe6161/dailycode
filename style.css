@@ -374,6 +374,7 @@ body::before {
 :where(button, summary, a):focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
+  box-shadow: 0 0 16px var(--focus-glow);
 }
 
 /* ============================================================

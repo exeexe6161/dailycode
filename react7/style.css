@@ -380,9 +380,12 @@ button { touch-action: manipulation; }
   transition: border-color var(--ease), background var(--ease), color var(--ease);
 }
 .btn:hover { border-color: var(--accent); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
 .btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 0 18px var(--btn-glow); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
 .btn-ghost { color: var(--text-muted); }
 .btn-ghost:hover { color: var(--text); }
+.btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
 
 .help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
 .help summary { cursor: pointer; font-weight: 600; }
@@ -407,6 +410,7 @@ button { touch-action: manipulation; }
   text-decoration: none;
   font-weight: 600;
   padding: 4px 2px;
+  min-height: 44px;
 }
 .footer-link:hover { color: var(--accent); }
 .footer-sep { color: var(--text-muted); }

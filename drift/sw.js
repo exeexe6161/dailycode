@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-serpix-v12';
+var CACHE = 'dailycode-serpix-v13';
 var LEGACY = ['dailycode-drift-v4'];
 var PREFIX = 'dailycode-serpix-';
 

@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-nexa-v12';
+var CACHE = 'dailycode-nexa-v13';
 var LEGACY = ['dailycode-cluster-v4'];
 var PREFIX = 'dailycode-nexa-';
 

@@ -3,7 +3,7 @@
   "name": "Lexiq",
   "short_name": "Lexiq",
   "description": "Build as many words as you can from the letters before time runs out.",
-  "lang": "en",
+  "lang": "de",
   "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",
