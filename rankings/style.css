@@ -335,8 +335,8 @@ button { touch-action: manipulation; }
 .rk-game-score { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
 .rk-empty { color: var(--text-muted); font-size: .9rem; text-align: center; padding: 20px 10px; }
 
-.help { margin: 0 0 16px; color: var(--text-muted); font-size: .9rem; }
-.help summary { cursor: pointer; color: var(--text); font-weight: 600; }
+.help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
+.help summary { cursor: pointer; font-weight: 600; }
 .help ul { margin: 8px 0 0; padding-left: 18px; }
 .help li { margin: 4px 0; }
 

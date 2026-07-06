@@ -57,7 +57,7 @@
   --tile-ink:    #e9ecf3;
   --tile-sel:    #34d399;
   --tile-sel-ink:#04130b;
-  --good:        #34d399;
+  --good:        #4ade80;
   --bad:         #fbbf24;
   --tile-glow:   rgba(108, 140, 255, .40);
 
@@ -86,7 +86,7 @@
     --tile-ink:    #e9ecf3;
     --tile-sel:    #34d399;
     --tile-sel-ink:#04130b;
-    --good:        #34d399;
+    --good:        #4ade80;
     --bad:         #fbbf24;
     --tile-glow:   rgba(108, 140, 255, .40);
 
@@ -262,7 +262,7 @@ button { touch-action: manipulation; }
 .btn-ghost:hover { color: var(--text); }
 .btn[disabled] { opacity: .5; cursor: default; }
 
-.help { margin: 12px 0 8px; color: var(--text-muted); font-size: .9rem; }
+.help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
 .help summary { cursor: pointer; font-weight: 600; }
 .help ul { margin: 8px 0 0; padding-left: 18px; }
 .help li { margin: 4px 0; }

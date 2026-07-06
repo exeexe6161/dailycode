@@ -275,7 +275,7 @@ button { touch-action: manipulation; }
   gap: 12px;
   padding: 20px;
   text-align: center;
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
   border-radius: var(--radius);
   backdrop-filter: blur(2px);
 }

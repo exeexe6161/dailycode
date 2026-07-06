@@ -43,7 +43,6 @@
      manuell dunkel UND auto bei System dunkel. */
   --halo:            transparent;
   --btn-glow:        transparent;
-  --btn-glow-strong: transparent;
   --focus-glow:      transparent;
 
   /* Form */
@@ -94,7 +93,6 @@
   /* Glow und Halo aktiv */
   --halo:            rgba(255, 255, 255, .16);
   --btn-glow:        rgba(108, 140, 255, .32);
-  --btn-glow-strong: rgba(108, 140, 255, .48);
   --focus-glow:      rgba(108, 140, 255, .4);
 }
 
@@ -133,7 +131,6 @@
     /* Glow und Halo aktiv */
     --halo:            rgba(255, 255, 255, .16);
     --btn-glow:        rgba(108, 140, 255, .32);
-    --btn-glow-strong: rgba(108, 140, 255, .48);
     --focus-glow:      rgba(108, 140, 255, .4);
   }
 }
@@ -197,52 +194,11 @@ button { touch-action: manipulation; }
   gap: 6px;
   margin: 0 0 14px;
 }
-.lang-btn {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 6px 12px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text-muted);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  transition: border-color var(--ease), color var(--ease), background var(--ease);
-}
-.lang-btn:hover { border-color: var(--accent); }
-.lang-btn[aria-pressed="true"] {
-  border-color: var(--accent);
-  color: var(--text);
-  background: var(--surface-2);
-}
-
-/* Darstellungsumschalter (auto, hell, dunkel), gleiche Behandlung wie Sprache */
 .themebar {
   display: flex;
   justify-content: center;
   gap: 6px;
   margin: 0 0 16px;
-}
-.theme-btn {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 6px 12px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text-muted);
-  font: inherit;
-  font-weight: 700;
-  font-size: .85rem;
-  cursor: pointer;
-  transition: border-color var(--ease), color var(--ease), background var(--ease);
-}
-.theme-btn:hover { border-color: var(--accent); }
-.theme-btn[aria-pressed="true"] {
-  border-color: var(--accent);
-  color: var(--text);
-  background: var(--surface-2);
 }
 
 /* Spielfeld */
@@ -379,8 +335,8 @@ button.slot:not(:disabled):active { transform: scale(.96); }
 .btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
 
 /* Hilfe */
-.help { margin-top: 22px; color: var(--text-muted); font-size: .9rem; }
-.help summary { cursor: pointer; color: var(--text); font-weight: 600; }
+.help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
+.help summary { cursor: pointer; font-weight: 600; }
 .help ul { margin: 10px 0 0; padding-left: 18px; }
 .help li { margin: 5px 0; }
 
@@ -558,6 +514,7 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   text-align: center;
   margin-bottom: 16px;
 }
+.stat-cell { padding: 8px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
 .stat-num { font-size: 1.2rem; font-weight: 700; }
 .stat-cap { font-size: .72rem; color: var(--text-muted); }
 .dist-title { font-size: .95rem; margin: 0 0 8px; }

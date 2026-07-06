@@ -228,7 +228,7 @@ button { touch-action: manipulation; }
   justify-content: center;
   flex-wrap: wrap;
   gap: 16px;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   font-weight: 700;
 }
 .hud-label { color: var(--text-muted); font-weight: 600; }
@@ -358,7 +358,7 @@ button { touch-action: manipulation; }
   gap: 12px;
   padding: 20px;
   text-align: center;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
   border-radius: var(--radius);
   backdrop-filter: blur(2px);
 }
