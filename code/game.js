@@ -103,7 +103,7 @@
       aria_sym_plain: 'Symbol {name}',
       aria_reveal: 'Geheimer Code: {code}',
       reveal_label: 'Code:',
-      status_fresh: 'Ciphera Code vom {date} nach UTC. {pos} Positionen, {sym} Symbole, {max} Versuche.',
+      status_fresh: 'PuzzlePure Code vom {date} nach UTC. {pos} Positionen, {sym} Symbole, {max} Versuche.',
       status_win: 'Geknackt in {n} von {max} Versuchen.',
       status_lose: 'Keine Versuche mehr. Der Code war: {code}.',
       status_evaluated: function (p) {
@@ -178,7 +178,7 @@
       aria_sym_plain: 'Symbol {name}',
       aria_reveal: 'Secret code: {code}',
       reveal_label: 'Code:',
-      status_fresh: 'Ciphera code for {date} in UTC. {pos} positions, {sym} symbols, {max} tries.',
+      status_fresh: 'PuzzlePure Code for {date} in UTC. {pos} positions, {sym} symbols, {max} tries.',
       status_win: 'Cracked in {n} of {max} tries.',
       status_lose: 'No tries left. The code was: {code}.',
       status_evaluated: function (p) {
@@ -253,7 +253,7 @@
       aria_sym_plain: '{name} simgesi',
       aria_reveal: 'Gizli kod: {code}',
       reveal_label: 'Kod:',
-      status_fresh: '{date} için UTC Ciphera kodu. {pos} konum, {sym} simge, {max} deneme.',
+      status_fresh: '{date} için UTC PuzzlePure Code kodu. {pos} konum, {sym} simge, {max} deneme.',
       status_win: '{n}. denemede çözüldü.',
       status_lose: 'Deneme kalmadı. Kod şuydu: {code}.',
       status_evaluated: 'Deneme {n} değerlendirildi. {rest} deneme kaldı.',
@@ -877,7 +877,7 @@
     }
   }
 
-  /* ---------- Schwierigkeit Auswahl (optisch wie Questra Stufen Buttons) ---------- */
+  /* ---------- Schwierigkeit Auswahl (optisch wie PuzzlePure Quiz Stufen Buttons) ---------- */
   function buildDiffRow() {
     if (!diffRowEl) return;
     diffRowEl.innerHTML = '';
@@ -1056,13 +1056,16 @@
       if (window.PuzzlePureScore) {
         lastPpPayload = {
           game: 'code',
+          roundId: 'code:daily:' + todayKey + ':d' + difficulty,
           difficulty: difficulty,
           outcome: 'win',
           timeSeconds: winSeconds,
           parSeconds: PAR_SECONDS,
           mistakes: playedGuesses.length - 1,
           hints: 0,
-          perfect: playedGuesses.length === 1
+          perfect: playedGuesses.length === 1,
+          rawGameScore: currentRow + 1,
+          gameScoreMode: 'min'
         };
         ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
         rewardsTriggered = false;
@@ -1081,6 +1084,7 @@
       if (window.PuzzlePureScore) {
         lastPpPayload = {
           game: 'code',
+          roundId: 'code:daily:' + todayKey + ':d' + difficulty,
           difficulty: difficulty,
           outcome: 'loss',
           timeSeconds: loseSeconds,
@@ -1206,7 +1210,7 @@
   // Nennt zusaetzlich die Schwierigkeit, da Spielstaende zwischen Stufen
   // sonst nicht vergleichbar waeren.
   function buildShareText(won, tries) {
-    var header = 'Ciphera ' + todayKey + ' [' + t('level', { n: difficulty }) + ']  ' + (won ? String(tries) : 'X') + '/' + MAX_TRIES;
+    var header = 'PuzzlePure Code ' + todayKey + ' [' + t('level', { n: difficulty }) + ']  ' + (won ? String(tries) : 'X') + '/' + MAX_TRIES;
     var lines = [header, ''];
     for (var r = 0; r < playedGuesses.length; r++) {
       var result = evaluate(playedGuesses[r], code);

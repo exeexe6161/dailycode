@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Pixela  Tokens und Styles
+   dailycode  PuzzlePure Picto  Tokens und Styles
    Token Disziplin: Werte als CSS Variablen, Hell und Dunkel Paritaet.
    Der Token Block ist aus dem System uebernommen, damit Portal und
    alle Spiele dieselben Themewerte zeigen. Keine Inline-Styles ausser
@@ -162,13 +162,14 @@ button { touch-action: manipulation; }
 .subtitle { margin: 0 0 12px; color: var(--text-muted); font-size: .95rem; text-align: center; }
 
 .head-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
   gap: 10px;
-  margin: 0 0 16px;
+  max-width: 360px;
+  margin: 0 auto 16px;
 }
+.head-actions .pill-btn { width: 100%; }
 .pill-btn {
   display: flex;
   align-items: center;
@@ -468,6 +469,8 @@ button { touch-action: manipulation; }
 
 @media (max-width: 420px) {
   body { padding-inline: 8px; }
+  .head-actions { gap: 8px; }
+  .head-actions .pill-btn { padding-inline: 10px; }
   .picto-board-wrap { padding: 8px 5px; }
   .picto-levels, .picto-modes { gap: 5px; }
   .picto-level-btn { padding-inline: 10px; }

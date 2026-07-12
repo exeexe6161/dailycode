@@ -1,7 +1,7 @@
 {
   "id": "dailycode-questra",
-  "name": "Questra",
-  "short_name": "Questra",
+  "name": "PuzzlePure Quiz",
+  "short_name": "PP Quiz",
   "description": "Answer seven short, neutral questions each day and see a calm rating at the end of the round.",
   "lang": "de",
   "dir": "ltr",

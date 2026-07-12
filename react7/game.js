@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Siebtes Spiel  (Reflexa)
+   dailycode  Siebtes Spiel  (PuzzlePure Reflex)
    Schnell-Reaktionsspiel: Oben ein ZIEL aus Form und Farbe (z. B. Dreieck
    in Blau). Unten Optionen als antippbare Knoepfe. Genau EINE Option passt.
 
@@ -313,6 +313,7 @@
   var ppResult = null;
   var lastPpPayload = null;
   var rewardsTriggered = false;
+  var ppRoundId = null;
   function renderPuzzlePureScore() {
     if (!ppScoreEl) return;
     ppScoreEl.replaceChildren();
@@ -835,7 +836,7 @@
     // erreichten Rundenzahl. Verlorene Leben sind am Ende immer die volle
     // Anzahl der Stufe, daher weiterhin kein sinnvolles mistakes Signal.
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'react7', difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'react7', roundId: ppRoundId, difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false, rawGameScore: score, gameScoreMode: 'max' };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
@@ -853,6 +854,7 @@
   function hideOverlay() { if (overlayEl) overlayEl.hidden = true; }
 
   function restartRun() {
+    ppRoundId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('react7') : 'react7:' + Date.now();
     clearReveal();
     stopTick();
     hideOverlay();

@@ -1,7 +1,7 @@
 {
   "id": "dailycode-memora",
-  "name": "Memora",
-  "short_name": "Memora",
+  "name": "PuzzlePure Echo",
+  "short_name": "PP Echo",
   "description": "Memorize the shapes shown briefly, then find every matching pair.",
   "lang": "de",
   "dir": "ltr",

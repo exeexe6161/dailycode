@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Fuenftes Spiel  (Lexiq)
+   dailycode  Fuenftes Spiel  (PuzzlePure Words)
    Wortbildung gegen die Uhr. Aus acht Buchstabenkacheln bildet der
    Spieler Woerter; gueltige Woerter geben Punkte und etwas Zeit
    zurueck. Wortlisten lokal (DE enz CC0, EN dwyl Unlicense), nur die
@@ -294,6 +294,7 @@
   var ppResult = null;          // Ergebnis der letzten PuzzlePureScore Aufzeichnung
   var lastPpPayload = null;     // an recordResult() uebergebenes Payload, fuer PuzzlePureRewards
   var rewardsTriggered = false; // verhindert doppelten Rewards Trigger je Runde
+  var ppRoundId = null;
 
   /* ---------- Generator mit Spielbarkeitsgarantie ---------- */
   function draw(lang) { var bag = bagFor(lang); return bag[Math.floor(Math.random() * bag.length)]; }
@@ -491,6 +492,7 @@
   function setPauseLabel() { if (pauseBtn) pauseBtn.textContent = (phase === 'pause') ? t('btn_resume') : t('btn_pause'); }
 
   function startRun() {
+    ppRoundId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('glyph') : 'glyph:' + Date.now();
     score = 0; remaining = TIME_BY_DIFF[difficulty] || START_TIME; selection = []; warnedAt = {}; invalidAttempts = 0;
     rack = generateRack(); freshFlags = rangeAll();
     phase = 'play';
@@ -520,7 +522,7 @@
     // fair). difficulty kommt aus der vorab gewaehlten Stufe (Batch 3).
     // mistakes zaehlt echte zu kurze oder ungueltige Worteinreichungen.
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'glyph', difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: invalidAttempts, hints: 0, perfect: invalidAttempts === 0 };
+      lastPpPayload = { game: 'glyph', roundId: ppRoundId, difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: invalidAttempts, hints: 0, perfect: invalidAttempts === 0, rawGameScore: score, gameScoreMode: 'max' };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }

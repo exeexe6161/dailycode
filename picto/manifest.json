@@ -1,7 +1,7 @@
 {
   "id": "dailycode-pixela",
-  "name": "Pixela",
-  "short_name": "Pixela",
+  "name": "PuzzlePure Picto",
+  "short_name": "PP Picto",
   "description": "Fill the grid using row and column clues to reveal the daily picture.",
   "lang": "de",
   "dir": "ltr",

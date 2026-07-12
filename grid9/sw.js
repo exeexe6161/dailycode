@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-numora-v12';
+var CACHE = 'dailycode-numora-v14';
 var LEGACY = ['dailycode-grid9-v1'];
 var PREFIX = 'dailycode-numora-';
 
@@ -60,7 +60,7 @@ self.addEventListener('fetch', function (event) {
   if (req.method !== 'GET') { return; }
 
   event.respondWith(
-    caches.match(req).then(function (cached) {
+    caches.open(CACHE).then(function (cache) { return cache.match(req); }).then(function (cached) {
       if (cached) { return cached; }
       return fetch(req).then(function (res) {
         // Nur erfolgreiche, gleiche Herkunft Antworten nachtraeglich ablegen.
@@ -71,7 +71,7 @@ self.addEventListener('fetch', function (event) {
         return res;
       }).catch(function () {
         // Offline und nicht im Cache: bei Navigationen die App Shell liefern.
-        if (req.mode === 'navigate') { return caches.match('./index.html'); }
+        if (req.mode === 'navigate') { return caches.open(CACHE).then(function (cache) { return cache.match('./index.html'); }); }
         return undefined;
       });
     })

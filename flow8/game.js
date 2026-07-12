@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Achtes Spiel  (Fluxa)
+   dailycode  Achtes Spiel  (PuzzlePure Flow)
    Wege-Verbindungsraetsel: Farbige Endpunktpaare auf einem Gitter mit
    zusammenhaengenden orthogonalen Wegen verbinden. Ziel (streng): alle
    Paare verbunden UND jedes Feld belegt (volles Gitter). Wege kreuzen
@@ -234,14 +234,15 @@
   var linkImprintEl = document.getElementById('linkImprint');
 
   /* ---------- PuzzlePure Score Anzeige ----------
-     Eigenes Element zwischen #overlayScore und #overlayBtn. Fluxa hat kein
+     Eigenes Element zwischen #overlayScore und #overlayBtn. PuzzlePure Flow hat kein
      eigenes Punktesystem (nur die erreichte Stufe level), daher keine
-     Begriffskollision wie bei Reflexa. */
+     Begriffskollision wie bei PuzzlePure Reflex. */
   var ppScoreEl = document.createElement('div');
   if (overlayEl && overlayBtn) overlayEl.insertBefore(ppScoreEl, overlayBtn);
   var ppResult = null;
   var lastPpPayload = null;
   var rewardsTriggered = false;
+  var ppRunId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('flow8') : 'flow8:' + Date.now();
   function renderPuzzlePureScore() {
     if (!ppScoreEl) return;
     ppScoreEl.replaceChildren();
@@ -752,7 +753,7 @@
     // der erreichten Levelstufe (siehe ppDifficultyFromLevel, dieselben
     // Schwellen wie levelConfig()).
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'flow8', difficulty: ppDifficultyFromLevel(level), outcome: 'win', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'flow8', roundId: ppRunId + ':level:' + level, difficulty: ppDifficultyFromLevel(level), outcome: 'win', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false, rawGameScore: level, gameScoreMode: 'max' };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
@@ -895,7 +896,7 @@
     }, 0);
   }
   function newPuzzle() { newPuzzleSalt += 1; generate(); }
-  function restartRun() { level = 1; newPuzzleSalt = 0; generate(); }
+  function restartRun() { ppRunId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('flow8') : 'flow8:' + Date.now(); level = 1; newPuzzleSalt = 0; generate(); }
   function nextLevel() { level += 1; newPuzzleSalt = 0; generate(); }
 
   /* ---------- Statische Texte und Rechtslinks ---------- */

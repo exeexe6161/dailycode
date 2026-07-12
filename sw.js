@@ -12,7 +12,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-portal-v25';
+var CACHE = 'dailycode-portal-v28';
 var PREFIX = 'dailycode-portal-';
 var LEGACY = ['dailycode-cache-v2'];
 
@@ -34,6 +34,8 @@ var ASSETS = [
   './brand/puzzlepure-lockup-white.svg',
   './fonts/Inter-Regular.woff2',
   './fonts/Inter-Bold.woff2',
+  './fonts/LICENSE-Inter.txt',
+  './licenses/LICENSE-LUCIDE.txt',
   './datenschutz-de.html',
   './datenschutz-en.html',
   './datenschutz-tr.html',

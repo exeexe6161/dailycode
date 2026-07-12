@@ -201,7 +201,7 @@ button { touch-action: manipulation; }
   margin: 0 0 16px;
 }
 
-/* Schwierigkeit (optisch wie Questra Stufen Buttons) */
+/* Schwierigkeit (optisch wie PuzzlePure Quiz Stufen Buttons) */
 .diff-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 14px; }
 .diff-btn {
   font: inherit;

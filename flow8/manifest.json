@@ -1,7 +1,7 @@
 {
   "id": "dailycode-fluxa",
-  "name": "Fluxa",
-  "short_name": "Fluxa",
+  "name": "PuzzlePure Flow",
+  "short_name": "PP Flow",
   "description": "Connect every pair of matching dots and cover the whole grid without crossing the paths.",
   "lang": "de",
   "dir": "ltr",

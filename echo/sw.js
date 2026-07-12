@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-memora-v13';
+var CACHE = 'dailycode-memora-v15';
 var LEGACY = ['dailycode-echo-v4'];
 var PREFIX = 'dailycode-memora-';
 
@@ -61,7 +61,7 @@ self.addEventListener('fetch', function (event) {
   if (req.method !== 'GET') { return; }
 
   event.respondWith(
-    caches.match(req).then(function (cached) {
+    caches.open(CACHE).then(function (cache) { return cache.match(req); }).then(function (cached) {
       if (cached) { return cached; }
       return fetch(req).then(function (res) {
         // Nur erfolgreiche, gleiche Herkunft Antworten nachtraeglich ablegen.
@@ -72,7 +72,7 @@ self.addEventListener('fetch', function (event) {
         return res;
       }).catch(function () {
         // Offline und nicht im Cache: bei Navigationen die App Shell liefern.
-        if (req.mode === 'navigate') { return caches.match('./index.html'); }
+        if (req.mode === 'navigate') { return caches.open(CACHE).then(function (cache) { return cache.match('./index.html'); }); }
         return undefined;
       });
     })

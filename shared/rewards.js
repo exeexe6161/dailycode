@@ -15,8 +15,8 @@
     de: {
       toast_new_best: 'Neue Bestleistung',
       toast_daily_best: 'Neuer Tagesbestwert',
-      toast_flawless: 'Fehlerfrei geloest',
-      toast_fast_solve: 'Schnell geloest',
+      toast_flawless: 'Fehlerfrei gelöst',
+      toast_fast_solve: 'Schnell gelöst',
       toast_streak: 'Serie fortgesetzt',
       toast_trophy: 'Pokal freigeschaltet',
       toast_league_up: 'Neue Liga erreicht'
@@ -31,13 +31,13 @@
       toast_league_up: 'New League Reached'
     },
     tr: {
-      toast_new_best: 'Yeni En Iyi Sonuc',
-      toast_daily_best: 'Yeni Gunun En Iyisi',
-      toast_flawless: 'Hatasiz Cozuldu',
-      toast_fast_solve: 'Hizli Cozuldu',
+      toast_new_best: 'Yeni En İyi Sonuç',
+      toast_daily_best: 'Yeni Günün En İyisi',
+      toast_flawless: 'Hatasız Çözüldü',
+      toast_fast_solve: 'Hızlı Çözüldü',
       toast_streak: 'Seri Devam Ediyor',
-      toast_trophy: 'Kupa Acildi',
-      toast_league_up: 'Yeni Liga Ulasildi'
+      toast_trophy: 'Kupa Açıldı',
+      toast_league_up: 'Yeni Lige Ulaşıldı'
     }
   };
   function t(lang, key) {
@@ -183,7 +183,7 @@
      ppResult: Rueckgabewert von recordResult()
      payload:  dasselbe Objekt, das an recordResult() uebergeben wurde (fuer perfect/timeSeconds/parSeconds)
      cardEl:   das Ergebnis Element, das sanft eingeblendet und bei wichtigen Ereignissen dezent geglowt wird
-     starsEl:  optional, Container der Sternanzeige (nur Pixela/Questra)
+     starsEl:  optional, Container der Sternanzeige (nur PuzzlePure Picto/PuzzlePure Quiz)
      scoreLineEl: optional, das Element mit dem Punktestext fuer den Count Up */
   function trigger(opts) {
     opts = opts || {};

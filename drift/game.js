@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Zweites Spiel  (Serpix)
+   dailycode  Zweites Spiel  (PuzzlePure Drift)
    Eine wachsende Kette aus Segmenten zieht in Schrittrichtung ueber
    ein Raster. Durchlaessige Raender (Wrap-around), Niederlage nur bei
    Selbstkollision. Vanilla JS, keine Libraries, keine externen
@@ -7,7 +7,7 @@
    Styles im Markup, dynamische Werte nur ueber CSSOM und Canvas.
    Theme und Sprache teilen die bestehenden Keys (dailycode:theme,
    dailycode:lang). Sprache DE/EN/TR ueber I18N Tabelle und t()
-   Muster, identisch zu code/game.js (Ciphera).
+   Muster, identisch zu code/game.js (PuzzlePure Code).
    ============================================================ */
 (function () {
   'use strict';
@@ -32,7 +32,7 @@
   var STEP_BY_DIFF = { 1: 180, 2: STEP_BASE, 3: 120, 4: 95 };
 
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ----------
-     Struktur und Fallback-Muster identisch zu code/game.js (Ciphera). */
+     Struktur und Fallback-Muster identisch zu code/game.js (PuzzlePure Code). */
   var I18N = {
     de: {
       subtitle: 'Lenke die wachsende Kette über das Feld und weiche dir selbst aus.',
@@ -416,6 +416,7 @@
   var ppResult = null; // Ergebnis des gemeinsamen PuzzlePureScore Systems, gesetzt in gameOver()
   var lastPpPayload = null; // Payload des letzten recordResult() Aufrufs, fuer PuzzlePureRewards.trigger()
   var rewardsTriggered = false; // verhindert doppelte Toasts bei erneutem Rendern derselben Runde
+  var ppRoundId = null;
 
   var rafId = 0;
   var lastTs = 0;
@@ -424,6 +425,7 @@
   function keyOf(x, y) { return x + ',' + y; }
 
   function reset() {
+    ppRoundId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('drift') : 'drift:' + Date.now();
     chain = [];
     occ = {};
     var cx = Math.floor(GRID / 2);
@@ -758,7 +760,7 @@
     if (prev == null || score > prev) saveBest(score);
     var best = loadBestVal();
     updateScore(); // aktualisiert Punkte- und Bestwertanzeige (over ist bereits true)
-    // Serpix ist ein Endlosmodus ohne Sieg/Niederlage Konzept, daher zaehlt
+    // PuzzlePure Drift ist ein Endlosmodus ohne Sieg/Niederlage Konzept, daher zaehlt
     // jede beendete Runde als 'complete', auch das seltene volle Feld (won),
     // unveraendert aus Batch 1. difficulty kommt jetzt aus der vorab
     // gewaehlten Stufe (Batch 3), nicht mehr aus dem erreichten Tempo.
@@ -766,13 +768,16 @@
     if (window.PuzzlePureScore) {
       lastPpPayload = {
         game: 'drift',
+        roundId: ppRoundId,
         difficulty: difficulty,
         outcome: 'complete',
         timeSeconds: null,
         parSeconds: null,
         mistakes: 0,
         hints: 0,
-        perfect: won
+        perfect: won,
+        rawGameScore: score,
+        gameScoreMode: 'max'
       };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;

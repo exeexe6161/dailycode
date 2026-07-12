@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Questra  Taegliches Denkraetsel Quiz
+   dailycode  PuzzlePure Quiz  Taegliches Denkraetsel Quiz
    Sieben kurze, neutrale Fragen pro Runde, vier Antworten, genau eine
    richtig. Eigene Fragenbank (Logik, Zahlenmuster, Wortverstaendnis,
    Formen und Farben, Alltagswissen, Mini Rechnen, neutrale Denkfragen),
@@ -25,7 +25,7 @@
   ];
   var I18N = {
     de: {
-      subtitle: 'Beantworte sieben kurze Fragen und sieh, wie ruhig und klar du denkst.',
+      subtitle: 'Beantworte sieben kurze Wissens- und Logikfragen.',
       level: function (n) { return ['Leicht', 'Mittel', 'Schwer', 'Experte'][n - 1] || 'Mittel'; },
       aria_difficulty_group: 'Schwierigkeit',
       aria_difficulty: function (n) { return t('level')(n) + ' wählen'; },
@@ -46,7 +46,7 @@
       help_summary: 'So funktioniert es',
       help_1: 'Jede Runde hat sieben Fragen mit je vier Antworten. Genau eine Antwort ist richtig.',
       help_2: 'Tippe eine Antwort an, du siehst sofort ob sie richtig war, und bestätigst mit Weiter.',
-      help_3: 'Am Ende zeigt Questra deine Punktzahl, deine Zeit und eine ruhige Bewertung. Wechsle zwischen Tagesrätsel und Unbegrenzt für weitere Runden.',
+      help_3: 'Am Ende zeigt PuzzlePure Quiz deine Punktzahl, deine Zeit und eine ruhige Bewertung. Wechsle zwischen Tagesrätsel und Unbegrenzt für weitere Runden.',
       help_4: 'Über die Schwierigkeit oben wählst du Leicht, Mittel, Schwer oder Experte. Das bestimmt die Fragenmischung.',
       mode_daily: 'Tagesrätsel',
       mode_unlimited: 'Unbegrenzt',
@@ -72,10 +72,10 @@
       stat_bestscore_cap: 'Bestwert',
       stats_hint: 'Statistik nicht verfügbar, lokaler Speicher ist aus.',
       aria_option: function (n, text) { return 'Antwort ' + n + ', ' + text; },
-      aria_quiz: 'Quiz Bereich. Waehle eine der vier Antworten, danach zeigt ein Text ob sie richtig war.'
+      aria_quiz: 'Quizbereich. Wähle eine der vier Antworten. Danach zeigt ein Text, ob sie richtig war.'
     },
     en: {
-      subtitle: 'Answer seven short questions and see how calm and clear your thinking is.',
+      subtitle: 'Answer seven short knowledge and logic questions.',
       level: function (n) { return ['Easy', 'Medium', 'Hard', 'Expert'][n - 1] || 'Medium'; },
       aria_difficulty_group: 'Difficulty',
       aria_difficulty: function (n) { return 'Select ' + t('level')(n); },
@@ -96,7 +96,7 @@
       help_summary: 'How it works',
       help_1: 'Each round has seven questions with four answers each. Exactly one answer is correct.',
       help_2: 'Tap an answer, you see right away if it was correct, then confirm with Next.',
-      help_3: 'At the end Questra shows your score, your time and a calm rating. Switch between daily puzzle and unlimited for more rounds.',
+      help_3: 'At the end PuzzlePure Quiz shows your score, your time and a calm rating. Switch between daily puzzle and unlimited for more rounds.',
       help_4: 'The difficulty above lets you choose Easy, Medium, Hard or Expert. This sets the question mix.',
       mode_daily: 'Daily puzzle',
       mode_unlimited: 'Unlimited',
@@ -125,7 +125,7 @@
       aria_quiz: 'Quiz area. Choose one of the four answers, then a text shows whether it was correct.'
     },
     tr: {
-      subtitle: 'Yedi kısa soruyu yanıtla ve ne kadar sakin ve net düşündüğünü gör.',
+      subtitle: 'Yedi kısa bilgi ve mantık sorusunu yanıtla.',
       level: function (n) { return ['Kolay', 'Orta', 'Zor', 'Uzman'][n - 1] || 'Orta'; },
       aria_difficulty_group: 'Zorluk',
       aria_difficulty: function (n) { return t('level')(n) + ' seç'; },
@@ -146,7 +146,7 @@
       help_summary: 'Nasıl çalışır',
       help_1: 'Her turda dört seçenekli yedi soru vardır. Tam olarak bir cevap doğrudur.',
       help_2: 'Bir cevaba dokun, hemen doğru olup olmadığını gör, sonra İleri ile onayla.',
-      help_3: 'Sonunda Questra puanını, süreni ve sakin bir değerlendirme gösterir. Daha fazla tur için günlük bulmaca ile sınırsız mod arasında geçiş yap.',
+      help_3: 'Sonunda PuzzlePure Quiz puanını, süreni ve sakin bir değerlendirme gösterir. Daha fazla tur için günlük bulmaca ile sınırsız mod arasında geçiş yap.',
       help_4: 'Yukarıdaki zorluk seçimiyle Kolay, Orta, Zor veya Uzman seçebilirsin. Bu, soru karışımını belirler.',
       mode_daily: 'Günlük bulmaca',
       mode_unlimited: 'Sınırsız',
@@ -616,6 +616,7 @@
      Slot unabhaengige Sperre merkt sich je Runden Schluessel (Modus, Tag
      oder Index, Schwierigkeit), ob schon an PuzzlePureScore gemeldet wurde. */
   var SCORED_KEY = 'dailycode:questra:scored:v1';
+  var MAX_SCORED_ENTRIES = 500;
   function loadScoredSet() {
     if (!hasStorage) return {};
     try {
@@ -629,7 +630,9 @@
     if (!hasStorage) return;
     try {
       var set = loadScoredSet();
-      set[key] = true;
+      set[key] = Date.now();
+      var keys = Object.keys(set);
+      while (keys.length > MAX_SCORED_ENTRIES) delete set[keys.shift()];
       window.localStorage.setItem(SCORED_KEY, JSON.stringify(set));
     } catch (e) { /* Speicher voll oder gesperrt, Spiel bleibt spielbar */ }
   }
@@ -764,7 +767,7 @@
   }
 
   /* ============================================================
-     Questra UI, gebunden an mountQuestra(container).
+     PuzzlePure Quiz UI, gebunden an mountQuestra(container).
      ============================================================ */
   function mountQuestra(container) {
     var state = loadState();
@@ -1044,13 +1047,16 @@
         if (window.PuzzlePureScore && !isAlreadyScored(currentRoundKey())) {
           lastPpPayload = {
             game: 'questra',
+            roundId: 'questra:' + currentRoundKey(),
             difficulty: difficulty,
             outcome: 'complete',
             timeSeconds: Math.floor(currentElapsed()),
             parSeconds: PAR_SECONDS_BY_DIFFICULTY[difficulty],
             mistakes: 7 - finalScore,
             hints: 0,
-            perfect: finalScore === 7
+            perfect: finalScore === 7,
+            rawGameScore: finalScore,
+            gameScoreMode: 'max'
           };
           ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
           markScored(currentRoundKey());

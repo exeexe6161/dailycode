@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Sechstes Spiel  (Numora)
+   dailycode  Sechstes Spiel  (PuzzlePure Grid)
    Ruhiges Logikgitter: 9x9 Felder, Zahlen 1 bis 9, jede Zahl genau
    einmal pro Zeile, Spalte und 3x3 Block. Vorgegebene Felder (Givens)
    sind fest. Eingabe per Klick und Tastatur, Zahlenleiste 1 bis 9 plus
@@ -707,13 +707,16 @@
       var ppParByDiff = { leicht: 300, mittel: 480, schwer: 720 };
       lastPpPayload = {
         game: 'grid9',
+        roundId: 'grid9:' + difficulty + ':' + currentSeed,
         difficulty: ppDiffMap[difficulty] || 2,
         outcome: 'win',
         timeSeconds: sec,
         parSeconds: ppParByDiff[difficulty] || 480,
         mistakes: 0,
         hints: 0,
-        perfect: false
+        perfect: false,
+        rawGameScore: sec,
+        gameScoreMode: 'min'
       };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       saveSolvedSeed(difficulty, currentSeed);

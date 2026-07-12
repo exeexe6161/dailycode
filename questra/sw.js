@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Questra  Service Worker (Scope /questra/)
+   dailycode  PuzzlePure Quiz  Service Worker (Scope /questra/)
    Cache first fuer die App Shell. Versionierter Cache, es werden
    NUR Caches des eigenen Praefix (dailycode-questra-) aufgeraeumt,
    damit der Portal Worker (dailycode-portal-) und die anderen Spiel
@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-questra-v10';
+var CACHE = 'dailycode-questra-v12';
 var LEGACY = [];
 var PREFIX = 'dailycode-questra-';
 
@@ -60,7 +60,7 @@ self.addEventListener('fetch', function (event) {
   if (req.method !== 'GET') { return; }
 
   event.respondWith(
-    caches.match(req).then(function (cached) {
+    caches.open(CACHE).then(function (cache) { return cache.match(req); }).then(function (cached) {
       if (cached) { return cached; }
       return fetch(req).then(function (res) {
         if (res && res.ok && res.type === 'basic') {
@@ -69,7 +69,7 @@ self.addEventListener('fetch', function (event) {
         }
         return res;
       }).catch(function () {
-        if (req.mode === 'navigate') { return caches.match('./index.html'); }
+        if (req.mode === 'navigate') { return caches.open(CACHE).then(function (cache) { return cache.match('./index.html'); }); }
         return undefined;
       });
     })

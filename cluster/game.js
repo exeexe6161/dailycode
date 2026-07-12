@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Drittes Spiel  (Nexa)
+   dailycode  Drittes Spiel  (PuzzlePure Cluster)
    Einzelne geometrische Symbole fallen in ein Raster. Beruehren sich
    drei oder mehr gleiche Symbole orthogonal zusammenhaengend, loesen
    sie sich auf (Flood-Fill), darueber liegende fallen nach, was
@@ -11,7 +11,7 @@
    dynamische Werte nur ueber CSSOM und Canvas. Theme und Sprache
    teilen die bestehenden Keys (dailycode:theme, dailycode:lang).
    i18n vollstaendig DE/EN/TR ueber I18N Tabelle und t() Muster,
-   Sprachumschalter nach Vorbild Ciphera (code/game.js).
+   Sprachumschalter nach Vorbild PuzzlePure Code (code/game.js).
    ============================================================ */
 (function () {
   'use strict';
@@ -362,6 +362,7 @@
   var ppResult = null;
   var lastPpPayload = null;
   var rewardsTriggered = false;
+  var ppRoundId = null;
 
   var recent = [];              // zuletzt erzeugte Typen, begrenzt Wiederholungen
   var flashes = [];             // { r, c, type, t0 } dezente Aufloese-Blende, nur Zier
@@ -759,7 +760,7 @@
     // Endlosmodus ohne Sieg/Niederlage Konzept, daher 'complete'. difficulty
     // kommt aus der tatsaechlich erreichten Tempo Stufe (siehe ppDifficultyFromLevel).
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'cluster', difficulty: ppDifficultyFromLevel(level), outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false };
+      lastPpPayload = { game: 'cluster', roundId: ppRoundId, difficulty: ppDifficultyFromLevel(level), outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: 0, hints: 0, perfect: false, rawGameScore: score, gameScoreMode: 'max' };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
@@ -783,6 +784,7 @@
   }
 
   function restartGame() {
+    ppRoundId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('cluster') : 'cluster:' + Date.now();
     makeGrid();
     active = null;
     score = 0; clearsTotal = 0; level = 0; stepMs = FALL_BASE;

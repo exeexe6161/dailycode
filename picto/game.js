@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Pixela  Nonogram Raetsel, v2
+   dailycode  PuzzlePure Picto  Nonogram Raetsel, v2
    Deterministisches Tagesraetsel je Datum und Stufe sowie ein
    unbegrenzter Modus mit stabiler Raetselnummer. Eindeutigkeit der
    Loesung per Constraint-Solver garantiert (kein Raten noetig). Vier
@@ -612,6 +612,9 @@
      und Streak je Stufe. Alles defensiv gegen kaputte/fehlende Daten.
      ============================================================ */
   var PROGRESS_PREFIX = 'picto:progress:';
+  var PROGRESS_INDEX_KEY = 'dailycode:pixela:progress-index:v1';
+  var MAX_PROGRESS_ENTRIES = 80;
+  var MAX_SCORED_ENTRIES = 500;
   var STATE_KEY = 'dailycode:pixela:state:v1';
   var STATS_KEY = 'dailycode:pixela:stats:v1';
 
@@ -630,7 +633,16 @@
   }
   function saveProgressEntry(id, data) {
     if (!hasStorage) return;
-    try { window.localStorage.setItem(PROGRESS_PREFIX + id, JSON.stringify(data)); } catch (e) {}
+    try {
+      window.localStorage.setItem(PROGRESS_PREFIX + id, JSON.stringify(data));
+      var rawIndex = window.localStorage.getItem(PROGRESS_INDEX_KEY);
+      var index = rawIndex ? JSON.parse(rawIndex) : [];
+      if (!Array.isArray(index)) index = [];
+      index = index.filter(function (key) { return key !== id; });
+      index.push(id);
+      while (index.length > MAX_PROGRESS_ENTRIES) window.localStorage.removeItem(PROGRESS_PREFIX + index.shift());
+      window.localStorage.setItem(PROGRESS_INDEX_KEY, JSON.stringify(index));
+    } catch (e) {}
   }
 
   /* ---------- Sperre gegen Mehrfachwertung ----------
@@ -653,7 +665,9 @@
     if (!hasStorage) return;
     try {
       var set = loadScoredSet();
-      set[id] = true;
+      set[id] = Date.now();
+      var keys = Object.keys(set);
+      while (keys.length > MAX_SCORED_ENTRIES) delete set[keys.shift()];
       window.localStorage.setItem(SCORED_KEY, JSON.stringify(set));
     } catch (e) { /* Speicher voll oder gesperrt, Spiel bleibt spielbar */ }
   }
@@ -1017,13 +1031,16 @@
           var parSeconds = Math.round(puzzle.width * puzzle.height * 1.1);
           lastPpPayload = {
             game: 'picto',
+            roundId: 'picto:' + currentPuzzleId(),
             difficulty: difficulty,
             outcome: 'win',
             timeSeconds: Math.floor(currentElapsed()),
             parSeconds: parSeconds,
             mistakes: mistakes,
             hints: hintsUsed,
-            perfect: hintsUsed === 0 && mistakes === 0
+            perfect: hintsUsed === 0 && mistakes === 0,
+            rawGameScore: Math.floor(currentElapsed()),
+            gameScoreMode: 'min'
           };
           ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
           markScored(currentPuzzleId());
@@ -1042,13 +1059,16 @@
       var cols = puzzle.width;
       var floorPx = 15;
       var maxPx = Math.min(48, Math.max(18, Math.round(300 / cols)));
-      var gapPx = parseFloat(window.getComputedStyle(table).columnGap) || 2;
+      var tableStyle = window.getComputedStyle(table);
+      var wrapStyle = window.getComputedStyle(boardWrap);
+      var gapPx = parseFloat(tableStyle.columnGap) || 2;
+      var horizontalPadding = (parseFloat(wrapStyle.paddingLeft) || 0) + (parseFloat(wrapStyle.paddingRight) || 0);
       var clueW = 0;
       table.querySelectorAll('.picto-row-clue').forEach(function (el) {
         var w = el.getBoundingClientRect().width;
         if (w > clueW) clueW = w;
       });
-      var available = boardWrap.clientWidth - clueW - gapPx * cols - 2; // 2px Sicherheitsabstand gegen Rundung
+      var available = boardWrap.clientWidth - horizontalPadding - clueW - gapPx * cols - 2; // 2px Sicherheitsabstand gegen Rundung
       var cellPx = Math.max(floorPx, Math.min(maxPx, Math.floor(available / cols)));
       table.style.setProperty('--picto-cell-size', cellPx + 'px');
     }

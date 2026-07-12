@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Questra  Tokens und Styles
+   dailycode  PuzzlePure Quiz  Tokens und Styles
    Token Disziplin: Werte als CSS Variablen, Hell und Dunkel Paritaet.
    Der Token Block ist aus dem System uebernommen, damit Portal und
    alle Spiele dieselben Themewerte zeigen.
@@ -238,7 +238,7 @@ button { touch-action: manipulation; }
 .toggle-feedback.show { opacity: 1; }
 
 /* ============================================================
-   Questra Spielbereich: Modus, Status, Frage, vier Antworten,
+   PuzzlePure Quiz Spielbereich: Modus, Status, Frage, vier Antworten,
    Feedback, Ergebnis, Statistik.
    ============================================================ */
 .questra-root { margin: 0 0 16px; }

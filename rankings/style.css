@@ -340,6 +340,29 @@ button { touch-action: manipulation; }
 .rk-game-score { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; color: var(--accent); }
 .rk-empty { color: var(--text-muted); font-size: .9rem; text-align: center; padding: 20px 10px; }
 
+.rk-data-actions {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.rk-data-note, .rk-reset-status { margin: 6px 0 12px; color: var(--text-muted); font-size: .85rem; }
+.rk-reset-status { min-height: 1.4em; margin-bottom: 0; }
+.btn {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-danger-ghost { color: #b42318; }
+.btn-danger-ghost:hover { border-color: currentColor; background: var(--surface-2); }
+
 .help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
 .help summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: 600; }
 .help ul { margin: 8px 0 0; padding-left: 18px; }

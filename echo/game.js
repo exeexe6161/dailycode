@@ -1,5 +1,5 @@
 /* ============================================================
-   dailycode  Viertes Spiel  (Memora)
+   dailycode  Viertes Spiel  (PuzzlePure Echo)
    Gedaechtnis-Paare mit Vorab-Ansicht. Zu Beginn jeder Stufe werden
    alle Symbole kurz gezeigt, dann verdeckt. Der Spieler deckt zwei
    Felder auf, gleiche bleiben offen. Symbole werden PRIMAER ueber die
@@ -447,6 +447,7 @@
   var ppResult = null;
   var lastPpPayload = null;
   var rewardsTriggered = false;
+  var ppRoundId = null;
   var pairsThisLevel = START_PAIRS;
   var foundPairs = 0;
   var firstPick = -1;
@@ -700,7 +701,7 @@
     // Spiel ist bewusst nicht zeitkritisch (nur die Vorschau ist getaktet).
     // difficulty kommt aus der vorab gewaehlten Stufe (Batch 3).
     if (window.PuzzlePureScore) {
-      lastPpPayload = { game: 'echo', difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: wrongFlips, hints: 0, perfect: wrongFlips === 0 };
+      lastPpPayload = { game: 'echo', roundId: ppRoundId, difficulty: difficulty, outcome: 'complete', timeSeconds: null, parSeconds: null, mistakes: wrongFlips, hints: 0, perfect: wrongFlips === 0, rawGameScore: score, gameScoreMode: 'max' };
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       rewardsTriggered = false;
     }
@@ -733,6 +734,7 @@
 
   function restartGame() {
     tCancel();
+    ppRoundId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('echo') : 'echo:' + Date.now();
     level = 1; score = 0; mistakes = (DIFF_BASE[difficulty] || DIFF_BASE[2]).mistakes; wrongFlips = 0;
     hideOverlay();
     startLevel();

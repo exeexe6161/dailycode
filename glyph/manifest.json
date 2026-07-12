@@ -1,7 +1,7 @@
 {
   "id": "dailycode-lexiq",
-  "name": "Lexiq",
-  "short_name": "Lexiq",
+  "name": "PuzzlePure Words",
+  "short_name": "PP Words",
   "description": "Build as many words as you can from the letters before time runs out.",
   "lang": "de",
   "dir": "ltr",

@@ -8,8 +8,11 @@
 'use strict';
 
 (function (root) {
-  var SCORE_KEY = 'dailycode:puzzlepure:score:v1';
-  var PROFILE_KEY = 'dailycode:puzzlepure:profile:v1';
+  var SCORE_KEY = 'dailycode:puzzlepure:score:v2';
+  var PROFILE_KEY = 'dailycode:puzzlepure:profile:v2';
+  var LEGACY_SCORE_KEY = 'dailycode:puzzlepure:score:v1';
+  var LEGACY_PROFILE_KEY = 'dailycode:puzzlepure:profile:v1';
+  var MAX_RESULT_IDS = 1000;
 
   /* Technische Spielschluessel entsprechen den Ordnernamen, wie im
      Projekt bereits ueblich (z.B. dailycode:drift:best, dailycode:grid9:best). */
@@ -28,16 +31,17 @@
   var I18N = {
     de: {
       pp_points: 'PuzzlePure Punkte',
-      pp_best: 'Bester Wert',
+      pp_best: 'Beste PuzzlePure Wertung',
+      pp_game_best: 'Spielbestwert',
       pp_daily_best: 'Tagesbestwert',
       pp_new_best: 'Neue Bestleistung',
       pp_league_label: 'Liga',
-      pp_privacy_note: 'Deine Werte werden nur auf diesem Geraet gespeichert.',
+      pp_privacy_note: 'Deine Werte werden nur auf diesem Gerät gespeichert.',
       league_bronze: 'Bronze', league_silver: 'Silber', league_gold: 'Gold', league_platinum: 'Platin', league_diamond: 'Diamant',
       trophy_first_round: 'Erste Runde',
       trophy_daily_record: 'Tagesrekord',
       trophy_flawless: 'Fehlerfrei',
-      trophy_fast_solve: 'Schnell geloest',
+      trophy_fast_solve: 'Schnell gelöst',
       trophy_all_games: 'Alle Spiele gespielt',
       trophy_week_streak: 'Sieben Tage Serie',
       trophy_expert_cleared: 'Experte gemeistert'
@@ -45,6 +49,7 @@
     en: {
       pp_points: 'PuzzlePure Points',
       pp_best: 'Best Value',
+      pp_game_best: 'Game Best',
       pp_daily_best: 'Daily Best',
       pp_new_best: 'New Best Result',
       pp_league_label: 'League',
@@ -60,19 +65,20 @@
     },
     tr: {
       pp_points: 'PuzzlePure Puan',
-      pp_best: 'En Iyi Deger',
-      pp_daily_best: 'Gunun En Iyisi',
-      pp_new_best: 'Yeni En Iyi Sonuc',
+      pp_best: 'En İyi PuzzlePure Değeri',
+      pp_game_best: 'Oyun Rekoru',
+      pp_daily_best: 'Günün En İyisi',
+      pp_new_best: 'Yeni En İyi Sonuç',
       pp_league_label: 'Lig',
-      pp_privacy_note: 'Degerlerin yalnizca bu cihazda saklanir.',
-      league_bronze: 'Bronz', league_silver: 'Gumus', league_gold: 'Altin', league_platinum: 'Platin', league_diamond: 'Elmas',
-      trophy_first_round: 'Ilk Tur',
-      trophy_daily_record: 'Gunun Rekoru',
-      trophy_flawless: 'Hatasiz',
-      trophy_fast_solve: 'Hizli Cozum',
-      trophy_all_games: 'Tum Oyunlar Oynandi',
-      trophy_week_streak: 'Yedi Gun Serisi',
-      trophy_expert_cleared: 'Uzman Tamamlandi'
+      pp_privacy_note: 'Değerlerin yalnızca bu cihazda saklanır.',
+      league_bronze: 'Bronz', league_silver: 'Gümüş', league_gold: 'Altın', league_platinum: 'Platin', league_diamond: 'Elmas',
+      trophy_first_round: 'İlk Tur',
+      trophy_daily_record: 'Günün Rekoru',
+      trophy_flawless: 'Hatasız',
+      trophy_fast_solve: 'Hızlı Çözüm',
+      trophy_all_games: 'Tüm Oyunlar Oynandı',
+      trophy_week_streak: 'Yedi Gün Serisi',
+      trophy_expert_cleared: 'Uzman Tamamlandı'
     }
   };
 
@@ -118,8 +124,11 @@
 
   function defaultGameScore() {
     return {
-      highscore: 0,
-      highscoreByDifficulty: {},
+      platformBest: 0,
+      platformBestByDifficulty: {},
+      gameBest: null,
+      gameBestMode: 'max',
+      gameBestByDifficulty: {},
       dailyBestDate: null,
       dailyBestScore: 0,
       roundsPlayed: 0,
@@ -130,11 +139,22 @@
   function normalizeGameScore(o) {
     var d = defaultGameScore();
     if (!o || typeof o !== 'object') return d;
-    d.highscore = intOr(o.highscore, 0);
-    if (o.highscoreByDifficulty && typeof o.highscoreByDifficulty === 'object') {
-      for (var k in o.highscoreByDifficulty) {
-        if (Object.prototype.hasOwnProperty.call(o.highscoreByDifficulty, k)) {
-          d.highscoreByDifficulty[k] = intOr(o.highscoreByDifficulty[k], 0);
+    d.platformBest = intOr(o.platformBest, intOr(o.highscore, 0));
+    var platformByDifficulty = o.platformBestByDifficulty || o.highscoreByDifficulty;
+    if (platformByDifficulty && typeof platformByDifficulty === 'object') {
+      for (var k in platformByDifficulty) {
+        if (Object.prototype.hasOwnProperty.call(platformByDifficulty, k)) {
+          d.platformBestByDifficulty[k] = intOr(platformByDifficulty[k], 0);
+        }
+      }
+    }
+    d.gameBestMode = o.gameBestMode === 'min' ? 'min' : 'max';
+    if (typeof o.gameBest === 'number' && isFinite(o.gameBest) && o.gameBest >= 0) d.gameBest = o.gameBest;
+    if (o.gameBestByDifficulty && typeof o.gameBestByDifficulty === 'object') {
+      for (var gd in o.gameBestByDifficulty) {
+        if (Object.prototype.hasOwnProperty.call(o.gameBestByDifficulty, gd)) {
+          var gv = o.gameBestByDifficulty[gd];
+          if (typeof gv === 'number' && isFinite(gv) && gv >= 0) d.gameBestByDifficulty[gd] = gv;
         }
       }
     }
@@ -148,18 +168,75 @@
   function defaultScoreStore() {
     var games = {};
     GAMES.forEach(function (g) { games[g] = defaultGameScore(); });
-    return { games: games };
+    return { version: 2, games: games, processedResultIds: [] };
+  }
+  function storedNumber(key) {
+    try {
+      var raw = window.localStorage.getItem(key);
+      if (raw == null) return null;
+      var value = Number(raw);
+      return isFinite(value) && value >= 0 ? value : null;
+    } catch (e) { return null; }
+  }
+  function seedLegacyBest(game, score) {
+    if (score.gameBest !== null) return;
+    var values = [];
+    var byDifficulty = {};
+    var mode = (game === 'grid9') ? 'min' : 'max';
+    var prefixes = {
+      drift: 'dailycode:drift:best:', echo: 'dailycode:echo:best:',
+      react7: 'dailycode:react7:best:'
+    };
+    function add(value, difficulty) {
+      if (value === null) return;
+      values.push(value);
+      if (difficulty != null) byDifficulty[String(difficulty)] = value;
+    }
+    if (prefixes[game]) {
+      for (var d = 1; d <= 4; d++) add(storedNumber(prefixes[game] + d), d);
+      add(storedNumber(prefixes[game].slice(0, -1)), null);
+    } else if (game === 'glyph') {
+      ['de', 'en'].forEach(function (lang) {
+        for (var gd = 1; gd <= 4; gd++) add(storedNumber('dailycode:glyph:best:' + lang + ':' + gd), gd);
+        add(storedNumber('dailycode:glyph:best:' + lang), null);
+      });
+    } else if (game === 'grid9') {
+      ['leicht', 'mittel', 'schwer'].forEach(function (difficulty) {
+        add(storedNumber('dailycode:grid9:best:' + difficulty), difficulty);
+      });
+    } else if (game === 'cluster' || game === 'flow8') {
+      add(storedNumber('dailycode:' + game + ':best'), null);
+    } else if (game === 'questra') {
+      try {
+        var rawStats = window.localStorage.getItem('dailycode:questra:stats:v2') || window.localStorage.getItem('dailycode:questra:stats:v1');
+        var stats = rawStats ? JSON.parse(rawStats) : null;
+        if (stats && stats.byDifficulty) {
+          for (var qd = 1; qd <= 4; qd++) add(storedStatBest(stats.byDifficulty[qd]), qd);
+        } else add(storedStatBest(stats), 2);
+      } catch (e) {}
+    }
+    if (!values.length) return;
+    score.gameBestMode = mode;
+    score.gameBestByDifficulty = byDifficulty;
+    score.gameBest = mode === 'min' ? Math.min.apply(Math, values) : Math.max.apply(Math, values);
+  }
+  function storedStatBest(stats) {
+    if (!stats || typeof stats.bestScore !== 'number' || !isFinite(stats.bestScore) || stats.bestScore < 0) return null;
+    return stats.bestScore;
   }
   function loadScoreStore() {
     if (!hasStorage) return defaultScoreStore();
     try {
-      var raw = window.localStorage.getItem(SCORE_KEY);
+      var raw = window.localStorage.getItem(SCORE_KEY) || window.localStorage.getItem(LEGACY_SCORE_KEY);
       var d = defaultScoreStore();
-      if (!raw) return d;
-      var o = JSON.parse(raw);
+      var o = raw ? JSON.parse(raw) : null;
       if (o && o.games && typeof o.games === 'object') {
         GAMES.forEach(function (g) { d.games[g] = normalizeGameScore(o.games[g]); });
       }
+      if (o && Array.isArray(o.processedResultIds)) {
+        d.processedResultIds = o.processedResultIds.filter(function (id) { return typeof id === 'string' && id.length <= 160; }).slice(-MAX_RESULT_IDS);
+      }
+      GAMES.forEach(function (g) { seedLegacyBest(g, d.games[g]); });
       return d;
     } catch (e) { return defaultScoreStore(); }
   }
@@ -207,7 +284,7 @@
   function loadProfile() {
     if (!hasStorage) return defaultProfile();
     try {
-      var raw = window.localStorage.getItem(PROFILE_KEY);
+      var raw = window.localStorage.getItem(PROFILE_KEY) || window.localStorage.getItem(LEGACY_PROFILE_KEY);
       if (!raw) return defaultProfile();
       return normalizeProfile(JSON.parse(raw));
     } catch (e) { return defaultProfile(); }
@@ -253,6 +330,20 @@
     return Math.max(0, Math.round(raw));
   }
 
+  function newRoundId(game) {
+    var uuid = '';
+    try {
+      if (root.crypto && typeof root.crypto.randomUUID === 'function') uuid = root.crypto.randomUUID();
+    } catch (e) {}
+    if (!uuid) uuid = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    return String(game || 'game') + ':' + uuid;
+  }
+
+  function isBetterGameValue(value, previous, mode) {
+    if (previous === null) return true;
+    return mode === 'min' ? value < previous : value > previous;
+  }
+
   /* ---------- Rundenergebnis verbuchen ----------
      payload: { game, difficulty(1..4|null), outcome('win'|'loss'|'complete'),
                 timeSeconds, parSeconds, mistakes, hints, perfect, rawGameScore }
@@ -262,6 +353,10 @@
     if (GAMES.indexOf(game) === -1) {
       return { score: 0, isNewBest: false, isNewDifficultyBest: false, isNewDailyBest: false, newTrophies: [], league: 'bronze', previousLeague: 'bronze', streakContinued: false, totalScore: 0 };
     }
+    var roundId = payload && typeof payload.roundId === 'string' ? payload.roundId.slice(0, 160) : '';
+    if (!roundId) {
+      return { score: 0, accepted: false, duplicate: false, reason: 'missing_round_id', isNewBest: false, isNewDifficultyBest: false, isNewDailyBest: false, isNewGameBest: false, newTrophies: [], league: 'bronze', previousLeague: 'bronze', streakContinued: false, totalScore: 0 };
+    }
     var outcome = payload.outcome === 'loss' ? 'loss' : (payload.outcome === 'complete' ? 'complete' : 'win');
     var today = dateKeyUTC();
     var scoreStore = loadScoreStore();
@@ -269,6 +364,17 @@
     var gs = scoreStore.games[game];
     var previousLeague = profile.league;
     var previousStreak = profile.currentStreak;
+
+    if (scoreStore.processedResultIds.indexOf(roundId) !== -1) {
+      return {
+        score: 0, accepted: false, duplicate: true, reason: 'duplicate_round_id',
+        isNewBest: false, isNewDifficultyBest: false, isNewDailyBest: false, isNewGameBest: false,
+        newTrophies: [], league: profile.league, previousLeague: profile.league,
+        streakContinued: false, totalScore: profile.totalScore,
+        highscore: gs.platformBest, platformBest: gs.platformBest, gameBest: gs.gameBest,
+        dailyBestScore: gs.dailyBestScore
+      };
+    }
 
     var score = outcome === 'loss' ? 0 : computeScore(payload);
     var difficultyKey = [1, 2, 3, 4].indexOf(payload.difficulty) !== -1 ? String(payload.difficulty) : null;
@@ -278,17 +384,31 @@
     if (solved) gs.roundsSolved += 1;
     if (payload.perfect) gs.perfectRounds += 1;
 
-    var isNewBest = false, isNewDifficultyBest = false, isNewDailyBest = false;
+    var isNewBest = false, isNewDifficultyBest = false, isNewDailyBest = false, isNewGameBest = false;
     if (solved) {
-      if (score > gs.highscore) { gs.highscore = score; isNewBest = true; }
+      if (score > gs.platformBest) { gs.platformBest = score; isNewBest = true; }
       if (difficultyKey) {
-        var prevDiff = intOr(gs.highscoreByDifficulty[difficultyKey], 0);
-        if (score > prevDiff) { gs.highscoreByDifficulty[difficultyKey] = score; isNewDifficultyBest = true; }
+        var prevDiff = intOr(gs.platformBestByDifficulty[difficultyKey], 0);
+        if (score > prevDiff) { gs.platformBestByDifficulty[difficultyKey] = score; isNewDifficultyBest = true; }
+      }
+      if (typeof payload.rawGameScore === 'number' && isFinite(payload.rawGameScore) && payload.rawGameScore >= 0) {
+        var gameMode = payload.gameScoreMode === 'min' ? 'min' : 'max';
+        gs.gameBestMode = gameMode;
+        if (isBetterGameValue(payload.rawGameScore, gs.gameBest, gameMode)) {
+          gs.gameBest = payload.rawGameScore;
+          isNewGameBest = true;
+        }
+        if (difficultyKey) {
+          var previousGameDiff = Object.prototype.hasOwnProperty.call(gs.gameBestByDifficulty, difficultyKey) ? gs.gameBestByDifficulty[difficultyKey] : null;
+          if (isBetterGameValue(payload.rawGameScore, previousGameDiff, gameMode)) gs.gameBestByDifficulty[difficultyKey] = payload.rawGameScore;
+        }
       }
       if (gs.dailyBestDate !== today) { gs.dailyBestDate = today; gs.dailyBestScore = 0; }
       if (score > gs.dailyBestScore) { gs.dailyBestScore = score; isNewDailyBest = true; }
     }
     scoreStore.games[game] = gs;
+    scoreStore.processedResultIds.push(roundId);
+    if (scoreStore.processedResultIds.length > MAX_RESULT_IDS) scoreStore.processedResultIds = scoreStore.processedResultIds.slice(-MAX_RESULT_IDS);
     saveScoreStore(scoreStore);
 
     profile.roundsPlayed += 1;
@@ -325,15 +445,20 @@
 
     return {
       score: score,
+      accepted: true,
+      duplicate: false,
       isNewBest: isNewBest,
       isNewDifficultyBest: isNewDifficultyBest,
       isNewDailyBest: isNewDailyBest,
+      isNewGameBest: isNewGameBest,
       newTrophies: newTrophies,
       league: profile.league,
       previousLeague: previousLeague,
       streakContinued: streakContinued,
       totalScore: profile.totalScore,
-      highscore: gs.highscore,
+      highscore: gs.platformBest,
+      platformBest: gs.platformBest,
+      gameBest: gs.gameBest,
       dailyBestScore: gs.dailyBestScore
     };
   }
@@ -341,6 +466,21 @@
   function getProfile() { return loadProfile(); }
   function getAllScores() { return loadScoreStore(); }
   function getGameScore(game) { return normalizeGameScore(loadScoreStore().games[game]); }
+
+  function resetProgress() {
+    if (!hasStorage) return false;
+    try {
+      var keep = { 'dailycode:lang': true, 'dailycode:theme': true };
+      var remove = [];
+      for (var i = 0; i < window.localStorage.length; i++) {
+        var key = window.localStorage.key(i);
+        if (!key || keep[key]) continue;
+        if (key.indexOf('dailycode:') === 0 || key.indexOf('picto:progress:') === 0) remove.push(key);
+      }
+      remove.forEach(function (key) { window.localStorage.removeItem(key); });
+      return true;
+    } catch (e) { return false; }
+  }
 
   /* ---------- UI Hilfsfunktion ----------
      Baut ein kleines, ruhiges Ergebnis Fragment (kein Chart, keine
@@ -356,7 +496,7 @@
 
     var best = document.createElement('p');
     best.className = 'pp-score-best';
-    best.textContent = t(lang, 'pp_best') + ': ' + result.highscore;
+    best.textContent = t(lang, 'pp_best') + ': ' + result.platformBest;
     wrap.append(best);
 
     if (result.isNewBest || result.isNewDifficultyBest || result.isNewDailyBest) {
@@ -384,6 +524,8 @@
     getProfile: getProfile,
     getAllScores: getAllScores,
     getGameScore: getGameScore,
+    newRoundId: newRoundId,
+    resetProgress: resetProgress,
     leagueForScore: leagueForScore,
     computeScore: computeScore,
     buildResultBlock: buildResultBlock,

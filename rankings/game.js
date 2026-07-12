@@ -25,20 +25,30 @@
       help_summary: 'So funktioniert es',
       help_1: 'Jede abgeschlossene Runde in einem Spiel bringt PuzzlePure Punkte, die sich zu deinen Gesamtpunkten addieren.',
       help_2: 'Aus den Gesamtpunkten ergibt sich deine Liga, aus besonderen Leistungen ergeben sich Pokale.',
-      help_3: 'Alle Werte werden nur auf diesem Geraet gespeichert und nirgendwo hochgeladen.',
+      help_3: 'Alle Werte werden nur auf diesem Gerät gespeichert und nirgendwo hochgeladen.',
       rk_total_points: 'Gesamtpunkte',
       rk_league_to_next: function (n, name) { return 'Noch ' + n + ' Punkte bis ' + name; },
-      rk_league_max: 'Hoechste Liga erreicht',
+      rk_league_max: 'Höchste Liga erreicht',
       rk_league_progress_aria: function (name) { return 'Fortschritt in der Liga ' + name; },
       rk_rounds_played: 'Gespielt',
-      rk_rounds_solved: 'Geloest',
+      rk_rounds_solved: 'Gelöst',
       rk_perfect_rounds: 'Perfekt',
       rk_current_streak: 'Serie',
       rk_best_streak: 'Beste Serie',
       rk_trophies_title: 'Pokale',
-      rk_games_title: 'Highscores je Spiel',
+      rk_games_title: 'Spielbestwerte',
       rk_not_played: 'Noch nicht gespielt',
-      rk_rounds_meta: function (played, solved) { return 'Gespielt ' + played + ' · Geloest ' + solved; }
+      rk_rounds_meta: function (played, solved) { return 'Gespielt ' + played + ' · Gelöst ' + solved; },
+      rk_platform_best: 'Beste PuzzlePure Wertung',
+      rk_attempts: function (n) { return n === 1 ? '1 Versuch' : n + ' Versuche'; },
+      rk_level: function (n) { return 'Stufe ' + n; },
+      rk_answers: function (n) { return n + ' von 7 richtig'; },
+      data_title: 'Lokale Daten',
+      data_note: 'Löscht Spielfortschritt, Statistiken, Ranglistenwerte und Pokale auf diesem Gerät. Sprache und Darstellung bleiben erhalten.',
+      reset_progress: 'Spielfortschritt löschen',
+      reset_confirm: 'Wirklich alle lokalen PuzzlePure Spielstände und Ranglistenwerte löschen?',
+      reset_done: 'Lokale Spielfortschritte wurden gelöscht.',
+      reset_failed: 'Die lokalen Daten konnten nicht gelöscht werden.'
     },
     en: {
       subtitle: 'Total points, league, trophies and highscores across all games.',
@@ -62,31 +72,51 @@
       rk_trophies_title: 'Trophies',
       rk_games_title: 'Highscores per Game',
       rk_not_played: 'Not played yet',
-      rk_rounds_meta: function (played, solved) { return 'Played ' + played + ' · Solved ' + solved; }
+      rk_rounds_meta: function (played, solved) { return 'Played ' + played + ' · Solved ' + solved; },
+      rk_platform_best: 'Best PuzzlePure score',
+      rk_attempts: function (n) { return n === 1 ? '1 attempt' : n + ' attempts'; },
+      rk_level: function (n) { return 'Level ' + n; },
+      rk_answers: function (n) { return n + ' of 7 correct'; },
+      data_title: 'Local data',
+      data_note: 'Deletes game progress, statistics, ranking values and trophies on this device. Language and appearance are kept.',
+      reset_progress: 'Delete game progress',
+      reset_confirm: 'Delete all local PuzzlePure game progress and ranking values?',
+      reset_done: 'Local game progress was deleted.',
+      reset_failed: 'The local data could not be deleted.'
     },
     tr: {
-      subtitle: 'Tum oyunlarda toplam puan, lig, kupalar ve en iyi skorlar.',
-      theme_group: 'Gorunum', theme_auto: 'Otomatik', theme_light: 'Acik', theme_dark: 'Koyu',
+      subtitle: 'Tüm oyunlarda toplam puan, lig, kupalar ve en iyi skorlar.',
+      theme_group: 'Görünüm', theme_auto: 'Otomatik', theme_light: 'Açık', theme_dark: 'Koyu',
       aria_lang_group: 'Dil',
-      nav_privacy: 'Gizlilik', nav_imprint: 'Kunye',
+      nav_privacy: 'Gizlilik', nav_imprint: 'Künye',
       home: 'Ana sayfa', home_aria: 'Ana sayfaya git',
-      help_summary: 'Nasil calisir',
-      help_1: 'Bir oyundaki her tamamlanan tur PuzzlePure Puan kazandirir, bunlar toplam puanina eklenir.',
-      help_2: 'Toplam puanin liginizi belirler, ozel basarilar da kupa kazandirir.',
-      help_3: 'Tum degerler yalnizca bu cihazda saklanir ve hicbir yere yuklenmez.',
+      help_summary: 'Nasıl çalışır',
+      help_1: 'Bir oyundaki her tamamlanan tur PuzzlePure puanı kazandırır, bunlar toplam puanına eklenir.',
+      help_2: 'Toplam puanın ligini belirler, özel başarılar da kupa kazandırır.',
+      help_3: 'Tüm değerler yalnızca bu cihazda saklanır ve hiçbir yere yüklenmez.',
       rk_total_points: 'Toplam Puan',
-      rk_league_to_next: function (n, name) { return name + ' e ' + n + ' puan kaldi'; },
-      rk_league_max: 'En yuksek liga ulasildi',
+      rk_league_to_next: function (n, name) { return name + ' ligine ' + n + ' puan kaldı'; },
+      rk_league_max: 'En yüksek lige ulaşıldı',
       rk_league_progress_aria: function (name) { return name + ' liginde ilerleme'; },
       rk_rounds_played: 'Oynanan',
-      rk_rounds_solved: 'Cozulen',
-      rk_perfect_rounds: 'Mukemmel',
+      rk_rounds_solved: 'Çözülen',
+      rk_perfect_rounds: 'Mükemmel',
       rk_current_streak: 'Seri',
-      rk_best_streak: 'En Iyi Seri',
+      rk_best_streak: 'En İyi Seri',
       rk_trophies_title: 'Kupalar',
-      rk_games_title: 'Oyun Basina En Iyi Skorlar',
-      rk_not_played: 'Henuz oynanmadi',
-      rk_rounds_meta: function (played, solved) { return 'Oynanan ' + played + ' · Cozulen ' + solved; }
+      rk_games_title: 'Oyun Rekorları',
+      rk_not_played: 'Henüz oynanmadı',
+      rk_rounds_meta: function (played, solved) { return 'Oynanan ' + played + ' · Çözülen ' + solved; },
+      rk_platform_best: 'En iyi PuzzlePure değeri',
+      rk_attempts: function (n) { return n + ' deneme'; },
+      rk_level: function (n) { return 'Seviye ' + n; },
+      rk_answers: function (n) { return '7 sorudan ' + n + ' doğru'; },
+      data_title: 'Yerel veriler',
+      data_note: 'Bu cihazdaki oyun ilerlemesini, istatistikleri, sıralama değerlerini ve kupaları siler. Dil ve görünüm korunur.',
+      reset_progress: 'Oyun ilerlemesini sil',
+      reset_confirm: 'Tüm yerel PuzzlePure oyun ilerlemesi ve sıralama değerleri silinsin mi?',
+      reset_done: 'Yerel oyun ilerlemesi silindi.',
+      reset_failed: 'Yerel veriler silinemedi.'
     }
   };
   function t(key) {
@@ -100,8 +130,8 @@
      wie schon in portal.js fuer die Kacheln. Technische Schluessel
      entsprechen den Ordnernamen, wie in shared/score.js. */
   var GAME_NAME = {
-    code: 'Ciphera', drift: 'Serpix', cluster: 'Nexa', echo: 'Memora', glyph: 'Lexiq',
-    grid9: 'Numora', react7: 'Reflexa', flow8: 'Fluxa', picto: 'Pixela', questra: 'Questra'
+    code: 'PuzzlePure Code', drift: 'PuzzlePure Drift', cluster: 'PuzzlePure Cluster', echo: 'PuzzlePure Echo', glyph: 'PuzzlePure Words',
+    grid9: 'PuzzlePure Grid', react7: 'PuzzlePure Reflex', flow8: 'PuzzlePure Flow', picto: 'PuzzlePure Picto', questra: 'PuzzlePure Quiz'
   };
   var GAME_HREF = {
     code: '../code/index.html', drift: '../drift/index.html', cluster: '../cluster/index.html',
@@ -249,6 +279,20 @@
     return '<div class="stat-cell"><div class="stat-num">' + num + '</div><div class="stat-cap">' + cap + '</div></div>';
   }
 
+  function formatTime(seconds) {
+    var total = Math.max(0, Math.floor(seconds));
+    var minutes = Math.floor(total / 60);
+    return minutes + ':' + String(total % 60).padStart(2, '0');
+  }
+  function formatGameBest(game, gs) {
+    if (!gs || gs.gameBest === null) return '—';
+    if (game === 'code') return t('rk_attempts')(gs.gameBest);
+    if (game === 'grid9' || game === 'picto') return formatTime(gs.gameBest);
+    if (game === 'flow8') return t('rk_level')(gs.gameBest);
+    if (game === 'questra') return t('rk_answers')(gs.gameBest);
+    return String(gs.gameBest);
+  }
+
   function renderRankings() {
     if (!stageEl) return;
     if (!window.PuzzlePureScore) { stageEl.innerHTML = '<p class="rk-empty">' + t('rk_not_played') + '</p>'; return; }
@@ -299,9 +343,9 @@
       var href = GAME_HREF[g] || '#';
       html += '<a class="rk-game-row" href="' + href + '">';
       html += '<span class="rk-game-name">' + name + '</span>';
-      html += '<span class="rk-game-score">' + gs.highscore + '</span>';
+      html += '<span class="rk-game-score">' + formatGameBest(g, gs) + '</span>';
       if (gs.roundsPlayed > 0) {
-        html += '<span class="rk-game-meta">' + PP.t(lang, 'pp_daily_best') + ': ' + gs.dailyBestScore + ' · ' + t('rk_rounds_meta')(gs.roundsPlayed, gs.roundsSolved) + '</span>';
+        html += '<span class="rk-game-meta">' + t('rk_platform_best') + ': ' + gs.platformBest + ' · ' + t('rk_rounds_meta')(gs.roundsPlayed, gs.roundsSolved) + '</span>';
       } else {
         html += '<span class="rk-game-meta">' + t('rk_not_played') + '</span>';
       }
@@ -345,6 +389,9 @@
     setText('help1', t('help_1'));
     setText('help2', t('help_2'));
     setText('help3', t('help_3'));
+    setText('dataActionsTitle', t('data_title'));
+    setText('dataActionsNote', t('data_note'));
+    setText('resetProgressBtn', t('reset_progress'));
   }
   function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
 
@@ -361,6 +408,14 @@
     else if (systemDarkMQ.addListener) systemDarkMQ.addListener(function () { if (theme === 'auto') applyTheme(); });
 
     registerServiceWorker();
+
+    var resetBtn = document.getElementById('resetProgressBtn');
+    if (resetBtn) resetBtn.addEventListener('click', function () {
+      if (!window.confirm(t('reset_confirm'))) return;
+      var ok = window.PuzzlePureScore && window.PuzzlePureScore.resetProgress();
+      setText('resetStatus', t(ok ? 'reset_done' : 'reset_failed'));
+      if (ok) renderRankings();
+    });
 
     renderRankings();
   }
