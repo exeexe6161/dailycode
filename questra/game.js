@@ -881,8 +881,12 @@
         persistState();
         mode = m;
         state.mode = mode;
+        if (mode === 'unlimited') {
+          unlimitedIndex = nextRandomUnlimitedIndex();
+          state.unlimitedIndexByDifficulty[difficulty] = unlimitedIndex;
+        }
         saveState(state);
-        loadRoundForState(false);
+        loadRoundForState(mode === 'unlimited');
         render();
       });
       return b;
@@ -935,6 +939,18 @@
 
     function currentRoundKey() {
       return (mode === 'daily' ? ('daily:' + dateStr) : ('unlimited:' + unlimitedIndex)) + ':d' + difficulty;
+    }
+
+    function nextRandomUnlimitedIndex() {
+      var previousQuestions = state.round && Array.isArray(state.round.indices) ? state.round.indices.join(',') : '';
+      var next = unlimitedIndex;
+      for (var attempt = 0; attempt < 12; attempt++) {
+        next = randomUnlimitedIndex();
+        var nextKey = 'unlimited:' + next + ':d' + difficulty;
+        var nextQuestions = generateUnlimitedRound(next, difficulty).join(',');
+        if (next !== unlimitedIndex && !isAlreadyScored(nextKey) && nextQuestions !== previousQuestions) return next;
+      }
+      return (unlimitedIndex + 1) % 1000000;
     }
 
     function goToIndex(idx) {
@@ -1185,7 +1201,14 @@
     }
     currentRelocalize = relocalizeGame;
 
-    loadRoundForState(false);
+    if (mode === 'unlimited') {
+      unlimitedIndex = nextRandomUnlimitedIndex();
+      state.unlimitedIndexByDifficulty[difficulty] = unlimitedIndex;
+      saveState(state);
+      loadRoundForState(true);
+    } else {
+      loadRoundForState(false);
+    }
     render();
   }
 

@@ -158,6 +158,13 @@ function testReleaseConfiguration() {
   });
 }
 
+function testQuizRandomUnlimitedEntry() {
+  var source = fs.readFileSync(path.join(root, 'questra', 'game.js'), 'utf8');
+  assert.ok(source.indexOf("if (mode === 'unlimited')") !== -1, 'Quiz prüft den unbegrenzten Modus beim Einstieg nicht');
+  assert.ok(source.indexOf('unlimitedIndex = nextRandomUnlimitedIndex();') !== -1, 'Quiz startet beim Einstieg keine zufällige Runde');
+  assert.ok(source.indexOf('loadRoundForState(true);') !== -1, 'Quiz erzwingt für die zufällige Runde keinen frischen Zustand');
+}
+
 testScoreIdempotencyAndMetrics();
 testLegacyMigration();
 testMissingRoundIdRejected();
@@ -166,5 +173,6 @@ testSyntaxAndJson();
 testHtmlResourcesAndZoom();
 testScorePayloadsAndWorkerIsolation();
 testReleaseConfiguration();
+testQuizRandomUnlimitedEntry();
 
 console.log('PuzzlePure Plattformprüfungen bestanden');
