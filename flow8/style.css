@@ -294,7 +294,7 @@ button { touch-action: manipulation; }
 .btn-ghost:hover { color: var(--text); }
 
 .help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
-.help summary { cursor: pointer; font-weight: 600; }
+.help summary { min-height: 44px; padding: 10px 0; cursor: pointer; font-weight: 600; }
 .help ul { margin: 8px 0 0; padding-left: 18px; }
 .help li { margin: 4px 0; }
 
@@ -422,4 +422,3 @@ button { touch-action: manipulation; }
   font-display: swap;
   src: url('../fonts/Inter-Bold.woff2') format('woff2');
 }
-

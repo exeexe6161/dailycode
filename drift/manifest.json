@@ -3,7 +3,7 @@
   "name": "PuzzlePure Drift",
   "short_name": "PP Drift",
   "description": "Guide the growing chain across the grid and keep clear of yourself.",
-  "lang": "de",
+  "lang": "en",
   "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",

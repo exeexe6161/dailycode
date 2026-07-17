@@ -75,6 +75,7 @@
       lbl_score: 'Punkte', lbl_best: 'Bestwert', best_none: 'noch keine', lbl_time: 'Zeit',
       btn_undo: 'Zurück', btn_clear: 'Leeren', btn_submit: 'Prüfen',
       btn_pause: 'Pause', btn_resume: 'Weiter', btn_restart: 'Neu',
+      wl_de: 'Deutsch', wl_en: 'Englisch',
       loading: 'Lade Wörterbuch',
       load_err: 'Wortliste konnte nicht geladen werden',
       choose_lang: 'Sprache wählen',
@@ -95,13 +96,16 @@
       diff_1: 'Leicht', diff_2: 'Mittel', diff_3: 'Schwer', diff_4: 'Experte',
       aria_diff_1: 'Leicht wählen', aria_diff_2: 'Mittel wählen', aria_diff_3: 'Schwer wählen', aria_diff_4: 'Experte wählen',
       nav_privacy: 'Datenschutz', nav_imprint: 'Impressum',
-      home: 'Startseite', home_aria: 'Zur Startseite', rankings: 'Rangliste', rankings_aria: 'Zur Rangliste'
+      home: 'Startseite', home_aria: 'Zur Startseite', rankings: 'Rangliste', rankings_aria: 'Zur Rangliste',
+      aria_lang_group: 'Sprache', selected: 'ausgewählt',
+      theme_group: 'Darstellung', theme_auto: 'Auto', theme_light: 'Hell', theme_dark: 'Dunkel'
     },
     en: {
       subtitle: 'Build as many valid words as you can from the letters.',
       lbl_score: 'Score', lbl_best: 'Best', best_none: 'none yet', lbl_time: 'Time',
       btn_undo: 'Undo', btn_clear: 'Clear', btn_submit: 'Check',
       btn_pause: 'Pause', btn_resume: 'Resume', btn_restart: 'New',
+      wl_de: 'German', wl_en: 'English',
       loading: 'Loading dictionary',
       load_err: 'Could not load the word list',
       choose_lang: 'Choose a language',
@@ -122,10 +126,42 @@
       diff_1: 'Easy', diff_2: 'Medium', diff_3: 'Hard', diff_4: 'Expert',
       aria_diff_1: 'Select easy', aria_diff_2: 'Select medium', aria_diff_3: 'Select hard', aria_diff_4: 'Select expert',
       nav_privacy: 'Privacy', nav_imprint: 'Imprint',
-      home: 'Home', home_aria: 'Go to home', rankings: 'Rankings', rankings_aria: 'To the rankings'
+      home: 'Home', home_aria: 'Go to home', rankings: 'Rankings', rankings_aria: 'To the rankings',
+      aria_lang_group: 'Language', selected: 'selected',
+      theme_group: 'Appearance', theme_auto: 'Auto', theme_light: 'Light', theme_dark: 'Dark'
+    },
+    tr: {
+      subtitle: 'Harflerden olabildiğince çok geçerli kelime oluştur.',
+      lbl_score: 'Puan', lbl_best: 'En iyi', best_none: 'henüz yok', lbl_time: 'Süre',
+      btn_undo: 'Geri al', btn_clear: 'Temizle', btn_submit: 'Kontrol et',
+      btn_pause: 'Duraklat', btn_resume: 'Devam et', btn_restart: 'Yeni',
+      wl_de: 'Almanca', wl_en: 'İngilizce',
+      loading: 'Sözlük yükleniyor',
+      load_err: 'Kelime listesi yüklenemedi',
+      choose_lang: 'Oyun dili seç',
+      go: 'Hadi, kelime oluştur',
+      too_short: 'Çok kısa',
+      invalid: 'Geçerli bir kelime değil',
+      over_title: 'Süre doldu',
+      over_restart: 'Yeniden oyna',
+      time_warn: '{n} saniye kaldı',
+      tr_notice: 'Türkçe kelime listesi henüz mevcut değil. Oyun için Almanca veya İngilizce seç.',
+      aria_rack: 'Harf alanı. Harfleri yaz veya seç. Enter tuşu kelimeyi kontrol eder.',
+      help_summary: 'Nasıl çalışır',
+      help_1: 'Harflere dokun veya klavyeyle yaz, ardından kontrol etmek için Enter tuşuna bas.',
+      help_2: 'Her harf yalnızca bir kez kullanılabilir. Bir kelimeden sonra yeni harfler gelir.',
+      help_3: 'Uzun kelimeler daha fazla puan ve süre kazandırır. Boşluk tuşu oyunu duraklatır.',
+      help_4: 'Kelimeler en az 3 harften oluşmalıdır. Süre dolduğunda tur sona erer.',
+      diff_group: 'Zorluk',
+      diff_1: 'Kolay', diff_2: 'Orta', diff_3: 'Zor', diff_4: 'Uzman',
+      aria_diff_1: 'Kolayı seç', aria_diff_2: 'Orta düzeyi seç', aria_diff_3: 'Zoru seç', aria_diff_4: 'Uzmanı seç',
+      nav_privacy: 'Gizlilik', nav_imprint: 'Künye',
+      home: 'Ana sayfa', home_aria: 'Ana sayfaya git', rankings: 'Sıralama', rankings_aria: 'Sıralamaya git',
+      aria_lang_group: 'Dil', selected: 'seçili',
+      theme_group: 'Görünüm', theme_auto: 'Otomatik', theme_light: 'Açık', theme_dark: 'Koyu'
     }
   };
-  function uiTable() { return STR[uiLang] || STR.en; }   // tr-UI faellt auf en zurueck
+  function uiTable() { return STR[uiLang] || STR.en; }
   function t(key) {
     var tab = uiTable();
     return (tab[key] !== undefined) ? tab[key] : (STR.en[key] !== undefined ? STR.en[key] : key);
@@ -134,6 +170,7 @@
   /* ---------- Lucide Bedien-Icons (ISC) ---------- */
   function svg(inner) { return '<svg viewBox="0 0 24 24" class="lucide" aria-hidden="true" focusable="false">' + inner + '</svg>'; }
   var ICON = {
+    globe: svg('<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/>'),
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>'),
     monitor: svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>')
@@ -141,6 +178,7 @@
   var THEME_ICON = { auto: 'monitor', light: 'sun', dark: 'moon' };
 
   /* ---------- DOM ---------- */
+  var langbarEl = document.getElementById('langbar');
   var themebarEl = document.getElementById('themebar');
   var themeColorEl = document.getElementById('themeColor');
   var themeFeedbackEl = document.getElementById('themeFeedback');
@@ -183,12 +221,13 @@
   var difficulty = loadDifficulty();
   var diffButtons = [];
   var systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
-  var themeToggleBtn = null, fbTimer = 0;
+  var langToggleBtn = null, themeToggleBtn = null, fbTimer = 0;
 
   function storageOK() { try { var k = '__dc_t__'; window.localStorage.setItem(k, '1'); window.localStorage.removeItem(k); return true; } catch (e) { return false; } }
   function loadTheme() { if (hasStorage) { try { var v = window.localStorage.getItem(THEME_KEY); if (v === 'auto' || v === 'light' || v === 'dark') return v; } catch (e) {} } return 'auto'; }
   function saveTheme(v) { if (!hasStorage) return; try { window.localStorage.setItem(THEME_KEY, v); } catch (e) {} }
   function loadLang() { if (hasStorage) { try { var v = window.localStorage.getItem(LANG_KEY); if (v === 'de' || v === 'en' || v === 'tr') return v; } catch (e) {} } return 'de'; }
+  function saveLang(v) { if (!hasStorage) return; try { window.localStorage.setItem(LANG_KEY, v); } catch (e) {} }
   function effectiveDark() { return theme === 'dark' || (theme === 'auto' && systemDarkMQ.matches); }
   function updateThemeColor() { if (themeColorEl) themeColorEl.setAttribute('content', effectiveDark() ? '#0a0c11' : '#f4f5f7'); }
   function applyTheme() { document.documentElement.setAttribute('data-theme', theme); updateThemeColor(); refreshThemeBar(); }
@@ -206,7 +245,7 @@
   function cycleTheme() { var i = THEMES.indexOf(theme); setTheme(THEMES[(i + 1) % THEMES.length]); showThemeFeedback(); }
   function showThemeFeedback() {
     if (!themeFeedbackEl) return;
-    themeFeedbackEl.textContent = (uiLang === 'de') ? ({ auto: 'Auto', light: 'Hell', dark: 'Dunkel' })[theme] : ({ auto: 'Auto', light: 'Light', dark: 'Dark' })[theme];
+    themeFeedbackEl.textContent = t('theme_' + theme);
     themeFeedbackEl.classList.add('show');
     if (fbTimer) window.clearTimeout(fbTimer);
     fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
@@ -214,7 +253,43 @@
   function refreshThemeBar() {
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
-    themeToggleBtn.setAttribute('aria-label', (uiLang === 'de' ? 'Darstellung' : 'Appearance'));
+    themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
+  }
+
+  function langName(code) {
+    return ({ de: 'Deutsch', en: 'English', tr: 'Türkçe' })[code] || code;
+  }
+  function buildLangBar() {
+    if (!langbarEl) return;
+    langbarEl.innerHTML = '';
+    langToggleBtn = document.createElement('button');
+    langToggleBtn.type = 'button';
+    langToggleBtn.className = 'icon-btn lang-toggle';
+    langToggleBtn.addEventListener('click', cycleLang);
+    langbarEl.appendChild(langToggleBtn);
+    refreshLangBar();
+  }
+  function cycleLang() {
+    var order = ['de', 'en', 'tr'];
+    var i = order.indexOf(uiLang);
+    setUiLang(order[(i + 1) % order.length]);
+  }
+  function refreshLangBar() {
+    if (!langToggleBtn) return;
+    langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + uiLang.toUpperCase() + '</span>';
+    langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(uiLang));
+  }
+  function setUiLang(lang) {
+    if (!STR[lang] || lang === uiLang) return;
+    uiLang = lang;
+    saveLang(lang);
+    document.documentElement.lang = lang;
+    applyTexts();
+    setFooterLinks();
+    refreshLangBar();
+    refreshThemeBar();
+    renderRack();
+    resolveWordLang();
   }
 
   /* ---------- Schwierigkeit: Wahl laden, speichern, anzeigen ----------
@@ -267,20 +342,24 @@
   var wordLang = 'en';          // tatsaechliche Spielsprache (DE oder EN)
   var wordSet = null;           // exakter Lookup
   var anagramKeys = null;       // sortierte-Buchstaben-Schluessel fuer Spielbarkeit
+  var playableWords = [];       // Fallback-Woerter fuer garantiert spielbare Racks
   var block = null;             // Sperrliste der aktiven Sprache
 
   function sortKey(s) { return s.split('').sort().join(''); }
 
   function buildSets(text) {
-    var ws = new Set(), ak = new Set();
+    var ws = new Set(), ak = new Set(), playable = [];
     var lines = text.split('\n');
     for (var i = 0; i < lines.length; i++) {
       var w = lines[i].trim();
       if (w.length < MIN_WORD) continue;
       ws.add(w);
-      if (w.length <= RACK) ak.add(sortKey(w));   // nur was aus dem Rack bildbar waere
+      if (w.length <= RACK) {
+        ak.add(sortKey(w));   // nur was aus dem Rack bildbar waere
+        if (!block || !block.has(w)) playable.push(w);
+      }
     }
-    wordSet = ws; anagramKeys = ak;
+    wordSet = ws; anagramKeys = ak; playableWords = playable;
   }
 
   /* ---------- Spielzustand ---------- */
@@ -323,8 +402,36 @@
       ensureVowels(arr);
       if (rackHasWord(arr)) return arr;
     }
-    // Fallback (praktisch nie): vokalbetont, irgendetwas Spielbares
-    var fb = []; for (var k = 0; k < RACK; k++) fb.push(draw(wordLang)); ensureVowels(fb); return fb;
+    return guaranteedRack();
+  }
+
+  // Baut den seltenen Fallback aus einem echten Wort der aktiven Liste.
+  // Die Wortbuchstaben werden nie ersetzt. Freie Plaetze liefern bei Bedarf
+  // Vokale, danach wird gemischt. Damit bleibt mindestens ein Wort sicher.
+  function guaranteedRack() {
+    var candidates = playableWords.filter(function (word) {
+      return vowelCount(word.split(''), wordLang) + (RACK - word.length) >= MIN_VOWELS;
+    });
+    var pool = candidates.length ? candidates : playableWords;
+    if (!pool.length) {
+      var emergency = []; for (var e = 0; e < RACK; e++) emergency.push(draw(wordLang));
+      ensureVowels(emergency);
+      return emergency;
+    }
+    var word = pool[Math.floor(Math.random() * pool.length)];
+    var fb = word.split('');
+    while (fb.length < RACK) {
+      var slotsAfter = RACK - fb.length - 1;
+      var mustDrawVowel = vowelCount(fb, wordLang) + slotsAfter < MIN_VOWELS;
+      var next;
+      do { next = draw(wordLang); } while (mustDrawVowel && !isVowel(next, wordLang));
+      fb.push(next);
+    }
+    for (var i = fb.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = fb[i]; fb[i] = fb[j]; fb[j] = tmp;
+    }
+    return fb;
   }
 
   function ensureVowels(arr) {
@@ -377,7 +484,7 @@
       var sel = selection.indexOf(i) !== -1;
       btn.classList.toggle('is-selected', sel);
       if (freshFlags[i]) { btn.classList.remove('is-fresh'); void btn.offsetWidth; btn.classList.add('is-fresh'); }
-      btn.setAttribute('aria-label', ch + (sel ? ', ' + (uiLang === 'de' ? 'gewaehlt' : 'selected') : ''));
+      btn.setAttribute('aria-label', ch + (sel ? ', ' + t('selected') : ''));
     }
     freshFlags = [];
   }
@@ -584,7 +691,7 @@
     phase = 'await';
     stopClock();
     selection = []; rack = []; freshFlags = [];
-    score = 0; best = 0; remaining = 0;
+    score = 0; best = null; remaining = 0;
     if (rackEl) rackEl.innerHTML = '';
     updateHud();
     if (hudTimeEl) hudTimeEl.classList.remove('low');   // im Wartezustand kein Warn-Rot
@@ -625,6 +732,7 @@
     setText('lblScore', t('lbl_score')); setText('lblBest', t('lbl_best')); setText('lblTime', t('lbl_time'));
     setText('undoBtn', t('btn_undo')); setText('clearBtn', t('btn_clear')); setText('submitBtn', t('btn_submit'));
     setText('restartBtn', t('btn_restart'));
+    setText('wlDe', t('wl_de')); setText('wlEn', t('wl_en'));
     setText('navPrivacy', t('nav_privacy')); setText('navImprint', t('nav_imprint'));
     setText('homeLabel', t('home'));
     var homeLinkEl = document.getElementById('homeLink');
@@ -665,12 +773,14 @@
 
   /* ---------- Start (Reihenfolge penibel) ---------- */
   function init() {
+    buildLangBar();
     buildThemeBar();
     applyTheme();
     document.documentElement.lang = (uiLang === 'tr') ? 'tr' : uiLang;
     buildDiffRow();
     applyTexts();
     setFooterLinks();
+    refreshLangBar();
 
     window.addEventListener('keydown', onKeyDown);
     if (submitBtn) submitBtn.addEventListener('click', submit);

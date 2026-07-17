@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-ciphera-v16';
+var CACHE = 'dailycode-ciphera-v17';
 var LEGACY = ['dailycode-game-v5'];
 var PREFIX = 'dailycode-ciphera-';
 

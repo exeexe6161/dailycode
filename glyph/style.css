@@ -148,7 +148,7 @@ button { touch-action: manipulation; }
 }
 .subtitle { margin: 0 0 12px; color: var(--text-muted); font-size: .95rem; text-align: center; }
 
-.themebar { display: flex; justify-content: center; gap: 6px; margin: 0 0 16px; }
+.langbar, .themebar { display: flex; justify-content: center; gap: 6px; margin: 0 0 16px; }
 
 .lucide { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn {
@@ -161,6 +161,7 @@ button { touch-action: manipulation; }
 }
 .icon-btn:hover { border-color: var(--accent); color: var(--text); }
 .icon-btn .lucide { width: 22px; height: 22px; display: block; }
+.lang-toggle .lang-code { font-size: .9rem; letter-spacing: .5px; }
 
 .toggle-feedback {
   text-align: center; min-height: 1.3em; margin: 0 0 12px;
@@ -282,7 +283,7 @@ button { touch-action: manipulation; }
 .btn[disabled] { opacity: .5; cursor: default; }
 
 .help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
-.help summary { cursor: pointer; font-weight: 600; }
+.help summary { min-height: 44px; padding: 10px 0; cursor: pointer; font-weight: 600; }
 .help ul { margin: 8px 0 0; padding-left: 18px; }
 .help li { margin: 4px 0; }
 
@@ -388,4 +389,3 @@ button { touch-action: manipulation; }
   font-display: swap;
   src: url('../fonts/Inter-Bold.woff2') format('woff2');
 }
-

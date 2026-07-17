@@ -12,6 +12,17 @@
   <link rel="stylesheet" href="../shared/rewards.css">
   <link rel="manifest" href="manifest.json">
   <link rel="canonical" href="https://www.puzzlepure.com/glyph/index.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PuzzlePure Words">
+  <meta property="og:description" content="Bilde so viele Wörter wie möglich aus acht Buchstabenkacheln.">
+  <meta property="og:url" content="https://www.puzzlepure.com/glyph/index.html">
+  <meta property="og:image" content="https://www.puzzlepure.com/assets/games/lexiq.png">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="600">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PuzzlePure Words">
+  <meta name="twitter:description" content="Bilde so viele Wörter wie möglich aus acht Buchstabenkacheln.">
+  <meta name="twitter:image" content="https://www.puzzlepure.com/assets/games/lexiq.png">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -26,6 +37,7 @@
           <img src="../brand/puzzlepure-lockup-white.svg" alt="" class="logo-dark" aria-hidden="true" height="32">
         </div>
         <div class="head-controls">
+          <nav class="langbar" id="langbar"></nav>
           <nav class="themebar" id="themebar"></nav>
         </div>
       </div>
@@ -47,7 +59,7 @@
 
     <div class="diff-row" id="diffRow" role="group"></div>
 
-    <!-- Hinweis, wenn UI-Sprache tr ist: TR als Spielsprache folgt, Wahl DE/EN -->
+    <!-- Hinweis, wenn UI-Sprache tr ist: keine lizenzierte TR-Wortliste, Wahl DE/EN -->
     <div class="notice" id="langNotice" hidden>
       <p class="notice-text" id="langNoticeText"></p>
       <div class="notice-actions">

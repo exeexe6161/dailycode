@@ -3,7 +3,7 @@
   "name": "PuzzlePure Flow",
   "short_name": "PP Flow",
   "description": "Connect every pair of matching dots and cover the whole grid without crossing the paths.",
-  "lang": "de",
+  "lang": "en",
   "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",

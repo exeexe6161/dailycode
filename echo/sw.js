@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-memora-v15';
+var CACHE = 'dailycode-memora-v16';
 var LEGACY = ['dailycode-echo-v4'];
 var PREFIX = 'dailycode-memora-';
 
@@ -22,6 +22,7 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
+  './icon-192.png',
   './icon.svg',
   '../shared/score.js',
   '../shared/rewards.css',

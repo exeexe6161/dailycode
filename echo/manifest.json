@@ -3,7 +3,7 @@
   "name": "PuzzlePure Echo",
   "short_name": "PP Echo",
   "description": "Memorize the shapes shown briefly, then find every matching pair.",
-  "lang": "de",
+  "lang": "en",
   "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",

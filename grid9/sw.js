@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-numora-v14';
+var CACHE = 'dailycode-numora-v15';
 var LEGACY = ['dailycode-grid9-v1'];
 var PREFIX = 'dailycode-numora-';
 
@@ -21,6 +21,7 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
+  './icon-192.png',
   './icon.svg',
   '../shared/score.js',
   '../shared/rewards.css',

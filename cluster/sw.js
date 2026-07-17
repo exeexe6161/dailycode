@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-nexa-v15';
+var CACHE = 'dailycode-nexa-v16';
 var LEGACY = ['dailycode-cluster-v4'];
 var PREFIX = 'dailycode-nexa-';
 
@@ -22,6 +22,7 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
+  './icon-192.png',
   './icon.svg',
   '../shared/score.js',
   '../shared/rewards.css',

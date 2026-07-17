@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-fluxa-v15';
+var CACHE = 'dailycode-fluxa-v16';
 var LEGACY = ['dailycode-flow8-v1'];
 var PREFIX = 'dailycode-fluxa-';
 
@@ -24,6 +24,7 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
+  './icon-192.png',
   './icon.svg'
 ];
 

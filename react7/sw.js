@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-reflexa-v15';
+var CACHE = 'dailycode-reflexa-v16';
 var LEGACY = ['dailycode-react7-v2'];
 var PREFIX = 'dailycode-reflexa-';
 
@@ -24,6 +24,7 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
+  './icon-192.png',
   './icon.svg'
 ];
 

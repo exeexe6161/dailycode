@@ -366,6 +366,7 @@ body::before {
   text-decoration: none;
   font-weight: 600;
   padding: 4px 2px;
+  min-height: 44px;
 }
 .footer-link:hover { color: var(--accent); }
 .footer-sep { color: var(--text-muted); }

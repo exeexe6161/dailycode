@@ -11,7 +11,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-lexiq-v16';
+var CACHE = 'dailycode-lexiq-v18';
 var LEGACY = ['dailycode-glyph-v4'];
 var PREFIX = 'dailycode-lexiq-';
 
@@ -22,6 +22,7 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
+  './icon-192.png',
   './icon.svg',
   '../shared/score.js',
   '../shared/rewards.css',

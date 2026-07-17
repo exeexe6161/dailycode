@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-serpix-v16';
+var CACHE = 'dailycode-serpix-v17';
 var LEGACY = ['dailycode-drift-v4'];
 var PREFIX = 'dailycode-serpix-';
 
@@ -21,6 +21,7 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
+  './icon-192.png',
   './icon.svg',
   '../shared/score.js',
   '../shared/rewards.css',

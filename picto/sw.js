@@ -10,7 +10,7 @@
    ============================================================ */
 'use strict';
 
-var CACHE = 'dailycode-pixela-v16';
+var CACHE = 'dailycode-pixela-v17';
 var LEGACY = ['dailycode-picto-v1'];
 var PREFIX = 'dailycode-pixela-';
 
@@ -21,6 +21,7 @@ var ASSETS = [
   './game.js',
   './theme-init.js',
   './manifest.json',
+  './icon-192.png',
   './icon.svg',
   '../shared/score.js',
   '../shared/rewards.css',

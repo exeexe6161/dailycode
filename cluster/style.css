@@ -324,7 +324,7 @@ button { touch-action: manipulation; }
 .ctrl-btn .lucide { width: 26px; height: 26px; display: block; }
 
 .help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
-.help summary { cursor: pointer; font-weight: 600; }
+.help summary { min-height: 44px; padding: 10px 0; cursor: pointer; font-weight: 600; }
 .help ul { margin: 8px 0 0; padding-left: 18px; }
 .help li { margin: 4px 0; }
 
@@ -453,4 +453,3 @@ button { touch-action: manipulation; }
 .pp-score-best { margin: 2px 0 0; font-size: .85rem; color: var(--text-muted); }
 .pp-score-record { margin: 4px 0 0; font-size: .85rem; font-weight: 700; color: var(--good); }
 .pp-score-league { margin: 2px 0 0; font-size: .78rem; color: var(--text-muted); }
-

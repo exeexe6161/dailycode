@@ -3,7 +3,7 @@
   "name": "PuzzlePure Picto",
   "short_name": "PP Picto",
   "description": "Fill the grid using row and column clues to reveal the daily picture.",
-  "lang": "de",
+  "lang": "en",
   "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",

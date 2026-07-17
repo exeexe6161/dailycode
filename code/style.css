@@ -366,7 +366,7 @@ button.slot:not(:disabled):active { transform: scale(.96); }
 
 /* Hilfe */
 .help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
-.help summary { cursor: pointer; font-weight: 600; }
+.help summary { min-height: 44px; padding: 10px 0; cursor: pointer; font-weight: 600; }
 .help ul { margin: 10px 0 0; padding-left: 18px; }
 .help li { margin: 5px 0; }
 
@@ -739,4 +739,3 @@ button.slot:not(:disabled):active { transform: scale(.96); }
   font-display: swap;
   src: url('../fonts/Inter-Bold.woff2') format('woff2');
 }
-

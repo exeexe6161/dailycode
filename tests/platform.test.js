@@ -126,7 +126,11 @@ function testHtmlResourcesAndZoom() {
     assert.strictEqual(/user-scalable\s*=\s*no|maximum-scale\s*=\s*1/i.test(html), false, file + ' deaktiviert Zoom');
     Array.from(html.matchAll(/(?:src|href)="([^"#?]+)"/g)).forEach(function (match) {
       var ref = match[1];
-      if (/^(https?:|mailto:|\/)/.test(ref)) return;
+      if (ref.charAt(0) === '/') {
+        assert.ok(fs.existsSync(path.join(root, ref.slice(1))), file + ' referenziert fehlende Root Datei ' + ref);
+        return;
+      }
+      if (/^(https?:|mailto:)/.test(ref)) return;
       assert.ok(fs.existsSync(path.resolve(path.dirname(file), ref)), file + ' referenziert fehlende Datei ' + ref);
     });
   });
@@ -156,6 +160,64 @@ function testReleaseConfiguration() {
   ['fonts/LICENSE-Inter.txt', 'licenses/LICENSE-LUCIDE.txt', 'worddata/PROVENANCE.md'].forEach(function (file) {
     assert.ok(fs.existsSync(path.join(root, file)), 'Lizenznachweis fehlt: ' + file);
   });
+  var portalHtml = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  ['og:type', 'og:title', 'og:description', 'og:url', 'og:image', 'twitter:card', 'twitter:title', 'twitter:description', 'twitter:image'].forEach(function (field) {
+    assert.ok(portalHtml.indexOf('"' + field + '"') !== -1, 'Portal SEO Metadatum fehlt: ' + field);
+  });
+  var portalOgImage = portalHtml.match(/property="og:image" content="https:\/\/www\.puzzlepure\.com([^"]+)"/);
+  assert.ok(portalOgImage && fs.existsSync(path.join(root, portalOgImage[1].slice(1))), 'Portal Open Graph Bild fehlt');
+}
+
+function testGamePwaMetadataAndOfflineIcons() {
+  var games = ['code', 'drift', 'cluster', 'echo', 'glyph', 'grid9', 'react7', 'flow8', 'picto'];
+  games.forEach(function (game) {
+    var manifest = JSON.parse(fs.readFileSync(path.join(root, game, 'manifest.json'), 'utf8'));
+    assert.strictEqual(manifest.lang, 'en', game + ' kennzeichnet englische PWA Metadaten nicht als Englisch');
+    manifest.icons.forEach(function (icon) {
+      assert.ok(fs.existsSync(path.join(root, game, icon.src)), game + ' Manifest referenziert fehlendes Symbol ' + icon.src);
+    });
+    var worker = fs.readFileSync(path.join(root, game, 'sw.js'), 'utf8');
+    assert.ok(worker.indexOf("'./icon-192.png'") !== -1, game + ' cached das installierte App Symbol nicht offline');
+    var assetsBlock = worker.match(/var ASSETS = \[([\s\S]*?)\];/);
+    assert.ok(assetsBlock, game + ' Service Worker hat keine App Shell Liste');
+    Array.from(assetsBlock[1].matchAll(/'([^']+)'/g)).forEach(function (match) {
+      assert.ok(fs.existsSync(path.resolve(root, game, match[1])), game + ' Service Worker referenziert fehlendes Asset ' + match[1]);
+    });
+    var html = fs.readFileSync(path.join(root, game, 'index.html'), 'utf8');
+    ['og:type', 'og:title', 'og:description', 'og:url', 'og:image', 'twitter:card', 'twitter:title', 'twitter:description', 'twitter:image'].forEach(function (field) {
+      assert.ok(html.indexOf('"' + field + '"') !== -1, game + ' SEO Metadatum fehlt: ' + field);
+    });
+    var ogImage = html.match(/property="og:image" content="https:\/\/www\.puzzlepure\.com([^"]+)"/);
+    assert.ok(ogImage && fs.existsSync(path.join(root, ogImage[1].slice(1))), game + ' Open Graph Bild fehlt');
+  });
+}
+
+function testGlyphGuaranteedFallback() {
+  var source = fs.readFileSync(path.join(root, 'glyph/game.js'), 'utf8');
+  var freqStart = source.indexOf('var FREQ');
+  var freqEnd = source.indexOf('/* ---------- Profanitaetsfilter', freqStart);
+  var setsStart = source.indexOf('function sortKey');
+  var setsEnd = source.indexOf('/* ---------- Spielzustand', setsStart);
+  var generatorStart = source.indexOf('/* ---------- Generator', setsEnd);
+  var generatorEnd = source.indexOf('/* ---------- Rendering', generatorStart);
+  assert.ok(freqStart >= 0 && freqEnd > freqStart && setsStart >= 0 && setsEnd > setsStart && generatorStart >= 0 && generatorEnd > generatorStart);
+
+  var deterministicMath = Object.create(Math);
+  deterministicMath.random = function () { return 0; };
+  var context = { Math: deterministicMath, Set: Set, console: console };
+  vm.createContext(context);
+  vm.runInContext(
+    'var RACK=8, MIN_WORD=3, MIN_VOWELS=3, wordLang="de", wordSet=null, anagramKeys=null, playableWords=[], block=new Set(), rack=[], freshFlags=[];\n' +
+    source.slice(freqStart, freqEnd) + '\n' +
+    source.slice(setsStart, setsEnd) + '\n' +
+    source.slice(generatorStart, generatorEnd),
+    context
+  );
+  context.buildSets(fs.readFileSync(path.join(root, 'glyph/words-de.txt'), 'utf8'));
+  var rack = Array.from(context.generateRack());
+  assert.strictEqual(rack.length, 8);
+  assert.strictEqual(context.rackHasWord(rack), true, 'Glyph Fallback erzeugt kein spielbares Rack');
+  assert.ok(context.vowelCount(rack, 'de') >= 3, 'Glyph Fallback enthält zu wenige Vokale');
 }
 
 function testQuizRandomUnlimitedEntry() {
@@ -173,6 +235,8 @@ testSyntaxAndJson();
 testHtmlResourcesAndZoom();
 testScorePayloadsAndWorkerIsolation();
 testReleaseConfiguration();
+testGamePwaMetadataAndOfflineIcons();
+testGlyphGuaranteedFallback();
 testQuizRandomUnlimitedEntry();
 
 console.log('PuzzlePure Plattformprüfungen bestanden');

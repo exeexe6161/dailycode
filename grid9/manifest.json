@@ -3,7 +3,7 @@
   "name": "PuzzlePure Grid",
   "short_name": "PP Grid",
   "description": "Fill the grid so every row, column and block holds the numbers one to nine exactly once.",
-  "lang": "de",
+  "lang": "en",
   "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",
