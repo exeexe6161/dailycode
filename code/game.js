@@ -705,6 +705,7 @@
   }
 
   function refreshThemeBar() {
+    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
@@ -829,9 +830,21 @@
     var order = ['de', 'en', 'tr'];
     var i = order.indexOf(lang);
     setLang(order[(i + 1) % order.length]);
+    showLangFeedback();
+  }
+
+  // Gleiche Rueckmeldung wie beim Theme Wechsel, damit Screenreader Nutzer
+  // auch den Sprachwechsel per aria-live bestaetigt bekommen.
+  function showLangFeedback() {
+    if (!themeFeedbackEl) return;
+    themeFeedbackEl.textContent = langName(lang);
+    themeFeedbackEl.classList.add('show');
+    if (fbTimer) window.clearTimeout(fbTimer);
+    fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
 
   function refreshLangBar() {
+    if (langbarEl) langbarEl.setAttribute('aria-label', t('aria_lang_group'));
     if (!langToggleBtn) return;
     langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
     langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
@@ -1266,7 +1279,7 @@
     html += statCell(stats.currentStreak, t('stat_streak'));
     html += statCell(stats.maxStreak, t('stat_max'));
     html += '</div>';
-    html += '<h3 class="dist-title">' + t('dist_title') + '</h3>';
+    html += '<h2 class="dist-title">' + t('dist_title') + '</h2>';
     for (var i = 0; i < MAX_TRIES; i++) {
       var count = stats.dist[i];
       var pct = Math.round((count / maxDist) * 100);
@@ -1430,7 +1443,7 @@
   /* ---------- Tastatur ---------- */
   function onKeydown(e) {
     if (phase !== 'playing') return;
-    if (e.key >= '1' && e.key <= '6') {
+    if (e.key >= '1' && e.key <= '6' && Number(e.key) - 1 < SYMBOL_COUNT) {
       placeSymbol(Number(e.key) - 1);
       e.preventDefault();
     } else if (e.key === 'Backspace') {

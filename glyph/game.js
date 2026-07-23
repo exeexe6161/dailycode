@@ -251,6 +251,7 @@
     fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshThemeBar() {
+    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
@@ -273,8 +274,20 @@
     var order = ['de', 'en', 'tr'];
     var i = order.indexOf(uiLang);
     setUiLang(order[(i + 1) % order.length]);
+    showLangFeedback();
+  }
+
+  // Gleiche Rueckmeldung wie beim Theme Wechsel, damit Screenreader Nutzer
+  // auch den Sprachwechsel per aria-live bestaetigt bekommen.
+  function showLangFeedback() {
+    if (!themeFeedbackEl) return;
+    themeFeedbackEl.textContent = langName(uiLang);
+    themeFeedbackEl.classList.add('show');
+    if (fbTimer) window.clearTimeout(fbTimer);
+    fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshLangBar() {
+    if (langbarEl) langbarEl.setAttribute('aria-label', t('aria_lang_group'));
     if (!langToggleBtn) return;
     langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + uiLang.toUpperCase() + '</span>';
     langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(uiLang));
@@ -726,10 +739,14 @@
   /* ---------- Tastatur ---------- */
   function onKeyDown(e) {
     var k = e.key;
-    if (k === 'Enter') { e.preventDefault(); submit(); return; }
-    if (k === 'Backspace') { e.preventDefault(); undo(); return; }
+    // Ein fokussierter Button (z.B. "Neu", Overlay Aktion) soll Enter/Space
+    // immer nativ ausloesen koennen, sonst kommt ein reiner Tastaturnutzer
+    // nach Rundenende nicht mehr aus dem Zustand heraus.
+    var onButton = e.target && e.target.tagName === 'BUTTON';
+    if (k === 'Enter') { if (onButton) return; e.preventDefault(); submit(); return; }
+    if (k === 'Backspace') { if (onButton) return; e.preventDefault(); undo(); return; }
     if (k === 'Escape') { clearSel(); return; }
-    if (k === ' ' || k === 'Spacebar') { e.preventDefault(); togglePause(); return; }
+    if (k === ' ' || k === 'Spacebar') { if (onButton) return; e.preventDefault(); togglePause(); return; }
     if (k && k.length === 1) {
       var ch = k.toLowerCase();
       if (/^[a-zäöüß]$/.test(ch)) { selectByLetter(ch); }

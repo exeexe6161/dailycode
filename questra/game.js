@@ -542,8 +542,20 @@
     var order = ['de', 'en', 'tr'];
     var i = order.indexOf(lang);
     setLang(order[(i + 1) % order.length]);
+    showLangFeedback();
+  }
+
+  // Gleiche Rueckmeldung wie beim Theme Wechsel, damit Screenreader Nutzer
+  // auch den Sprachwechsel per aria-live bestaetigt bekommen.
+  function showLangFeedback() {
+    if (!themeFeedbackEl) return;
+    themeFeedbackEl.textContent = langName(lang);
+    themeFeedbackEl.classList.add('show');
+    if (fbTimer) window.clearTimeout(fbTimer);
+    fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshLangBar() {
+    if (langbarEl) langbarEl.setAttribute('aria-label', t('aria_lang_group'));
     if (!langToggleBtn) return;
     langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
     langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
@@ -575,6 +587,7 @@
     fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshThemeBar() {
+    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
@@ -1052,6 +1065,10 @@
       answeredThisQuestion = true;
       persistState();
       render();
+      // render() baut die Options-Buttons neu auf, der angeklickte Button
+      // (und damit der Fokus) existiert danach nicht mehr. Fokus bewusst auf
+      // die naechste sinnvolle Aktion legen, statt ihn auf body fallen zu lassen.
+      if (!nextBtn.hidden) nextBtn.focus();
     }
     function goNext() {
       if (currentQ < 6) {
@@ -1059,6 +1076,9 @@
         answeredThisQuestion = answers[currentQ] !== null;
         persistState();
         render();
+        var firstOption = optionsEl.querySelector('.questra-option');
+        if (firstOption && !firstOption.disabled) firstOption.focus();
+        else if (!nextBtn.hidden) nextBtn.focus();
       } else {
         finished = true;
         stopTimer();
@@ -1146,6 +1166,7 @@
           b.className = 'questra-option';
           b.textContent = optText;
           b.setAttribute('aria-label', t('aria_option')(i + 1, optText));
+          b.setAttribute('aria-pressed', String(i === picked));
           if (picked !== null) {
             b.disabled = true;
             if (i === qData.c) b.classList.add('is-correct');

@@ -269,8 +269,20 @@
     var order = ['de', 'en', 'tr'];
     var i = order.indexOf(lang);
     setLang(order[(i + 1) % order.length]);
+    showLangFeedback();
+  }
+
+  // Gleiche Rueckmeldung wie beim Theme Wechsel, damit Screenreader Nutzer
+  // auch den Sprachwechsel per aria-live bestaetigt bekommen.
+  function showLangFeedback() {
+    if (!themeFeedbackEl) return;
+    themeFeedbackEl.textContent = langName(lang);
+    themeFeedbackEl.classList.add('show');
+    if (fbTimer) window.clearTimeout(fbTimer);
+    fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshLangBar() {
+    if (langbarEl) langbarEl.setAttribute('aria-label', t('aria_lang_group'));
     if (!langToggleBtn) return;
     langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
     langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
@@ -323,6 +335,7 @@
     }, 2200);
   }
   function refreshThemeBar() {
+    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
@@ -716,6 +729,7 @@
     if (!pauseBtn) return;
     pauseBtn.textContent = paused ? t('resume') : t('pause');
     pauseBtn.setAttribute('aria-label', paused ? t('aria_resume') : t('aria_pause'));
+    pauseBtn.setAttribute('aria-pressed', String(paused));
   }
   function showOverlay(title, scoreText, btnText) {
     if (overlayTitleEl) overlayTitleEl.textContent = title;
@@ -801,13 +815,14 @@
   /* ---------- Tastatur ---------- */
   function onKeyDown(e) {
     var k = e.key;
-    if (k === 'ArrowLeft' || k === 'a' || k === 'A') { e.preventDefault(); moveLeft(); }
-    else if (k === 'ArrowRight' || k === 'd' || k === 'D') { e.preventDefault(); moveRight(); }
-    else if (k === 'ArrowDown' || k === 's' || k === 'S') { e.preventDefault(); setSoftDrop(true); }
+    var tag = e.target && e.target.tagName;
+    var onControl = tag === 'BUTTON' || tag === 'SUMMARY' || tag === 'A';
+    if (k === 'ArrowLeft' || k === 'a' || k === 'A') { if (onControl) return; e.preventDefault(); moveLeft(); }
+    else if (k === 'ArrowRight' || k === 'd' || k === 'D') { if (onControl) return; e.preventDefault(); moveRight(); }
+    else if (k === 'ArrowDown' || k === 's' || k === 'S') { if (onControl) return; e.preventDefault(); setSoftDrop(true); }
     else if (k === 'p' || k === 'P') { e.preventDefault(); togglePause(); }
     else if (k === ' ' || k === 'Spacebar') {
-      var tag = e.target && e.target.tagName;
-      if (tag !== 'BUTTON' && tag !== 'SUMMARY' && tag !== 'A') { e.preventDefault(); togglePause(); }
+      if (!onControl) { e.preventDefault(); togglePause(); }
     }
   }
   function onKeyUp(e) {
@@ -838,6 +853,14 @@
           btn.addEventListener('pointerup', function () { setSoftDrop(false); });
           btn.addEventListener('pointercancel', function () { setSoftDrop(false); });
           btn.addEventListener('pointerleave', function () { setSoftDrop(false); });
+          // Enter/Space loesen bei einem Button ein 'click' Event aus, kein
+          // pointerdown/up. detail===0 erkennt genau diese Tastaturaktivierung
+          // (echte Maus/Touch Klicks haben detail>=1 und laufen schon oben).
+          btn.addEventListener('click', function (ev) {
+            if (ev.detail !== 0) return;
+            setSoftDrop(true);
+            window.setTimeout(function () { setSoftDrop(false); }, 220);
+          });
         }
       })(btns[i]);
     }

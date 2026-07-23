@@ -5,6 +5,10 @@
 node_modules/
 *.log
 
+# Secrets
+.env
+.env.*
+
 # Vercel
 .vercel
 

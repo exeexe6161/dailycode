@@ -35,7 +35,7 @@
       cell_filled: 'gefüllt',
       cell_marked: 'markiert',
       cell_empty: 'leer',
-      aria_cell: function (r, c, state) { return 'Zelle ' + r + ', ' + c + ', ' + state; },
+      aria_cell: function (r, c, state, rowClue, colClue) { return 'Zelle ' + r + ', ' + c + ', ' + state + ', Zeile ' + rowClue + ', Spalte ' + colClue; },
       aria_board: 'Bilderrätselgitter. Zeilenzahlen und Spaltenzahlen geben an, wie viele zusammenhängende Felder gefüllt werden. Tippen füllt ein Feld; die rechte Maustaste oder Umschalttaste markiert es als leer. Pfeiltasten bewegen den Fokus, Eingabe oder Leertaste füllt ein Feld, X oder Rücktaste markiert es.',
       win: 'Bild vollständig',
       theme_group: 'Darstellung',
@@ -84,7 +84,7 @@
       cell_filled: 'filled',
       cell_marked: 'marked',
       cell_empty: 'empty',
-      aria_cell: function (r, c, state) { return 'Cell ' + r + ', ' + c + ', ' + state; },
+      aria_cell: function (r, c, state, rowClue, colClue) { return 'Cell ' + r + ', ' + c + ', ' + state + ', row ' + rowClue + ', column ' + colClue; },
       aria_board: 'Picture puzzle grid. Row and column numbers show how many connected cells to fill. Tap fills a cell, right click or Shift marks it as empty. Arrow keys move focus, Enter or Space fills a cell, X or Backspace marks it.',
       win: 'Picture complete',
       theme_group: 'Appearance',
@@ -133,7 +133,7 @@
       cell_filled: 'dolu',
       cell_marked: 'işaretli',
       cell_empty: 'boş',
-      aria_cell: function (r, c, state) { return 'Hücre ' + r + ', ' + c + ', ' + state; },
+      aria_cell: function (r, c, state, rowClue, colClue) { return 'Hücre ' + r + ', ' + c + ', ' + state + ', satır ' + rowClue + ', sütun ' + colClue; },
       aria_board: 'Resim bulmacası ızgarası. Satır ve sütun sayıları kaç bitişik hücrenin doldurulacağını gösterir. Dokunma bir hücreyi doldurur, sağ tık veya Shift tuşu onu boş olarak işaretler. Ok tuşları odağı taşır, Enter veya boşluk tuşu bir hücreyi doldurur, X veya Geri tuşu onu işaretler.',
       win: 'Resim tamamlandı',
       theme_group: 'Görünüm',
@@ -268,8 +268,20 @@
     var order = ['de', 'en', 'tr'];
     var i = order.indexOf(lang);
     setLang(order[(i + 1) % order.length]);
+    showLangFeedback();
+  }
+
+  // Gleiche Rueckmeldung wie beim Theme Wechsel, damit Screenreader Nutzer
+  // auch den Sprachwechsel per aria-live bestaetigt bekommen.
+  function showLangFeedback() {
+    if (!themeFeedbackEl) return;
+    themeFeedbackEl.textContent = langName(lang);
+    themeFeedbackEl.classList.add('show');
+    if (fbTimer) window.clearTimeout(fbTimer);
+    fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshLangBar() {
+    if (langbarEl) langbarEl.setAttribute('aria-label', t('aria_lang_group'));
     if (!langToggleBtn) return;
     langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
     langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
@@ -301,6 +313,7 @@
     fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshThemeBar() {
+    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
@@ -1067,7 +1080,7 @@
     function sizeBoard(table) {
       if (!table || !puzzle) return;
       var cols = puzzle.width;
-      var floorPx = 15;
+      var floorPx = 44; // Touch-Ziel Mindestgroesse (BFSG/WCAG), .picto-board-wrap scrollt ab hier statt weiter zu schrumpfen
       var maxPx = Math.min(48, Math.max(18, Math.round(300 / cols)));
       var tableStyle = window.getComputedStyle(table);
       var wrapStyle = window.getComputedStyle(boardWrap);
@@ -1136,7 +1149,7 @@
               if (st === 1) cell.classList.add('is-filled');
               if (st === 2) cell.classList.add('is-marked');
               var stateKey = st === 1 ? 'cell_filled' : (st === 2 ? 'cell_marked' : 'cell_empty');
-              cell.setAttribute('aria-label', t('aria_cell')(r + 1, c2 + 1, t(stateKey)));
+              cell.setAttribute('aria-label', t('aria_cell')(r + 1, c2 + 1, t(stateKey), puzzle.rowClues[r].join(' '), puzzle.colClues[c2].join(' ')));
               // Roving Tabindex: nur die aktuelle Zelle ist per Tab erreichbar
               cell.tabIndex = (r === curR && c2 === curC) ? 0 : -1;
 
@@ -1146,6 +1159,7 @@
                 var next = (ev.button === 2 || ev.shiftKey) ? (cur === 2 ? 0 : 2) : (cur === 1 ? 0 : 1);
                 pointerMode = next;
                 curR = r; curC = c2;
+                focusAfterRender = true;
                 setCell(r, c2, next);
               });
               cell.addEventListener('pointerenter', function () {

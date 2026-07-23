@@ -327,6 +327,7 @@
     fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshThemeBar() {
+    if (themebarEl) themebarEl.setAttribute('aria-label', t('theme_group'));
     if (!themeToggleBtn) return;
     themeToggleBtn.innerHTML = ICON[THEME_ICON[theme]];
     themeToggleBtn.setAttribute('aria-label', t('theme_group') + ': ' + t('theme_' + theme));
@@ -352,8 +353,20 @@
     var order = ['de', 'en', 'tr'];
     var i = order.indexOf(lang);
     setLang(order[(i + 1) % order.length]);
+    showLangFeedback();
+  }
+
+  // Gleiche Rueckmeldung wie beim Theme Wechsel, damit Screenreader Nutzer
+  // auch den Sprachwechsel per aria-live bestaetigt bekommen.
+  function showLangFeedback() {
+    if (!themeFeedbackEl) return;
+    themeFeedbackEl.textContent = langName(lang);
+    themeFeedbackEl.classList.add('show');
+    if (fbTimer) window.clearTimeout(fbTimer);
+    fbTimer = window.setTimeout(function () { themeFeedbackEl.classList.remove('show'); }, 2200);
   }
   function refreshLangBar() {
+    if (langbarEl) langbarEl.setAttribute('aria-label', t('aria_lang_group'));
     if (!langToggleBtn) return;
     langToggleBtn.innerHTML = ICON.globe + '<span class="lang-code">' + lang.toUpperCase() + '</span>';
     langToggleBtn.setAttribute('aria-label', t('aria_lang_group') + ': ' + langName(lang));
@@ -633,6 +646,10 @@
      Genau hier sitzt die lueckenlose Eingabesperre: ausserhalb von
      'play' wird nichts aufgedeckt, egal ob Klick, Tipp oder Enter. */
   function onActivate(i) {
+    // Cursor auf die tatsaechlich aktivierte Karte synchronisieren, auch bei
+    // Mausklick/Touch, sonst startet die Pfeiltasten-Navigation danach von
+    // einer veralteten Position aus weiter.
+    if (focusIndex !== i) { focusIndex = i; setCursor(); }
     if (phase !== 'play') return;            // gesperrt waehrend preview, flip, levelclear, over
     var card = cards[i];
     if (!card || card.state !== 'down') return; // schon offen oder gefunden

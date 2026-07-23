@@ -241,11 +241,14 @@ button { touch-action: manipulation; }
    9x9 Zahlengitter aus echten Knoepfen. Native Fokussierung und
    Tastatur. Neun Spalten statisch, Blockkanten ueber Klassen.
    ============================================================ */
-.stage { position: relative; width: 100%; margin: 0 auto 14px; }
+/* overflow-x: auto statt Zellen unter die 44px Touch-Ziel Untergrenze
+   schrumpfen zu lassen, siehe .grid min-width unten. */
+.stage { position: relative; width: 100%; margin: 0 auto 14px; overflow-x: auto; }
 .grid {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   width: 100%;
+  min-width: calc(44px * 9);
   margin: 0 auto;
   border: 2px solid var(--grid-strong);
   border-radius: 8px;
@@ -256,7 +259,8 @@ button { touch-action: manipulation; }
 .cell {
   position: relative;
   aspect-ratio: 1 / 1;
-  min-width: 0;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,6 +278,9 @@ button { touch-action: manipulation; }
   cursor: pointer;
   transition: background var(--ease);
 }
+/* Negativer Offset, damit der Fokusring bei Rand-/Eckzellen nicht vom
+   overflow:hidden des .grid abgeschnitten wird. */
+.cell:focus-visible { outline-offset: -3px; }
 .cell:nth-child(9n) { border-right: none; }
 .cell:nth-child(n+73) { border-bottom: none; }
 .cell.blk-right  { border-right: 2px solid var(--grid-strong); }

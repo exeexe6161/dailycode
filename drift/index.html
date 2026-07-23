@@ -59,8 +59,10 @@
 
     <div class="diff-row" id="diffRow" role="group"></div>
 
-    <!-- Punktanzeige als Text, Aenderungen werden angesagt -->
-    <p class="score" id="score" role="status" aria-live="polite"></p>
+    <!-- Punktanzeige als Text. Kein aria-live auf der laufenden Punktzahl,
+         sonst flutet das bei schnellem Spiel Screenreader Nutzer und
+         doppelt sich mit der Ansage im Overlay bei Rundenende. -->
+    <p class="score" id="score"></p>
     <p class="score best" id="best" role="status" aria-live="polite"></p>
 
     <section class="stage" id="stage">

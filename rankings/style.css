@@ -20,6 +20,7 @@
   --focus:       #1f6feb;
 
   --good:        #0f7a4f;
+  --danger:      #b42318;
 
   --halo:            transparent;
   --btn-glow:        transparent;
@@ -45,6 +46,9 @@
   --focus:       #9ab0ff;
 
   --good:        #4ade80;
+  /* #b42318 faellt gegen --surface im Dark Theme auf ca. 2,7:1, unter dem
+     fuer Text geforderten Minimum von 4,5:1 (WCAG 1.4.3). */
+  --danger:      #f87171;
 
   --halo:            rgba(255, 255, 255, .16);
   --btn-glow:        rgba(108, 140, 255, .32);
@@ -65,6 +69,7 @@
     --focus:       #9ab0ff;
 
     --good:        #4ade80;
+    --danger:      #f87171;
 
     --halo:            rgba(255, 255, 255, .16);
     --btn-glow:        rgba(108, 140, 255, .32);
@@ -360,7 +365,7 @@ button { touch-action: manipulation; }
   font-weight: 700;
   cursor: pointer;
 }
-.btn-danger-ghost { color: #b42318; }
+.btn-danger-ghost { color: var(--danger); }
 .btn-danger-ghost:hover { border-color: currentColor; background: var(--surface-2); }
 
 .help { margin: 0 0 8px; color: var(--text-muted); font-size: .9rem; }
