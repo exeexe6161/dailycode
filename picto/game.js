@@ -930,6 +930,11 @@
     }
 
     function loadPuzzleForState() {
+      // Verhindert, dass beim Wechsel zu einem anderen Raetsel der PuzzlePure
+      // Score Block noch die Werte des vorherigen Raetsels zeigt.
+      ppResult = null;
+      lastPpPayload = null;
+      rewardsTriggered = false;
       puzzle = mode === 'daily' ? generateDailyPuzzle(dateStr, difficulty) : generateUnlimitedPuzzle(unlimitedIndex, difficulty);
       var saved = loadProgress(currentPuzzleId());
       if (saved && Array.isArray(saved.player) && saved.player.length === puzzle.height && saved.player[0] && saved.player[0].length === puzzle.width) {
@@ -1045,6 +1050,11 @@
           ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
           markScored(currentPuzzleId());
           rewardsTriggered = false;
+        } else {
+          // Bereits gewertet (z.B. nach "Alles loeschen" erneut geloest):
+          // kein veraltetes Ergebnis eines fruehreren Löse-Versuchs anzeigen.
+          ppResult = null;
+          lastPpPayload = null;
         }
       }
       persistCurrentProgress();

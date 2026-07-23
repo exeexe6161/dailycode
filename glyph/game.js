@@ -434,12 +434,19 @@
     return fb;
   }
 
-  function ensureVowels(arr) {
+  // allowedIdxs beschraenkt, welche Positionen ersetzt werden duerfen (Standard: alle).
+  // Wichtig fuer refill(): dort duerfen nur die frisch gezogenen Positionen angefasst
+  // werden, sonst aendern sich stillschweigend Kacheln, die der Spieler behalten hat.
+  function ensureVowels(arr, allowedIdxs) {
     var guard = 0;
     while (vowelCount(arr, wordLang) < MIN_VOWELS && guard++ < 50) {
       // einen Konsonanten durch einen Vokal ersetzen
       var idx = -1;
-      for (var i = 0; i < arr.length; i++) { if (!isVowel(arr[i], wordLang)) { idx = i; break; } }
+      if (allowedIdxs) {
+        for (var a = 0; a < allowedIdxs.length; a++) { if (!isVowel(arr[allowedIdxs[a]], wordLang)) { idx = allowedIdxs[a]; break; } }
+      } else {
+        for (var i = 0; i < arr.length; i++) { if (!isVowel(arr[i], wordLang)) { idx = i; break; } }
+      }
       if (idx === -1) break;
       var v; do { v = draw(wordLang); } while (!isVowel(v, wordLang));
       arr[idx] = v;
@@ -450,7 +457,7 @@
   function refill(consumed) {
     for (var attempt = 0; attempt < 60; attempt++) {
       for (var c = 0; c < consumed.length; c++) { rack[consumed[c]] = draw(wordLang); }
-      ensureVowels(rack);
+      ensureVowels(rack, consumed);
       if (rackHasWord(rack)) { markFresh(consumed); return; }
     }
     rack = generateRack();           // Fallback: ganzes Rack neu, garantiert spielbar
@@ -659,8 +666,10 @@
   function hideOverlay() { if (overlayEl) overlayEl.hidden = true; }
 
   /* ---------- Wortliste laden, dann Lauf starten ---------- */
+  var wordlistRequestId = 0;
   function loadWordlist(lang) {
     wordLang = lang;
+    if (noticeEl) noticeEl.hidden = true; // TR Hinweis verbergen, sobald eine Spielsprache gewaehlt ist
     // Buchstaben-Anzeige an die SPIELSPRACHE koppeln (nicht an die UI-Sprache).
     // text-transform: uppercase ist locale-abhaengig; unter <html lang="tr">
     // wuerde aus 'i' ein tuerkisches 'İ'. Das lang-Attribut gezielt nur auf
@@ -671,10 +680,11 @@
     migrateOldBest(lang);
     phase = 'loading';
     announce(t('loading'));
+    var requestId = ++wordlistRequestId; // verwirft veraltete Antworten bei schnellem Sprachwechsel
     fetch('words-' + lang + '.txt', { credentials: 'omit' })
       .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.text(); })
-      .then(function (text) { buildSets(text); startRun(); })
-      .catch(function () { phase = 'init'; announce(t('load_err'), 'bad'); });
+      .then(function (text) { if (requestId !== wordlistRequestId) return; buildSets(text); startRun(); })
+      .catch(function () { if (requestId !== wordlistRequestId) return; phase = 'init'; announce(t('load_err'), 'bad'); });
   }
 
   function switchWordLang(lang) {

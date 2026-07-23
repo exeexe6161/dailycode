@@ -789,6 +789,7 @@
   }
 
   function restartGame() {
+    stopLoop();
     reset();
     setPauseLabels();
     hideOverlay();
@@ -929,7 +930,6 @@
     if (el) el.textContent = val;
   }
   function setFooterLinks() {
-    var lang = loadLang();
     if (linkPrivacyEl) linkPrivacyEl.setAttribute('href', '../datenschutz-' + lang + '.html');
     if (linkImprintEl) linkImprintEl.setAttribute('href', '../impressum-' + lang + '.html');
   }

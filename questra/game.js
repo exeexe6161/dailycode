@@ -814,7 +814,7 @@
     var numberEl = document.createElement('span');
     numberEl.className = 'questra-round-number';
     var nextRoundBtn = iconNavButton('chevronRight', function () { goToIndex(unlimitedIndex + 1); }, 'aria_next_round');
-    var randomBtn = iconNavButton('shuffle', function () { goToIndex(randomUnlimitedIndex()); }, 'aria_random_round');
+    var randomBtn = iconNavButton('shuffle', function () { goToIndex(nextRandomUnlimitedIndex()); }, 'aria_random_round');
     unlimitedNav.append(prevBtn, numberEl, nextRoundBtn, randomBtn);
 
     var statusLine = document.createElement('div');
@@ -844,7 +844,7 @@
     actions.className = 'questra-actions';
     var nextBtn = button(t('btn_next'), 'btn', function () { goNext(); });
     nextBtn.hidden = true;
-    var newRoundBtn = button(t('btn_new_round'), 'btn btn-ghost', function () { goToIndex(randomUnlimitedIndex()); });
+    var newRoundBtn = button(t('btn_new_round'), 'btn btn-ghost', function () { goToIndex(nextRandomUnlimitedIndex()); });
     newRoundBtn.hidden = true;
     actions.append(nextBtn, newRoundBtn);
 
@@ -974,6 +974,11 @@
     }
 
     function loadRoundForState(forceFresh) {
+      // Verhindert, dass beim Wechsel der Runde (prev/next/shuffle/neue Runde)
+      // noch das PuzzlePureScore Ergebnis einer anderen Runde angezeigt wird.
+      ppResult = null;
+      lastPpPayload = null;
+      rewardsTriggered = false;
       var key = currentRoundKey();
       if (!forceFresh && state.round && state.round.key === key && state.round.indices.length === 7) {
         indices = state.round.indices;

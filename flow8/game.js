@@ -699,7 +699,8 @@
       if (idx >= 0 && idx < K) {
         e.preventDefault();
         active = idx; pendingStart = 'endpoint'; downCell = endpoints[idx].a;
-        engaged = false; engage(); moved = true;
+        engaged = false; moved = true;
+        if (!connected[idx]) engage(); // bereits verbundene Paare beim reinen Anwaehlen nicht loeschen
         announce('msg_color', { n: idx + 1 });
         afterChange(); requestDraw();
       }
@@ -967,7 +968,7 @@
       canvas.addEventListener('keydown', onKeyDown);
     }
     if (clearBtn) clearBtn.addEventListener('click', function () { if (phase === 'play') { clearAll(); afterChange(); requestDraw(); } });
-    if (newBtn) newBtn.addEventListener('click', newPuzzle);
+    if (newBtn) newBtn.addEventListener('click', function () { if (phase === 'play') newPuzzle(); });
     if (restartBtn) restartBtn.addEventListener('click', restartRun);
     if (overlayBtn) overlayBtn.addEventListener('click', function () { if (phase === 'solved') nextLevel(); });
 

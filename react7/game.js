@@ -313,7 +313,7 @@
   var ppResult = null;
   var lastPpPayload = null;
   var rewardsTriggered = false;
-  var ppRoundId = null;
+  var ppRoundId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('react7') : 'react7:' + Date.now();
   function renderPuzzlePureScore() {
     if (!ppScoreEl) return;
     ppScoreEl.replaceChildren();

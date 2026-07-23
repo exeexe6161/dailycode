@@ -721,6 +721,11 @@
       ppResult = window.PuzzlePureScore.recordResult(lastPpPayload);
       saveSolvedSeed(difficulty, currentSeed);
       rewardsTriggered = false;
+    } else {
+      // Bereits fuer diesen Seed gewertet: kein veraltetes Ergebnis eines
+      // anderen Raetsels im Sieg Overlay anzeigen.
+      ppResult = null;
+      lastPpPayload = null;
     }
     showOverlay(t('win_title'),
       fmt('win_time', { t: fmtTime(sec) }) + '  ·  ' + fmt('win_best', { t: fmtTime(bestSec) }),

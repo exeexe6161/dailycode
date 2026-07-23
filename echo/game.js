@@ -447,7 +447,7 @@
   var ppResult = null;
   var lastPpPayload = null;
   var rewardsTriggered = false;
-  var ppRoundId = null;
+  var ppRoundId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('echo') : 'echo:' + Date.now();
   var pairsThisLevel = START_PAIRS;
   var foundPairs = 0;
   var firstPick = -1;

@@ -362,7 +362,7 @@
   var ppResult = null;
   var lastPpPayload = null;
   var rewardsTriggered = false;
-  var ppRoundId = null;
+  var ppRoundId = window.PuzzlePureScore ? window.PuzzlePureScore.newRoundId('cluster') : 'cluster:' + Date.now();
 
   var recent = [];              // zuletzt erzeugte Typen, begrenzt Wiederholungen
   var flashes = [];             // { r, c, type, t0 } dezente Aufloese-Blende, nur Zier
@@ -845,6 +845,7 @@
 
   /* ---------- Touch auf dem Feld: Tippen und Wischen ---------- */
   var tStartX = 0, tStartY = 0, tActive = false, tMoved = false;
+  var lastTouchAt = 0; // sperrt nachfolgende synthetische Maus Events nach echtem Touch
   function bindFieldTouch() {
     if (!canvas) return;
     canvas.addEventListener('touchstart', function (e) {
@@ -869,6 +870,7 @@
       }
     }, { passive: false });
     canvas.addEventListener('touchend', function (e) {
+      lastTouchAt = Date.now();
       setSoftDrop(false);
       if (tActive && !tMoved) {
         // Tippen ohne Wischen: ein Schritt zur angetippten Seite (kein Durchklippen).
@@ -888,6 +890,7 @@
   function bindFieldMouse() {
     if (!canvas) return;
     canvas.addEventListener('mousedown', function (e) {
+      if (Date.now() - lastTouchAt < 800) return; // synthetische Maus Events nach Touch ignorieren
       mActive = true; mMoved = false;
       mStartX = e.clientX;
       mStartY = e.clientY;
@@ -964,6 +967,9 @@
       showOverlay(t('over_title'),
         t('score') + ' ' + score + (best != null ? '  ·  ' + t('lbl_best') + ' ' + best : ''),
         t('over_restart'));
+      if (ppScoreMountEl && ppResult && window.PuzzlePureScore) {
+        ppScoreMountEl.replaceChildren(window.PuzzlePureScore.buildResultBlock(lang, ppResult));
+      }
     } else if (paused) {
       showOverlay(t('pause'), '', t('resume'));
     }
