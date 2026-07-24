@@ -114,7 +114,7 @@
       msg_correct: 'Correct',
       msg_wrong: 'Wrong',
       msg_timeout: 'Time is up',
-      msg_lives_left: '{n} lives left',
+      msg_lives_left: 'Lives left: {n}',
       msg_paused: 'Paused',
       msg_resumed: 'Resumed',
       over_title: 'Game over',
