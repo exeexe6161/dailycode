@@ -13,23 +13,27 @@
   'use strict';
 
   /* ---------- Spielkonstanten ----------
-     Schrittzeit sinkt mit der Punktzahl stufenweise bis zu einer
-     Obergrenze (STEP_MIN), darunter wird nicht weiter beschleunigt. */
+     Schrittzeit sinkt mit der Punktzahl stufenweise bis zu einer je
+     Schwierigkeit eigenen Untergrenze (STEP_MIN_BY_DIFF unten), darunter
+     wird nicht weiter beschleunigt. */
   var GRID = 17;                 // Raster 17 x 17
   var STEP_BASE = 150;           // ms pro Schritt bei Punktzahl 0, Mittel (bisheriges Verhalten)
-  var STEP_MIN = 70;             // Obergrenze fuer das Tempo (untere ms Grenze), fuer alle Stufen gleich
   var STEP_DEC = 12;             // ms schneller je Stufe, fuer alle Stufen gleich
   var POINTS_PER_LEVEL = 4;      // alle 4 Punkte eine Stufe schneller
   var START_LEN = 3;             // Anfangslaenge der Kette
   var SWIPE_MIN = 24;            // Mindestweg fuer eine Wischgeste in px
 
-  /* Schwierigkeit ueber das Starttempo (STEP_BY_DIFF). Mittel (2) entspricht
-     exakt dem bisherigen Verhalten (STEP_BASE oben). STEP_MIN und STEP_DEC
-     bleiben fuer alle Stufen gleich, nur der Startwert unterscheidet sich,
-     daher bleibt die Beschleunigungskurve gleich, nur verschoben. Kein
-     Timer, ein Endlosmodus soll fuer langes Ueberleben nicht bestraft
-     werden (siehe Batch 3 Konzept). */
+  /* Schwierigkeit ueber Starttempo UND eigene Untergrenze je Stufe
+     (STEP_BY_DIFF/STEP_MIN_BY_DIFF). Eine gemeinsame Untergrenze liess bei
+     langen Laeufen alle vier Stufen auf dasselbe Tempo zulaufen (Experte
+     erreichte sie schon nach wenigen Punkten), danach fuehlten sich alle
+     Stufen gleich an. Jede Stufe hat jetzt ihre eigene Untergrenze, damit
+     der Tempo-Abstand ueber den ganzen Lauf erhalten bleibt. Mittel (2)
+     entspricht weiterhin exakt dem bisherigen Verhalten. Kein Timer, ein
+     Endlosmodus soll fuer langes Ueberleben nicht bestraft werden (siehe
+     Batch 3 Konzept). */
   var STEP_BY_DIFF = { 1: 180, 2: STEP_BASE, 3: 120, 4: 95 };
+  var STEP_MIN_BY_DIFF = { 1: 100, 2: 80, 3: 65, 4: 50 };
 
   /* ---------- Sprachen: alle sichtbaren Strings und aria-labels ----------
      Struktur und Fallback-Muster identisch zu code/game.js (PuzzlePure Code). */
@@ -479,7 +483,8 @@
   function updateSpeed() {
     level = Math.floor(score / POINTS_PER_LEVEL);
     var base = STEP_BY_DIFF[difficulty] || STEP_BASE;
-    stepMs = Math.max(STEP_MIN, base - level * STEP_DEC);
+    var floor = STEP_MIN_BY_DIFF[difficulty] || STEP_MIN_BY_DIFF[2];
+    stepMs = Math.max(floor, base - level * STEP_DEC);
   }
 
   function updateScore() {
