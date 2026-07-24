@@ -35,22 +35,29 @@
   'use strict';
 
   /* ---------- Progression (dokumentiert): Gitter und Paarzahl je Stufe ----------
-     Stufe 1..2 -> 5x5 / 3 Paare, 3..4 -> 6x6 / 4, 5..6 -> 7x7 / 5,
-     ab 7 -> 8x8 / 6. Obergrenze 8x8 (touchfreundlich, Felder >= 44px). */
+     Jede Stufe aendert das Raster oder die Paarzahl, keine zwei aufeinander-
+     folgenden Stufen sind mehr identisch: 1 -> 5x5/3, 2 -> 5x5/4, 3 -> 6x6/4,
+     4 -> 6x6/5, 5 -> 7x7/5, 6 -> 7x7/6, ab 7 -> 8x8/6. Obergrenze 8x8
+     (touchfreundlich, Felder >= 44px) und 6 Paare (COL.paths hat genau 6
+     Farben, mehr Paare wuerden Farben wiederverwenden und Paare optisch
+     nicht mehr unterscheidbar machen). */
   function levelConfig(level) {
-    if (level <= 2) return { N: 5, K: 3 };
-    if (level <= 4) return { N: 6, K: 4 };
-    if (level <= 6) return { N: 7, K: 5 };
+    if (level === 1) return { N: 5, K: 3 };
+    if (level === 2) return { N: 5, K: 4 };
+    if (level === 3) return { N: 6, K: 4 };
+    if (level === 4) return { N: 6, K: 5 };
+    if (level === 5) return { N: 7, K: 5 };
+    if (level === 6) return { N: 7, K: 6 };
     return { N: 8, K: 6 };
   }
-  // Kein Schwierigkeit Waehler vorhanden. Fuer PuzzlePureScore wird dieselbe
-  // Stufeneinteilung wie levelConfig() oben als difficulty 1 bis 4 verwendet,
-  // keine neue Spielmechanik, nur dieselben Schwellen fuer den Score Payload.
+  // Kein Schwierigkeit Waehler vorhanden. Fuer PuzzlePureScore steigt die
+  // gemeldete Schwierigkeit bei jeder Stufe an, bis die vom Score System
+  // vorgegebene Obergrenze (Stufe 4) erreicht ist; danach bleiben Stufen mit
+  // dem Punktemultiplikator konstant, das Raster wird ueber levelConfig()
+  // oben trotzdem bis Stufe 6 weiter schwerer.
   function ppDifficultyFromLevel(lvl) {
-    if (lvl <= 2) return 1;
-    if (lvl <= 4) return 2;
-    if (lvl <= 6) return 3;
-    return 4;
+    if (lvl >= 4) return 4;
+    return lvl;
   }
   var MIN_SEG = 3; // Mindestlaenge je Segment, damit Endpunkte distinkt sind
 
